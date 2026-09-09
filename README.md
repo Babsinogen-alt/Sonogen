@@ -1,44 +1,42 @@
 # Babsinogen
 
-Clinical ultrasound decision-support tool for obstetric biometry, Doppler, anomaly markers, organ size, and **serial folliculometry**.
+Clinical decision-support for obstetric biometry, Doppler, anomaly markers, organ size, and **serial folliculometry**.
 
 Live site: [https://babsinogen-alt.github.io/Sonogen/](https://babsinogen-alt.github.io/Sonogen/)
 
-This is a **static GitHub Pages app**. Open `index.html` in a browser, or use the live URL. Nothing is sent to a server. Patient episodes stay on the device (IndexedDB / localStorage) and only after explicit consent.
-
-## Edit the code on GitHub
-
-1. Open [`index.html`](https://github.com/Babsinogen-alt/Sonogen/blob/main/index.html).
-2. Click the pencil icon.
-3. Commit the change.
-4. GitHub Pages republishes in about a minute.
-
-Other files:
-
-| File | Role |
-|---|---|
-| `index.html` | The entire app (HTML, CSS, clinical engines, folliculometry) |
-| `manifest.json` | Installable PWA name and icons |
-| `sw.js` | Offline cache. Bump `CACHE_NAME` after a major change so visitors get the new version |
-| `icon-192.png` / `icon-512.png` | App icons |
-
-Do **not** upload `node_modules` or a `.zip`. GitHub Pages serves these files as-is.
+This repository is a **static GitHub Pages app** (`index.html` plus icons). Open the file in GitHub and use the pencil icon to edit. Nothing is sent to a server — measurements stay in the browser (optional IndexedDB log, local folliculometry series).
 
 ## Modules
 
-1. **Dating & EDD** — LMP (Naegele), CRL (Robinson & Fleming), MSD, ACOG 700 redating
-2. **Biometry** — Hadlock EFW I–IV, head shape, growth centiles
-3. **Doppler** — INTERGROWTH-21st UA-PI centiles, Mari MCA-PSV, CPR, uterine artery, ductus venosus
-4. **Anomaly** — structured markers
-5. **Folliculometry** — serial follicle tracking with cycle-aware, trend-based interpretation
-6. **Organ size** — age-referenced measurements
-7. **Reports & log** — printable summary; optional on-device save
-8. **Quiz** — teaching bank including folliculometry
+1. **Dating & EDD** — LMP (Naegele), CRL (Robinson–Fleming), MSD fallback, ACOG/AIUM/SMFM Committee Opinion 700 redating, FHR ranges
+2. **Biometry** — HC / cephalic index / shape-corrected BPD, Hadlock I–IV EFW, Hadlock 1984 GA, growth centiles 24–41 weeks
+3. **Doppler** — UA-PI (INTERGROWTH-21st LMS centiles), AEDF/REDF, MCA-PSV (Mari), CPR, uterine artery, ductus venosus
+4. **Anomaly** — structured markers (CNS, NT, chest, renal, liquor, placenta)
+5. **Folliculometry** — serial follicle tracking, cycle-aware interpretation (natural / irregular / OI / IUI / ART), ovulation-sign scoring, endometrial correlation, end-of-tracking impression
+6. **Organ size** — age-graded references
+7. **Reports & Log** — printable summary; optional on-device save with explicit consent
+8. **Quiz** — six topical banks, 20 clinical-scenario questions each (Dating, Biometry, Doppler, Anomaly, Folliculometry, Gynaecology & organ size)
+9. **References** — bibliography for every formula and threshold used in the app
 
-## Folliculometry
+## Folliculometry (how it thinks)
 
-Interpretation is **trend-based**, not a 28-day calendar. Expected ovulation ≈ cycle length − luteal length (default 14 days, range 12–16). Ovulation is inferred from a **cluster of signs** (collapse, crenation, internal echoes, free fluid, corpus luteum, endometrial shift), never from follicle size or cycle day alone. Wording is conservative: “consistent with”, “probable”, “indeterminate”.
+- Trends over time matter more than a single diameter.
+- Expected ovulation ≈ **cycle length − luteal length** (default luteal 14 days, typical 12–16). A 28-day cycle is **not** assumed.
+- Mature/pre-ovulatory size is a **range** (often ~18–25 mm in natural cycles; stimulated trigger size is protocol-dependent, often ~16–22 mm).
+- Ovulation is inferred from a **cluster of signs** (collapse or ≥30% shrinkage, crenation, internal echoes, pouch-of-Douglas fluid, corpus luteum, trilaminar→secretory shift). Two signs = probable; three or more with collapse or a typical corpus luteum = consistent with ovulation. Ultrasound cannot prove oocyte release.
+- If serial data are weak, the report says so and recommends a repeat scan.
+
+Teaching series are on the Folliculometry tab: **Load ovulatory example** and **Load irregular / inconclusive**.
+
+## How to edit on GitHub
+
+1. Open [index.html](./index.html).
+2. Click the pencil.
+3. Commit changes to `main`.
+4. GitHub Pages rebuilds in about a minute. If you previously installed the PWA, do a hard refresh so `sw.js` can pick up cache `babsinogen-v6`.
+
+Do **not** upload a `.zip` as a single file. GitHub Pages serves the unzipped files at the repository root.
 
 ## Disclaimer
 
-Decision support only. Not a substitute for clinical judgement, departmental protocol, or formal reporting systems.
+Decision support only. Correlate every flag with clinical findings, departmental protocol, and serial trends. Not a substitute for clinical judgement.
