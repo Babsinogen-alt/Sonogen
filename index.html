@@ -211,6 +211,9 @@
     font-size: 11px; padding: 8px 12px; border-radius: 999px; min-height: 36px; box-shadow: var(--shadow);
   }
   .log-entry-actions button.danger { color: var(--danger); }
+  .f-patient-list { margin-top: 12px; max-height: 260px; overflow: auto; }
+  .log-entry.f-on { box-shadow: 0 0 0 2px var(--accent); }
+  .f-id-chip { font-family: var(--display); font-size: 18px; color: var(--accent); margin: 4px 0 10px; }
 
   .quiz-option {
     display: block; width: 100%; text-align: left; background: var(--panel2); border: 1px solid transparent;
@@ -531,6 +534,32 @@
     <div class="layout">
       <div>
         <div class="card">
+          <div class="card-title">Patient folders <span class="chip" id="f-patient-count"></span></div>
+          <p class="subhead">One folder per woman and tracking cycle, kept on this device. Search by initials or clinic ID, then open to add or edit scans. Nothing is uploaded.</p>
+          <div class="grid2">
+            <div class="field"><label>Search</label><div class="row"><input id="f-patient-search" type="search" placeholder="Initials, clinic ID, or day-1 date" autocomplete="off"></div></div>
+            <div class="field"><label>&nbsp;</label><div class="row"><button type="button" class="btn-primary" id="f-new-patient" style="width:100%;">New patient</button></div></div>
+          </div>
+          <div class="f-patient-list" id="f-patient-list"></div>
+          <div id="f-patient-editor" style="display:none;">
+            <div class="hairline">
+              <div class="f-id-chip" id="f-patient-heading">Current folder</div>
+              <div class="grid2">
+                <div class="field"><label>Initials</label><div class="row"><input id="f-initials" type="text" maxlength="12" placeholder="e.g. A.O." autocomplete="off"></div></div>
+                <div class="field"><label>Clinic ID / MRN</label><div class="row"><input id="f-mrn" type="text" maxlength="24" placeholder="folder number" autocomplete="off"></div></div>
+              </div>
+              <div class="field"><label>Folder note (optional)</label><div class="row"><input id="f-pnote" type="text" maxlength="80" placeholder="e.g. IUI cycle 2"></div></div>
+              <p class="note">Use initials and a clinic ID — not a full name — so the folder is findable without storing more than you need.</p>
+              <div class="btn-row">
+                <button type="button" class="btn-ghost" id="f-close-patient">Close folder</button>
+                <button type="button" class="btn-danger" id="f-delete-patient" style="width:auto;">Delete this patient</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="f-workspace" style="display:none">
+        <div class="card">
           <div class="card-title">Cycle Context</div>
           <p class="subhead">Interpretation is trend-based and cycle-aware. Cycle length is not assumed to be 28 days. Expected ovulation is modelled as cycle length minus luteal length (default 14 days, typical range 12–16).</p>
           <div class="field">
@@ -687,14 +716,15 @@
           </div>
           <p class="note" id="f-save-msg"></p>
         </div>
+        </div><!-- /f-workspace -->
 
         <div class="card">
           <div class="card-title">Worked examples</div>
-          <p class="subhead">Loads a de-identified teaching series so you can see how wording and labels behave. Does not overwrite saved patient log episodes.</p>
+          <p class="subhead">Loads a de-identified teaching series into its own folder so you can see how wording and labels behave. Named patient folders are left untouched.</p>
           <div class="btn-row">
             <button type="button" class="btn-ghost" id="f-demo-normal">Load ovulatory example</button>
             <button type="button" class="btn-ghost" id="f-demo-irregular">Load irregular / inconclusive</button>
-            <button type="button" class="btn-danger" id="f-reset-series" style="width:auto;">Clear this series</button>
+            <button type="button" class="btn-danger" id="f-reset-series" style="width:auto;">Clear scans in this folder</button>
           </div>
         </div>
       </div>
@@ -2537,18 +2567,165 @@
   /* =========================================================================
      FOLLICULOMETRY — serial tracking + conservative interpretation engine
      ========================================================================= */
-  var F_STORE = "babsinogen.follicle.v1";
+  var F_STORE = "babsinogen.follicle.v2";
+  var F_STORE_OLD = "babsinogen.follicle.v1";
   var fEditingId = null;
+  var fSearchQ = "";
 
+  function fNewId(prefix) {
+    return (prefix || "p") + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+  function fBlankCycle() {
+    return { type: "natural", cd1: "", cycleLen: "28", luteal: "14", triggerDate: "", triggerType: "none" };
+  }
+  function fBlankRecord(partial) {
+    var rec = {
+      id: fNewId("p"),
+      initials: "",
+      mrn: "",
+      note: "",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      cycle: fBlankCycle(),
+      scans: []
+    };
+    if (partial) {
+      Object.keys(partial).forEach(function (k) { rec[k] = partial[k]; });
+    }
+    return rec;
+  }
+  function fNormalizeStore(raw) {
+    if (!raw || typeof raw !== "object") return { records: [], activeId: null };
+    if (Array.isArray(raw.records)) {
+      return { records: raw.records, activeId: raw.activeId || null };
+    }
+    var rec = fBlankRecord({
+      id: "migrated",
+      initials: "",
+      mrn: "",
+      note: "Imported previous series",
+      cycle: raw.cycle || fBlankCycle(),
+      scans: raw.scans || []
+    });
+    return { records: [rec], activeId: rec.id };
+  }
   function fState() {
     try {
       var raw = localStorage.getItem(F_STORE);
-      if (raw) return JSON.parse(raw);
+      if (raw) return fNormalizeStore(JSON.parse(raw));
+      var old = localStorage.getItem(F_STORE_OLD);
+      if (old) {
+        var migrated = fNormalizeStore(JSON.parse(old));
+        fSaveState(migrated);
+        return migrated;
+      }
     } catch (e) {}
-    return { cycle: {}, scans: [] };
+    return { records: [], activeId: null };
   }
   function fSaveState(s) {
     try { localStorage.setItem(F_STORE, JSON.stringify(s)); } catch (e) {}
+  }
+  function fActive(st) {
+    st = st || fState();
+    if (!st.activeId) return null;
+    for (var i = 0; i < (st.records || []).length; i++) {
+      if (st.records[i].id === st.activeId) return st.records[i];
+    }
+    return null;
+  }
+  function fPatientLabel(rec) {
+    if (!rec) return "No folder open";
+    var bits = [rec.initials, rec.mrn].map(function (x) { return (x || "").trim(); }).filter(Boolean);
+    if (bits.length) return bits.join(" · ");
+    if (rec.note) return rec.note;
+    if (rec.cycle && rec.cycle.cd1) return "Day 1 " + rec.cycle.cd1;
+    return "Untitled folder";
+  }
+  function fRecordHaystack(rec) {
+    var last = "";
+    var scans = rec.scans || [];
+    if (scans.length) last = scans[scans.length - 1].date || "";
+    return [rec.initials, rec.mrn, rec.note, rec.cycle && rec.cycle.cd1, rec.cycle && rec.cycle.type, last].join(" ").toLowerCase();
+  }
+  function fReadIdentity() {
+    return {
+      initials: val("f-initials").trim(),
+      mrn: val("f-mrn").trim(),
+      note: val("f-pnote").trim()
+    };
+  }
+  function fWriteIdentity(rec) {
+    document.getElementById("f-initials").value = rec && rec.initials ? rec.initials : "";
+    document.getElementById("f-mrn").value = rec && rec.mrn ? rec.mrn : "";
+    document.getElementById("f-pnote").value = rec && rec.note ? rec.note : "";
+  }
+  function fFlushActive() {
+    var st = fState();
+    var rec = fActive(st);
+    if (!rec) return st;
+    rec.cycle = fReadCycle();
+    var idn = fReadIdentity();
+    rec.initials = idn.initials;
+    rec.mrn = idn.mrn;
+    rec.note = idn.note;
+    rec.updatedAt = new Date().toISOString();
+    fSaveState(st);
+    return st;
+  }
+  function fSelectPatient(id) {
+    var st = fState();
+    if (st.activeId && st.activeId !== id) fFlushActive();
+    st = fState();
+    st.activeId = id || null;
+    fSaveState(st);
+    fEditingId = null;
+    var rec = fActive(st);
+    if (rec) {
+      fWriteIdentity(rec);
+      fWriteCycle(rec.cycle || {});
+      fClearForm();
+    } else {
+      fWriteIdentity({});
+      fWriteCycle(fBlankCycle());
+      fClearForm();
+    }
+    renderFolliculometry();
+  }
+  function fCreatePatient() {
+    fFlushActive();
+    var rec = fBlankRecord();
+    var st = fState();
+    st.records = st.records || [];
+    st.records.unshift(rec);
+    st.activeId = rec.id;
+    fSaveState(st);
+    fWriteIdentity(rec);
+    fWriteCycle(rec.cycle);
+    fClearForm();
+    set("f-save-msg", "New folder. Add initials or a clinic ID so you can find it later.");
+    renderFolliculometry();
+    var el = document.getElementById("f-initials");
+    if (el) el.focus();
+  }
+  function fDeleteActivePatient() {
+    var st = fState();
+    var rec = fActive(st);
+    if (!rec) return;
+    var label = fPatientLabel(rec);
+    if (!confirm("Delete the folder “" + label + "” and all of its scans from this device? This cannot be undone.")) return;
+    st.records = (st.records || []).filter(function (r) { return r.id !== rec.id; });
+    st.activeId = st.records.length ? st.records[0].id : null;
+    fSaveState(st);
+    var next = fActive(st);
+    if (next) {
+      fWriteIdentity(next);
+      fWriteCycle(next.cycle || {});
+    } else {
+      fWriteIdentity({});
+      fWriteCycle(fBlankCycle());
+    }
+    fClearForm();
+    renderFolliculometry();
   }
   function fMeanDiam(f) {
     var ds = [num(f.d1), num(f.d2), num(f.d3)].filter(function (x) { return x != null && x > 0; });
@@ -2898,8 +3075,8 @@
     set("f-save-msg", "");
   }
   function fAutoCycleDay() {
-    var st = fState();
-    var cd1 = val("f-cd1") || (st.cycle && st.cycle.cd1);
+    var rec = fActive();
+    var cd1 = val("f-cd1") || (rec && rec.cycle && rec.cycle.cd1);
     var sd = val("f-scan-date");
     if (cd1 && sd) {
       var cd = fCycleDay(sd, cd1, null);
@@ -2950,22 +3127,77 @@
       return '<circle cx="' + x(p.cd).toFixed(1) + '" cy="' + y(p.mean).toFixed(1) + '" r="3.5" fill="#C45C4A"/>';
     }).join("");
     var grid = [10, 16, 18, 25].filter(function (g) { return g < maxMm; }).map(function (g) {
-      return '<line x1="' + mL + '" y1="' + y(g) + '" x2="' + (W - mR) + '" y2="' + y(g) + '" stroke="#262F39"/><text x="4" y="' + (y(g) + 3) + '" fill="#8792A0" font-size="10" font-family="ui-monospace,monospace">' + g + '</text>';
+      return '<line x1="' + mL + '" y1="' + y(g) + '" x2="' + (W - mR) + '" y2="' + y(g) + '" stroke="#E6D7C6"/><text x="4" y="' + (y(g) + 3) + '" fill="#6A6158" font-size="10" font-family="ui-monospace,monospace">' + g + '</text>';
     }).join("");
     return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Leading follicle growth">' +
-      '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="#171D24"/>' + grid +
+      '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="#FFFBF6" rx="10"/>' + grid +
       '<polyline fill="none" stroke="#C45C4A" stroke-width="1.6" points="' + poly + '"/>' + dots +
-      '<text x="' + (W / 2) + '" y="' + (H - 6) + '" text-anchor="middle" fill="#8792A0" font-size="10" font-family="ui-monospace,monospace">Cycle day</text>' +
+      '<text x="' + (W / 2) + '" y="' + (H - 6) + '" text-anchor="middle" fill="#6A6158" font-size="10" font-family="ui-monospace,monospace">Cycle day</text>' +
       '</svg><div class="chart-legend"><span><span class="sw" style="background:#C45C4A"></span>Leading follicle mean diameter (mm)</span></div>';
   }
-  function renderFolliculometry() {
+  function fRenderPatientList() {
     var st = fState();
-    st.cycle = fReadCycle();
-    var scans = fSortedScans(st.scans);
-    var cycle = st.cycle;
+    var q = (fSearchQ || "").trim().toLowerCase();
+    var rows = (st.records || []).slice().sort(function (a, b) {
+      return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+    });
+    if (q) {
+      rows = rows.filter(function (r) { return fRecordHaystack(r).indexOf(q) !== -1; });
+    }
+    var countEl = document.getElementById("f-patient-count");
+    if (countEl) countEl.textContent = st.records && st.records.length ? String(st.records.length) : "";
+    var editor = document.getElementById("f-patient-editor");
+    var heading = document.getElementById("f-patient-heading");
+    var rec = fActive(st);
+    if (editor) editor.style.display = rec ? "block" : "none";
+    if (heading && rec) heading.textContent = fPatientLabel(rec);
+    var ws = document.getElementById("f-workspace");
+    if (ws) ws.style.display = rec ? "block" : "none";
+
+    if (!(st.records || []).length) {
+      set("f-patient-list", '<p class="empty">No folders yet. Create a patient to start a tracking cycle.</p>');
+      return;
+    }
+    if (!rows.length) {
+      set("f-patient-list", '<p class="empty">No folder matches “' + fEsc(fSearchQ) + '”.</p>');
+      return;
+    }
+    set("f-patient-list", rows.map(function (r) {
+      var n = (r.scans || []).length;
+      var last = n && r.scans[n - 1] && r.scans[n - 1].date ? formatDate(parseLocalDate(r.scans[n - 1].date)) : "no scans";
+      var meta = [];
+      if (r.cycle && r.cycle.cd1) meta.push("Day 1 " + formatDate(parseLocalDate(r.cycle.cd1)));
+      if (r.cycle && r.cycle.type) meta.push(r.cycle.type);
+      meta.push(n + " scan" + (n === 1 ? "" : "s"));
+      meta.push(last);
+      return '<div class="log-entry' + (r.id === st.activeId ? " f-on" : "") + '">' +
+        '<div class="log-entry-top"><span class="log-entry-title">' + fEsc(fPatientLabel(r)) + '</span>' +
+        '<span class="log-entry-date">' + fEsc((r.updatedAt || "").slice(0, 10)) + '</span></div>' +
+        '<div class="note" style="margin:0;">' + fEsc(meta.join(" · ")) + (r.note ? " · " + fEsc(r.note) : "") + '</div>' +
+        '<div class="log-entry-actions"><button type="button" data-fopen="' + fEsc(r.id) + '">' +
+        (r.id === st.activeId ? "Editing" : "Open / edit") + '</button></div></div>';
+    }).join(""));
+    document.querySelectorAll("[data-fopen]").forEach(function (b) {
+      b.addEventListener("click", function () { fSelectPatient(b.getAttribute("data-fopen")); });
+    });
+  }
+  function renderFolliculometry() {
+    fRenderPatientList();
+    var rec = fActive();
+    if (!rec) {
+      set("f-series-card", '<div class="card-title">Serial scans</div><p class="empty">Open or create a patient folder to start a series.</p>');
+      set("f-chart-card", '<div class="card-title">Follicle growth trend</div><p class="empty">Select a patient first.</p>');
+      set("f-scan-report-card", '<div class="card-title">Latest scan report</div><p class="empty">Select a patient first.</p>');
+      set("f-trend-card", '<div class="card-title">Trend interpretation</div><p class="empty">Select a patient first.</p>');
+      set("f-final-card", '<div class="card-title">End-of-tracking interpretation</div><p class="empty">Select a patient first.</p>');
+      return;
+    }
+    rec.cycle = fReadCycle();
+    var scans = fSortedScans(rec.scans);
+    var cycle = rec.cycle;
     var exp = fExpectedOvDay(cycle.cycleLen, cycle.luteal);
 
-    var seriesHtml = '<div class="card-title">Serial scans <span class="chip">' + scans.length + '</span></div>';
+    var seriesHtml = '<div class="card-title">Serial scans — ' + fEsc(fPatientLabel(rec)) + ' <span class="chip">' + scans.length + '</span></div>';
     if (cycle.cd1) {
       seriesHtml += '<p class="note" style="margin-top:0;">Day 1 ' + formatDate(parseLocalDate(cycle.cd1)) +
         ' · ' + (cycle.type || "natural") + ' cycle · expected ovulation around day ' + exp +
@@ -3013,16 +3245,19 @@
     document.querySelectorAll("[data-fdel]").forEach(function (b) {
       b.addEventListener("click", function () {
         if (!confirm("Delete this scan from the series?")) return;
-        var st2 = fState();
-        st2.scans = (st2.scans || []).filter(function (s) { return s.id !== b.getAttribute("data-fdel"); });
+        var st2 = fFlushActive();
+        var rec2 = fActive(st2);
+        if (!rec2) return;
+        rec2.scans = (rec2.scans || []).filter(function (s) { return s.id !== b.getAttribute("data-fdel"); });
+        rec2.updatedAt = new Date().toISOString();
         fSaveState(st2);
         renderFolliculometry();
       });
     });
   }
   function fLoadScan(id) {
-    var st = fState();
-    var s = (st.scans || []).filter(function (x) { return x.id === id; })[0];
+    var rec = fActive();
+    var s = rec && (rec.scans || []).filter(function (x) { return x.id === id; })[0];
     if (!s) return;
     fEditingId = id;
     document.getElementById("f-scan-date").value = s.date || "";
@@ -3064,9 +3299,7 @@
     };
   }
   function fPersistCycle() {
-    var st = fState();
-    st.cycle = fReadCycle();
-    fSaveState(st);
+    fFlushActive();
   }
   function isoAdd(iso, days) {
     var d = parseLocalDate(iso);
@@ -3101,15 +3334,37 @@
         ]
       };
     }
-    fSaveState(st);
-    fWriteCycle(st.cycle);
-    fClearForm();
-    renderFolliculometry();
-    set("f-save-msg", kind === "normal" ? "Loaded a typical ovulatory teaching series." : "Loaded an irregular, inconclusive teaching series.");
+    fFlushActive();
+    var rec = fBlankRecord({
+      id: kind === "normal" ? "demo-ovulatory" : "demo-irregular",
+      initials: kind === "normal" ? "EX" : "IR",
+      mrn: kind === "normal" ? "TEACH-OV" : "TEACH-IR",
+      note: kind === "normal" ? "Teaching — ovulatory" : "Teaching — irregular",
+      cycle: st.cycle,
+      scans: st.scans
+    });
+    var store = fState();
+    var found = -1;
+    (store.records || []).forEach(function (r, i) { if (r.id === rec.id) found = i; });
+    if (found >= 0) store.records[found] = rec;
+    else {
+      store.records = store.records || [];
+      store.records.unshift(rec);
+    }
+    store.activeId = rec.id;
+    fSaveState(store);
+    fSelectPatient(rec.id);
+    set("f-save-msg", kind === "normal" ? "Loaded a typical ovulatory teaching series (own folder)." : "Loaded an irregular, inconclusive teaching series (own folder).");
   }
   function initFolliculometry() {
-    var st = fState();
-    fWriteCycle(st.cycle || {});
+    var rec = fActive();
+    if (rec) {
+      fWriteIdentity(rec);
+      fWriteCycle(rec.cycle || {});
+    } else {
+      fWriteIdentity({});
+      fWriteCycle(fBlankCycle());
+    }
     if (!val("f-cycle-len")) document.getElementById("f-cycle-len").value = "28";
     if (!val("f-luteal")) document.getElementById("f-luteal").value = "14";
     fRenderFollicleRows([fDefaultFollicle(), fDefaultFollicle()]);
@@ -3125,6 +3380,28 @@
         renderFolliculometry();
       });
     });
+    ["f-initials","f-mrn","f-pnote"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("change", function () { fFlushActive(); renderFolliculometry(); });
+      el.addEventListener("blur", function () { fFlushActive(); fRenderPatientList(); });
+    });
+    document.getElementById("f-patient-search").addEventListener("input", function (e) {
+      fSearchQ = e.target.value || "";
+      fRenderPatientList();
+    });
+    document.getElementById("f-new-patient").addEventListener("click", fCreatePatient);
+    document.getElementById("f-close-patient").addEventListener("click", function () {
+      fFlushActive();
+      var st = fState();
+      st.activeId = null;
+      fSaveState(st);
+      fWriteIdentity({});
+      fWriteCycle(fBlankCycle());
+      fClearForm();
+      renderFolliculometry();
+    });
+    document.getElementById("f-delete-patient").addEventListener("click", fDeleteActivePatient);
     document.getElementById("f-add-foll").addEventListener("click", function () {
       var fol = fReadFolliclesFromForm();
       fol.push(fDefaultFollicle());
@@ -3133,23 +3410,36 @@
     document.getElementById("f-save-scan").addEventListener("click", function () {
       var scan = fCollectScan();
       if (!scan) { set("f-save-msg", "Scan date is required."); return; }
-      var st2 = fState();
-      st2.cycle = fReadCycle();
-      st2.scans = st2.scans || [];
+      var st2 = fFlushActive();
+      var rec2 = fActive(st2);
+      if (!rec2) {
+        fCreatePatient();
+        st2 = fFlushActive();
+        rec2 = fActive(st2);
+      }
+      if (!rec2) { set("f-save-msg", "Open or create a patient folder first."); return; }
+      rec2.cycle = fReadCycle();
+      rec2.scans = rec2.scans || [];
       var idx = -1;
-      st2.scans.forEach(function (s, i) { if (s.id === scan.id) idx = i; });
-      if (idx >= 0) st2.scans[idx] = scan; else st2.scans.push(scan);
+      rec2.scans.forEach(function (s, i) { if (s.id === scan.id) idx = i; });
+      if (idx >= 0) rec2.scans[idx] = scan; else rec2.scans.push(scan);
+      rec2.updatedAt = new Date().toISOString();
       fSaveState(st2);
       fEditingId = null;
-      set("f-save-msg", "Scan saved in this device’s tracking series.");
+      set("f-save-msg", "Scan saved in " + fPatientLabel(rec2) + ".");
       renderFolliculometry();
     });
     document.getElementById("f-new-scan").addEventListener("click", fClearForm);
     document.getElementById("f-demo-normal").addEventListener("click", function () { fLoadDemo("normal"); });
     document.getElementById("f-demo-irregular").addEventListener("click", function () { fLoadDemo("irregular"); });
     document.getElementById("f-reset-series").addEventListener("click", function () {
-      if (!confirm("Clear the current folliculometry series from this device?")) return;
-      fSaveState({ cycle: fReadCycle(), scans: [] });
+      if (!confirm("Clear the scans in this patient folder? Identity and cycle dates are kept.")) return;
+      var st2 = fFlushActive();
+      var rec2 = fActive(st2);
+      if (!rec2) return;
+      rec2.scans = [];
+      rec2.updatedAt = new Date().toISOString();
+      fSaveState(st2);
       fClearForm();
       renderFolliculometry();
     });
@@ -3157,18 +3447,20 @@
   }
 
   function fReportSections() {
-    var st = fState();
-    var scans = fSortedScans(st.scans);
+    var rec = fActive();
+    if (!rec) return [];
+    var scans = fSortedScans(rec.scans);
     if (!scans.length) return [];
-    var cycle = st.cycle || {};
+    var cycle = rec.cycle || {};
     var out = [];
+    var who = fPatientLabel(rec);
     scans.forEach(function (s, i) {
       var n = fScanNarrative(cycle, scans, i);
-      out.push({ title: "Folliculometry — CD " + (s.cycleDay != null ? s.cycleDay : "—") + " (" + formatDate(parseLocalDate(s.date)) + ")", html: "<p>" + fEsc(n.text) + "</p>" });
+      out.push({ title: "Folliculometry — " + who + " — CD " + (s.cycleDay != null ? s.cycleDay : "—") + " (" + formatDate(parseLocalDate(s.date)) + ")", html: "<p>" + fEsc(n.text) + "</p>" });
     });
-    out.push({ title: "Folliculometry — trend", html: "<p>" + fEsc(fTrendNarrative(cycle, scans)) + "</p>" });
+    out.push({ title: "Folliculometry — " + who + " — trend", html: "<p>" + fEsc(fTrendNarrative(cycle, scans)) + "</p>" });
     var fin = fFinalNarrative(cycle, scans);
-    out.push({ title: "Folliculometry — " + fin.title, html: "<p><strong>" + fEsc(fin.label ? fin.label.label : "") + "</strong></p><p>" + fEsc(fin.text) + "</p>" });
+    out.push({ title: "Folliculometry — " + who + " — " + fin.title, html: "<p><strong>" + fEsc(fin.label ? fin.label.label : "") + "</strong></p><p>" + fEsc(fin.text) + "</p>" });
     return out;
   }
 
