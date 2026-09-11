@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#C45C4A">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -67,7 +67,7 @@
   }
   .title-row h1 {
     font-family: var(--display); font-size: 34px; font-weight: 600;
-    letter-spacing: -0.02em; color: var(--paper); line-height: 1.08;
+    letter-spacing: -0.02em; color: var(--accent); line-height: 1.08;
   }
   .tagline { font-size: 15px; color: var(--muted); margin-top: 10px; line-height: 1.55; max-width: 54ch; }
   .offline-chip {
@@ -283,16 +283,36 @@
   @media (min-width: 800px) { .ref-grid { grid-template-columns: 1fr 1fr; } }
   .logo-wrap {
     display: flex; align-items: center; justify-content: center;
-    width: 60px; height: 60px; border-radius: 16px; background: #B84E3E;
-    box-shadow: 0 10px 28px rgba(184, 78, 62, 0.32), var(--shadow);
+    width: 60px; height: 60px; border-radius: 16px; background: #C45C4A;
+    box-shadow: 0 10px 28px rgba(196, 92, 74, 0.32), var(--shadow);
     overflow: hidden; flex-shrink: 0;
   }
   .logo-wrap img { width: 60px; height: 60px; display: block; }
+
+  .boot-splash {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; background: var(--ink-page);
+    transition: opacity 420ms var(--ease), visibility 420ms var(--ease);
+  }
+  .boot-splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+  .boot-splash img {
+    width: 96px; height: 96px; border-radius: 24px; display: block;
+    box-shadow: 0 14px 36px rgba(196, 92, 74, 0.28);
+    background: #C45C4A;
+  }
+  .boot-name {
+    font-family: var(--display); font-size: 32px; font-weight: 600;
+    color: var(--accent); letter-spacing: -0.02em; margin: 4px 0 0;
+  }
+  .boot-sub { font-size: 13px; color: var(--muted); letter-spacing: 0.03em; }
+  @media (prefers-reduced-motion: reduce) { .boot-splash { display: none; } }
 
   #report-view { display: none; }
   @media print {
     body { background: #fff; padding: 0; }
     .app { display: none !important; }
+    .boot-splash { display: none !important; }
     #report-view {
       display: block; background: #fff; color: #111; font-family: Georgia, "Times New Roman", serif;
       padding: 24px; max-width: 720px; margin: 0 auto;
@@ -308,13 +328,18 @@
 </style>
 </head>
 <body>
+<div id="boot-splash" class="boot-splash" aria-hidden="true">
+  <img src="logo-mark.png?v=10" width="96" height="96" alt="">
+  <p class="boot-name">Babsinogen</p>
+  <p class="boot-sub">Obstetric biometry & folliculometry</p>
+</div>
 <div class="app" id="app">
 
   <header class="header">
     <div class="eyebrow">BABSINOGEN &middot; CLINICAL TOOLS</div>
     <div class="title-row">
       <div class="logo-wrap" aria-hidden="true">
-        <img src="logo-mark.png?v=9" width="60" height="60" alt="Babsinogen" class="logo-mark">
+        <img src="logo-mark.png?v=10" width="60" height="60" alt="Babsinogen" class="logo-mark">
       </div>
       <h1>Babsinogen</h1>
     </div>
@@ -3391,6 +3416,22 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(function () {});
   });
 }
+
+(function () {
+  var el = document.getElementById("boot-splash");
+  if (!el) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    el.remove();
+    return;
+  }
+  function hide() {
+    el.classList.add("hide");
+    setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 480);
+  }
+  var delay = 1100;
+  if (document.readyState === "complete") setTimeout(hide, delay);
+  else window.addEventListener("load", function () { setTimeout(hide, delay); });
+})();
 </script>
 </body>
 </html>
