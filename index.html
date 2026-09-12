@@ -3464,7 +3464,11 @@
     return out;
   }
 
-  function renderAll() { renderBiometry(); renderDating(); renderDoppler(); renderFolliculometry(); }
+  function renderClinical() { renderBiometry(); renderDating(); renderDoppler(); }
+  function renderAll() {
+    renderClinical();
+    if (window.__follReady) renderFolliculometry();
+  }
 
   /* =========================================================================
      PATIENT LOG — fully local IndexedDB storage. Nothing is saved unless the
@@ -3648,6 +3652,24 @@
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
+      if (name === "organ" && !window.__organReady) {
+        window.__organReady = true;
+        renderOrganPicker();
+        renderOrganInputs();
+      } else if (name === "anomaly" && !window.__anomReady) {
+        window.__anomReady = true;
+        renderAnomalyPicker();
+        renderAnomalyInputs();
+      } else if (name === "log" && !window.__logReady) {
+        window.__logReady = true;
+        initPatientLog();
+      } else if (name === "quiz" && !window.__quizReady) {
+        window.__quizReady = true;
+        initQuiz();
+      } else if (name === "follicle" && !window.__follReady) {
+        window.__follReady = true;
+        initFolliculometry();
+      }
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
     showTab("dating");
@@ -3659,7 +3681,7 @@
         bioUnit = b.getAttribute("data-unit");
         bioToggle.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); });
         ["u1", "u2", "u3", "u4"].forEach(function (id) { document.getElementById(id).textContent = bioUnit; });
-        renderAll();
+        renderClinical();
       });
     });
 
@@ -3667,7 +3689,7 @@
     var scanDateEl = document.getElementById("d-scandate");
     scanDateEl.value = new Date().toISOString().slice(0, 10);
 
-    // Wire all inputs to re-render everything (simple, robust for a calculator this size)
+    // Dating / biometry / Doppler share gestational age — recompute those three only
     var ids = ["b-bpd","b-ofd","b-ac","b-fl","b-estwk","b-estd",
       "d-lmp","d-crl","d-msd","d-scandate","fhr-wk","fhr-d","fhr-bpm",
       "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv",
@@ -3676,26 +3698,10 @@
       var el = document.getElementById(id);
       if (!el) return;
       var evt = (el.type === "checkbox" || el.tagName === "SELECT" || el.type === "date") ? "change" : "input";
-      el.addEventListener(evt, renderAll);
+      el.addEventListener(evt, renderClinical);
     });
 
-    // Organ Size tab manages its own picker + dynamic inputs
-    renderOrganPicker();
-    renderOrganInputs();
-
-    // Anomaly Scan tab manages its own picker + dynamic inputs
-    renderAnomalyPicker();
-    renderAnomalyInputs();
-
-    // Patient Log tab: report generation + consent-gated save/list/delete
-    initPatientLog();
-
-    // Quiz tab
-    initQuiz();
-
-    initFolliculometry();
-
-    renderAll();
+    renderClinical();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", onReady);
@@ -3705,24 +3711,35 @@
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     if (window.self !== window.top) return;
-    navigator.serviceWorker.register("sw.js").catch(function () {});
+    var reg = function () { navigator.serviceWorker.register("sw.js").catch(function () {}); };
+    if ("requestIdleCallback" in window) requestIdleCallback(reg, { timeout: 2500 });
+    else setTimeout(reg, 800);
   });
 }
 
 (function () {
   var el = document.getElementById("boot-splash");
   if (!el) return;
+  try {
+    if (sessionStorage.getItem("babsinogen.splash") === "1") {
+      el.remove();
+      return;
+    }
+    sessionStorage.setItem("babsinogen.splash", "1");
+  } catch (e) {}
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     el.remove();
     return;
   }
   function hide() {
     el.classList.add("hide");
-    setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 480);
+    setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 220);
   }
-  var delay = 1100;
-  if (document.readyState === "complete") setTimeout(hide, delay);
-  else window.addEventListener("load", function () { setTimeout(hide, delay); });
+  function afterPaint() {
+    requestAnimationFrame(function () { requestAnimationFrame(hide); });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", afterPaint);
+  else afterPaint();
 })();
 </script>
 </body>
