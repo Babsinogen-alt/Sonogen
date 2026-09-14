@@ -214,6 +214,14 @@
   .f-patient-list { margin-top: 12px; max-height: 260px; overflow: auto; }
   .log-entry.f-on { box-shadow: 0 0 0 2px var(--accent); }
   .f-id-chip { font-family: var(--display); font-size: 18px; color: var(--accent); margin: 4px 0 10px; }
+  .bpp-grid { display: grid; gap: 10px; }
+  .bpp-item { background: var(--panel2); border-radius: 12px; padding: 12px 14px; }
+  .bpp-item label.bpp-name { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .bpp-item select { width: 100%; min-height: 44px; }
+  .imp-list { margin: 0; padding-left: 18px; }
+  .imp-list li { margin: 4px 0; font-size: 13.5px; line-height: 1.45; }
+  .bpp-score { font-family: var(--display); font-size: 32px; font-weight: 600; color: var(--accent); letter-spacing: -0.03em; }
+  .dx-stack { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
 
   .quiz-option {
     display: block; width: 100%; text-align: left; background: var(--panel2); border: 1px solid transparent;
@@ -355,6 +363,7 @@
     <button class="tab" data-tab="biometry">Biometry</button>
     <button class="tab" data-tab="doppler">Doppler</button>
     <button class="tab" data-tab="anomaly">Anomaly</button>
+    <button class="tab" data-tab="impress">Impression</button>
     <button class="tab" data-tab="follicle">Folliculometry</button>
     <button class="tab" data-tab="organ">Organ Size</button>
     <button class="tab" data-tab="log">Reports &amp; Log</button>
@@ -528,6 +537,197 @@
     </div>
   </section>
 
+  <!-- ===================== TAB: PREGNANCY IMPRESSION ===================== -->
+  <section class="panel-view" id="view-impress">
+    <div class="layout">
+      <div>
+        <div class="card">
+          <div class="card-title">Scan context</div>
+          <p class="subhead">This module reads dating, biometry, Doppler, FHR, fluid, and anomaly entries already on those tabs, then applies SRU / ACOG / ISUOG criteria. Add only what those tabs do not capture.</p>
+          <div class="field">
+            <label>Indication</label>
+            <div class="row">
+              <select id="imp-indication">
+                <option value="">—</option>
+                <option value="dating">Dating</option>
+                <option value="bleeding">Bleeding / pain (early pregnancy)</option>
+                <option value="viability">Viability</option>
+                <option value="anatomy">Anatomy / anomaly</option>
+                <option value="growth">Growth</option>
+                <option value="rfm">Reduced fetal movements</option>
+                <option value="doppler">Doppler / FGR surveillance</option>
+                <option value="bpp">Biophysical profile</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Cycle regularity</label>
+            <div class="row">
+              <select id="imp-cycle">
+                <option value="">Not recorded</option>
+                <option value="regular">Regular</option>
+                <option value="irregular">Irregular / uncertain LMP</option>
+                <option value="ivf">IVF / known conception date</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>IVF / conception date (if known)</label><div class="row"><input id="imp-ivf" type="date"></div></div>
+          <div class="field"><label>Prior scan note (key findings / dates)</label><div class="row"><input id="imp-prior-note" type="text" maxlength="200" placeholder="e.g. GS only at 5w2d on 1 Mar"></div></div>
+          <div class="field">
+            <label>Approach</label>
+            <div class="row">
+              <select id="imp-approach">
+                <option value="tv">Transvaginal</option>
+                <option value="ta">Transabdominal</option>
+                <option value="both">TA + TV</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Pregnancy location</label>
+            <div class="row">
+              <select id="imp-location">
+                <option value="">Not yet determined</option>
+                <option value="iup">Definite intrauterine pregnancy (GS with yolk sac or embryo)</option>
+                <option value="ectopic">Adnexal ectopic mass; empty uterus</option>
+                <option value="heterotopic">Heterotopic (IUP + ectopic)</option>
+                <option value="pul">Pregnancy of unknown location (no IUP, no ectopic mass)</option>
+              </select>
+            </div>
+          </div>
+          <div class="hairline">
+            <div class="card-title" style="margin-bottom:8px;">Early pregnancy extras</div>
+            <p class="note" style="margin-top:0;">CRL, MSD, scan date, and FHR are taken from Dating. Use this block for yolk sac and serial-interval rules.</p>
+            <div class="field">
+              <label>Yolk sac</label>
+              <div class="row">
+                <select id="imp-ys">
+                  <option value="">Not recorded</option>
+                  <option value="absent">Not seen</option>
+                  <option value="present">Present, normal size</option>
+                  <option value="large">Present, enlarged</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Yolk sac diameter (if measured)</label><div class="row"><input id="imp-ysmm" type="number" inputMode="decimal" step="0.1" placeholder="e.g. 6.2"><span class="suffix">mm</span></div></div>
+            <div class="field">
+              <label>Embryo / fetus</label>
+              <div class="row">
+                <select id="imp-embryo">
+                  <option value="">Infer from CRL</option>
+                  <option value="seen">Seen</option>
+                  <option value="not_seen">Not seen</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Fetal cardiac activity</label>
+              <div class="row">
+                <select id="imp-fca">
+                  <option value="">Infer from FHR entry</option>
+                  <option value="present">Present</option>
+                  <option value="absent">Absent (observed adequately)</option>
+                  <option value="not_assessed">Not assessed</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Prior scan: intrauterine GS <em>without</em> yolk sac</label><div class="row"><input id="imp-prior-noys" type="date"></div></div>
+            <div class="field"><label>Prior scan: intrauterine GS <em>with</em> yolk sac</label><div class="row"><input id="imp-prior-ys" type="date"></div></div>
+            <div class="field"><label>β-hCG (optional, mIU/mL)</label><div class="row"><input id="imp-hcg" type="number" inputMode="decimal" step="1" placeholder="—"></div></div>
+            <label class="check-row"><input type="checkbox" id="imp-irregular-sac"> Irregular gestational sac / low implantation / large subchorionic hematoma</label>
+          </div>
+          <div class="hairline">
+            <div class="card-title" style="margin-bottom:8px;">Second / third trimester extras</div>
+            <label class="check-row"><input type="checkbox" id="imp-no-move"> No fetal movements over an adequate observation period (several minutes)</label>
+            <label class="check-row"><input type="checkbox" id="imp-spalding"> Spalding sign / maceration / skin edema >5 mm / intrafetal gas</label>
+            <div class="field"><label>Cervical length (if measured)</label><div class="row"><input id="imp-cx" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix">mm</span></div></div>
+            <div class="field">
+              <label>Placenta</label>
+              <div class="row">
+                <select id="imp-plac-loc">
+                  <option value="">Not recorded</option>
+                  <option value="fund">Fundal / body, clear of os</option>
+                  <option value="low">Low-lying</option>
+                  <option value="previa">Placenta previa</option>
+                  <option value="abruption">Findings concerning for abruption</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Biophysical profile</div>
+          <p class="subhead">Manning ultrasound BPP: 2 points if the component is present, 0 if absent. NST is optional (modified BPP = NST + amniotic fluid). Fluid can be taken from the Anomaly → Amniotic fluid entry.</p>
+          <div class="bpp-grid">
+            <div class="bpp-item">
+              <label class="bpp-name">Fetal breathing</label>
+              <select id="bpp-breath">
+                <option value="">Not assessed</option>
+                <option value="2">Present — ≥1 episode ≥30 s in 30 min</option>
+                <option value="0">Absent</option>
+              </select>
+            </div>
+            <div class="bpp-item">
+              <label class="bpp-name">Gross body movement</label>
+              <select id="bpp-move">
+                <option value="">Not assessed</option>
+                <option value="2">Present — ≥3 discrete movements in 30 min</option>
+                <option value="0">Absent / <3 movements</option>
+              </select>
+            </div>
+            <div class="bpp-item">
+              <label class="bpp-name">Fetal tone</label>
+              <select id="bpp-tone">
+                <option value="">Not assessed</option>
+                <option value="2">Present — ≥1 flexion–extension</option>
+                <option value="0">Absent</option>
+              </select>
+            </div>
+            <div class="bpp-item">
+              <label class="bpp-name">Amniotic fluid (BPP pocket)</label>
+              <select id="bpp-af">
+                <option value="">Use Anomaly tab / not assessed</option>
+                <option value="2">Pocket ≥2 cm (or AFI >5 cm)</option>
+                <option value="0">No pocket ≥2 cm (or AFI ≤5 cm)</option>
+              </select>
+            </div>
+            <div class="bpp-item">
+              <label class="bpp-name">Nonstress test (optional)</label>
+              <select id="bpp-nst">
+                <option value="">Not performed</option>
+                <option value="2">Reactive</option>
+                <option value="0">Non-reactive</option>
+              </select>
+            </div>
+          </div>
+          <p class="note">A score of 8/8 or 10/10 is reassuring when fluid is normal. 6/10 is equivocal. ≤4/10 is abnormal. An abnormal modified BPP is a non-reactive NST or oligohydramnios, even if the other component is normal. Decision support only — timing of delivery is a clinical decision.</p>
+          <div id="bpp-live"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card" id="imp-output"></div>
+        <div class="card">
+          <div class="card-title">Criteria this engine will apply</div>
+          <p class="note" style="margin-top:0;">Definitive diagnoses are issued only when the published threshold is met. Suspicious findings generate follow-up language, not a forced loss diagnosis.</p>
+          <table class="ref rules-table">
+            <thead><tr><th>Finding</th><th>Rule</th></tr></thead>
+            <tbody>
+              <tr><td>Embryonic demise</td><td>TV: CRL ≥7 mm, no cardiac activity (SRU).</td></tr>
+              <tr><td>Anembryonic pregnancy</td><td>TV: MSD ≥25 mm, no embryo (SRU).</td></tr>
+              <tr><td>Serial empty sac</td><td>No embryo with heartbeat ≥14 d after GS without YS, or ≥11 d after GS with YS.</td></tr>
+              <tr><td>Suspicious, not diagnostic</td><td>CRL <7 mm no FCA; MSD 16–24 mm no embryo; YS >6 mm; slow FHR.</td></tr>
+              <tr><td>IUFD</td><td>≥20 weeks: no cardiac activity and no movement on ultrasound (not handheld Doppler alone).</td></tr>
+              <tr><td>SGA / FGR</td><td>SGA: EFW <10th. FGR: EFW <3rd, or <10th plus Doppler/fluid abnormality.</td></tr>
+              <tr><td>Oligo / poly</td><td>SDP <2 or AFI ≤5; SDP ≥8 or AFI ≥24–25 cm.</td></tr>
+              <tr><td>BPP</td><td>Manning 2/0 scoring; modified BPP = NST + fluid.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ===================== TAB: FOLLICULOMETRY ===================== -->
   <section class="panel-view" id="view-follicle">
@@ -815,6 +1015,17 @@
           <li><strong>Renal pelvis.</strong> GA-banded (e.g. 5 mm at 21–30 weeks); not asserted beyond 30 weeks.</li>
           <li><strong>Fluid.</strong> ACOG prefers SDP <2 cm for oligohydramnios. Typical AFI 5–24 cm.</li>
           <li><strong>Placenta.</strong> Thickness often flagged >40 mm in the second trimester, >60 mm in the third.</li>
+        </ul>
+      </div>
+      <div class="card ref-block">
+        <h3>Pregnancy impression, EPL, IUFD & BPP</h3>
+        <ul>
+          <li><strong>SRU early pregnancy (2012, 2024 update).</strong> Definitive TV criteria: CRL ≥7 mm without cardiac activity; MSD ≥25 mm without an embryo; no embryo with heartbeat ≥14 days after a GS without a yolk sac, or ≥11 days after a GS with a yolk sac.</li>
+          <li><strong>Suspicious, not diagnostic.</strong> CRL <7 mm no FCA; MSD 16–24 mm no embryo; yolk sac >6 mm; slow early FHR (Doubilet & Benson).</li>
+          <li><strong>IUFD.</strong> Death at ≥20 weeks: absent cardiac activity and absent movement on ultrasound (not handheld Doppler/CTG alone). Spalding/maceration/gas are supportive.</li>
+          <li><strong>FGR / SGA.</strong> SGA: EFW <10th. FGR: EFW <3rd, or <10th with Doppler/fluid/small-AC features (ISUOG / ACOG OCC).</li>
+          <li><strong>Fluid.</strong> Oligohydramnios: SDP <2 cm or AFI ≤5 cm (ACOG prefers SDP). Polyhydramnios: SDP ≥8 cm or AFI ≥24–25 cm.</li>
+          <li><strong>BPP.</strong> Manning 2/0 scoring. 8/8 or 10/10 reassuring if fluid is normal; 6/10 equivocal (repeat); ≤4/10 abnormal. Modified BPP = NST + fluid; either component abnormal = abnormal modified BPP.</li>
         </ul>
       </div>
       <div class="card ref-block">
@@ -1283,6 +1494,31 @@
 
   /* --- Amniotic fluid --- */
   var AFI_LOW = 5, AFI_HIGH = 24, SDP_LOW = 2, SDP_HIGH = 8;
+  function fluidClassify() {
+    var method = anomVal("an-afmethod") || "afi";
+    var afVal = anomNum("an-afval");
+    if (afVal == null) return null;
+    var sdp = method === "sdp";
+    var v = afVal.toFixed(1);
+    if (sdp) {
+      if (afVal < SDP_LOW) {
+        return { kind: "oligo", sev: afVal < 1 ? "severe" : "present", cls: "danger",
+          text: "SDP " + v + " cm (<2 cm) — oligohydramnios" + (afVal < 1 ? "; pocket <1 cm is in the severe range" : "") + "." };
+      }
+      if (afVal >= 16) return { kind: "poly", sev: "severe", cls: "warn", text: "SDP " + v + " cm (≥16 cm) — severe polyhydramnios." };
+      if (afVal >= 12) return { kind: "poly", sev: "moderate", cls: "warn", text: "SDP " + v + " cm (12–15.9 cm) — moderate polyhydramnios." };
+      if (afVal >= 8) return { kind: "poly", sev: "mild", cls: "warn", text: "SDP " + v + " cm (8–11.9 cm) — mild polyhydramnios." };
+      return { kind: "normal", sev: "", cls: "ok", text: "SDP " + v + " cm — normal amniotic fluid." };
+    }
+    if (afVal <= AFI_LOW) {
+      return { kind: "oligo", sev: afVal < 2 ? "severe" : "present", cls: "danger",
+        text: "AFI " + v + " cm (≤5 cm) — oligohydramnios." };
+    }
+    if (afVal >= 35) return { kind: "poly", sev: "severe", cls: "warn", text: "AFI " + v + " cm (≥35 cm) — severe polyhydramnios." };
+    if (afVal >= 30) return { kind: "poly", sev: "moderate", cls: "warn", text: "AFI " + v + " cm (30–34.9 cm) — moderate polyhydramnios." };
+    if (afVal >= AFI_HIGH) return { kind: "poly", sev: "mild", cls: "warn", text: "AFI " + v + " cm (≥24 cm) — mild polyhydramnios (some series use ≥25 cm)." };
+    return { kind: "normal", sev: "", cls: "ok", text: "AFI " + v + " cm — normal amniotic fluid." };
+  }
   var OLIGO_CAUSES = ["Renal agenesis / dysplasia", "Urinary tract obstruction (e.g. PUV, UPJ obstruction)", "Fetal growth restriction / placental insufficiency", "Preterm premature rupture of membranes (PPROM)", "Post-term pregnancy"];
   var POLY_CAUSES = ["GI obstruction (e.g. duodenal atresia \u2014 correlate with \u2018double bubble\u2019)", "Impaired fetal swallowing (neurologic cause or aneuploidy)", "Maternal diabetes / fetal macrosomia", "Fetal anemia / hydrops", "Idiopathic (no cause found in a large proportion of cases)"];
 
@@ -2158,6 +2394,7 @@
     });
   }
   function selectAnomalySection(id) {
+    snapshotAnomaly();
     anomalySection = id;
     document.querySelectorAll("#anomaly-picker button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-section") === id); });
     renderAnomalyInputs();
@@ -2186,7 +2423,7 @@
         '<label class="check-row"><input type="checkbox" id="an-spine"> Spinal defect / myelomeningocele seen</label>' +
         '</div>';
       set("anomaly-inputs", html);
-      wireOrganInputs(["an-atrium", "an-cistmag", "an-cistmag-oblit", "an-tcd-wk", "an-tcd-d", "an-tcd", "an-dwm", "an-banana", "an-lemon", "an-spine"]);
+      wireAnomalyInputs(["an-atrium", "an-cistmag", "an-cistmag-oblit", "an-tcd-wk", "an-tcd-d", "an-tcd", "an-dwm", "an-banana", "an-lemon", "an-spine"]);
     } else if (anomalySection === "face") {
       html = '<div class="card-title">Face</div>' +
         '<p class="subhead">Nuchal translucency (11\u201313+6wk, CRL 45\u201384mm)</p>' +
@@ -2201,7 +2438,7 @@
         '<label class="check-row"><input type="checkbox" id="an-cleft"> Cleft lip / palate seen</label>' +
         '</div>';
       set("anomaly-inputs", html);
-      wireOrganInputs(["an-nt", "an-nasal", "an-nf", "an-orbital", "an-cleft"]);
+      wireAnomalyInputs(["an-nt", "an-nasal", "an-nf", "an-orbital", "an-cleft"]);
     } else if (anomalySection === "cardiothoracic") {
       html = '<div class="card-title">Cardiothoracic</div>' +
         '<div class="grid2">' +
@@ -2210,7 +2447,7 @@
         '</div>' +
         '<div class="field"><label>Abdominal circumference (for chest/AC)</label><div class="row"><input id="an-ac2" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">mm</span></div></div>';
       set("anomaly-inputs", html);
-      wireOrganInputs(["an-cardc", "an-thorc", "an-ac2"]);
+      wireAnomalyInputs(["an-cardc", "an-thorc", "an-ac2"]);
     } else if (anomalySection === "skeletal") {
       html = '<div class="card-title">Skeletal</div>' +
         '<div class="grid2">' +
@@ -2225,31 +2462,42 @@
         '<label class="check-row"><input type="checkbox" id="an-clav"> Clavicle hypoplastic or not identified</label>' +
         '</div>';
       set("anomaly-inputs", html);
-      wireOrganInputs(["an-fl", "an-ac", "an-foot", "an-bow", "an-fx", "an-mineral", "an-clav"]);
+      wireAnomalyInputs(["an-fl", "an-ac", "an-foot", "an-bow", "an-fx", "an-mineral", "an-clav"]);
     } else if (anomalySection === "renal") {
       html = '<div class="card-title">Renal</div>' + gaField("an-renal") +
         '<div class="field"><label>Renal pelvis AP diameter</label><div class="row"><input id="an-pelvis" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">mm</span></div></div>' +
         '<div class="field"><label>Laterality</label><div class="row"><select id="an-lat"><option value="unilateral">Unilateral</option><option value="bilateral">Bilateral</option></select></div></div>';
       set("anomaly-inputs", html);
-      wireOrganInputs(["an-renal-wk", "an-renal-d", "an-pelvis", "an-lat"]);
+      wireAnomalyInputs(["an-renal-wk", "an-renal-d", "an-pelvis", "an-lat"]);
     } else if (anomalySection === "fluid") {
       html = '<div class="card-title">Amniotic Fluid</div>' +
         '<div class="field"><label>Method</label><div class="row"><select id="an-afmethod"><option value="afi">AFI (four-quadrant)</option><option value="sdp">Single deepest pocket</option></select></div></div>' +
         '<div class="field"><label>Value</label><div class="row"><input id="an-afval" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>';
       set("anomaly-inputs", html);
-      wireOrganInputs(["an-afmethod", "an-afval"]);
+      wireAnomalyInputs(["an-afmethod", "an-afval"]);
     } else if (anomalySection === "placenta") {
       html = '<div class="card-title">Placenta</div>' +
         '<div class="field"><label>Trimester</label><div class="row"><select id="an-trim"><option value="second">Second</option><option value="third">Third</option></select></div></div>' +
         '<div class="field"><label>Thickness (at the centre, perpendicular to the wall)</label><div class="row"><input id="an-placenta" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">mm</span></div></div>';
       set("anomaly-inputs", html);
-      wireOrganInputs(["an-trim", "an-placenta"]);
+      wireAnomalyInputs(["an-trim", "an-placenta"]);
     }
+    restoreAnomaly();
     renderAnomalyResult();
   }
 
   function renderAnomalyResult() {
-    var html = '<div class="card-title">Findings</div>';
+    var html = "";
+    var allDx = measurementDiagnoses();
+    if (allDx.length) {
+      html += '<div class="card-title">Impression from entered parameters</div>';
+      allDx.forEach(function (d) {
+        var h = d.cls === "danger" ? "Diagnosis" : (d.cls === "warn" ? "Abnormal finding" : "Within expected range");
+        html += '<div class="impression ' + (d.cls === "ok" ? "" : d.cls) + '"><h3>' + h + "</h3><p>" + fEsc(d.text) + "</p></div>";
+      });
+      html += '<p class="note">Every measurement-based label from this tab plus biometry, Doppler, FHR, fluid, and BPP. Open Impression for the full SRU/ACOG/ISUOG report.</p><div class="hairline"></div>';
+    }
+    html += '<div class="card-title">Findings</div>';
 
     if (anomalySection === "cns") {
       var atrium = num(val("an-atrium"));
@@ -2383,18 +2631,13 @@
       }
 
     } else if (anomalySection === "fluid") {
-      var method = val("an-afmethod"), afVal = num(val("an-afval"));
-      if (afVal != null) {
-        var lowCut = method === "afi" ? AFI_LOW : SDP_LOW, highCut = method === "afi" ? AFI_HIGH : SDP_HIGH;
-        html += organRow(method === "afi" ? "AFI" : "Deepest pocket", afVal.toFixed(1) + " cm", lowCut + "\u2013" + highCut + " cm normal");
-        if (afVal < lowCut) {
-          html += '<div class="badge danger">Oligohydramnios</div><div class="note"><strong>Consider:</strong> ' + OLIGO_CAUSES.join(" \u00b7 ") + '</div>';
-        } else if (afVal > highCut) {
-          html += '<div class="badge warn">Polyhydramnios</div><div class="note"><strong>Consider:</strong> ' + POLY_CAUSES.join(" \u00b7 ") + '</div>';
-        } else {
-          html += '<div class="badge ok">Normal</div>';
-        }
-        html += '<div class="note">ACOG favours the single deepest pocket over AFI for diagnosing oligohydramnios \u2014 it flags fewer cases without a demonstrated difference in outcomes.</div>';
+      var flc = fluidClassify();
+      if (flc) {
+        html += organRow(anomVal("an-afmethod") === "sdp" ? "Deepest pocket" : "AFI", (anomNum("an-afval") || 0).toFixed(1) + " cm", anomVal("an-afmethod") === "sdp" ? "2–8 cm typical" : "5–24 cm typical");
+        html += '<div class="impression ' + (flc.cls === "ok" ? "" : flc.cls) + '"><h3>Impression</h3><p>' + fEsc(flc.text) + "</p></div>";
+        if (flc.kind === "oligo") html += '<div class="note"><strong>Consider:</strong> ' + OLIGO_CAUSES.join(" \u00b7 ") + "</div>";
+        if (flc.kind === "poly") html += '<div class="note"><strong>Consider:</strong> ' + POLY_CAUSES.join(" \u00b7 ") + "</div>";
+        html += '<div class="note">ACOG favours the single deepest pocket over AFI for diagnosing oligohydramnios \u2014 it flags fewer cases without a demonstrated difference in outcomes. Oligohydramnios: SDP <2 cm or AFI ≤5 cm. Polyhydramnios: SDP ≥8 cm or AFI ≥24–25 cm.</div>';
       } else {
         html += '<p class="empty">Enter the measured value.</p>';
       }
@@ -2411,7 +2654,790 @@
       }
     }
 
+    if (!allDx.length) {
+      html += '<p class="note">Enter a measurement on this system — or on Biometry, Doppler, Dating, or Impression/BPP — to see a diagnosis here.</p>';
+    }
+
     set("anomaly-result", html);
+  }
+
+  /* =========================================================================
+     ANOMALY persistence + pregnancy impression engine (SRU / ACOG / ISUOG)
+     ========================================================================= */
+  var anomalyStore = {};
+  function snapshotAnomaly() {
+    document.querySelectorAll("#anomaly-inputs input, #anomaly-inputs select").forEach(function (el) {
+      if (!el.id) return;
+      anomalyStore[el.id] = el.type === "checkbox" ? el.checked : el.value;
+    });
+  }
+  function restoreAnomaly() {
+    Object.keys(anomalyStore).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (el.type === "checkbox") el.checked = !!anomalyStore[id];
+      else el.value = anomalyStore[id] == null || anomalyStore[id] === false ? "" : anomalyStore[id];
+    });
+  }
+  function anomVal(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      if (el.type === "checkbox") return el.checked;
+      return el.value;
+    }
+    if (Object.prototype.hasOwnProperty.call(anomalyStore, id)) return anomalyStore[id];
+    return "";
+  }
+  function anomNum(id) {
+    var v = anomVal(id);
+    if (v === true || v === false) return null;
+    return num(v);
+  }
+  function anomOn(id) { return anomVal(id) === true || anomVal(id) === "true"; }
+  function wireAnomalyInputs(ids) {
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var evt = (el.type === "checkbox" || el.tagName === "SELECT") ? "change" : "input";
+      el.addEventListener(evt, function () {
+        snapshotAnomaly();
+        renderAnomalyResult();
+        if (window.__impReady) { renderImpression(); renderBppLive(); };
+      });
+    });
+  }
+  function anomalyDiagnoses() {
+    var dx = [];
+    var atrium = anomNum("an-atrium");
+    if (atrium != null) {
+      var vm = classifyVentriculomegaly(atrium);
+      dx.push({ cls: vm.cls, text: "Lateral ventricle atrium " + atrium.toFixed(1) + " mm — " + vm.label + "." });
+    }
+    if (anomOn("an-cistmag-oblit")) {
+      dx.push({ cls: "danger", text: "Cisterna magna obliterated/effaced — pattern concerning for Chiari II; correlate with spine." });
+    } else {
+      var cm = anomNum("an-cistmag");
+      if (cm != null && cm > CISTERNA_MAGNA_UPPER) dx.push({ cls: "warn", text: "Enlarged cisterna magna (" + cm.toFixed(1) + " mm) — consider Dandy–Walker continuum." });
+    }
+    if (anomOn("an-dwm")) dx.push({ cls: "warn", text: "Absent/hypoplastic vermis with splayed hemispheres — supports Dandy–Walker malformation when the cisterna magna is enlarged." });
+    var tcdWk = anomNum("an-tcd-wk"), tcdD = anomNum("an-tcd-d"), tcdVal = anomNum("an-tcd");
+    var tcdGa = tcdWk != null ? tcdWk + (tcdD || 0) / 7 : null;
+    if (tcdVal != null && tcdGa != null) {
+      var tcdExp = tcdExpected(tcdGa);
+      if (tcdVal < tcdExp.lo) dx.push({ cls: "warn", text: "TCD " + tcdVal.toFixed(1) + " mm — small for GA; consider cerebellar hypoplasia or a Dandy–Walker variant." });
+    }
+    if (anomOn("an-banana") || anomOn("an-lemon") || anomOn("an-spine")) {
+      var bits = [];
+      if (anomOn("an-banana")) bits.push("banana sign");
+      if (anomOn("an-lemon")) bits.push("lemon sign");
+      if (anomOn("an-spine")) bits.push("spinal defect");
+      dx.push({ cls: "danger", text: bits.join(", ") + " — pattern consistent with Chiari II and open spinal dysraphism." });
+    }
+    var nt = anomNum("an-nt");
+    if (nt != null) {
+      var ntc = classifyNT(nt);
+      dx.push({ cls: ntc.cls, text: "Nuchal translucency " + nt.toFixed(1) + " mm — " + ntc.label + "." });
+    }
+    var nasal = anomVal("an-nasal");
+    if (nasal && nasal !== "present" && nasal !== true) dx.push({ cls: "warn", text: "Nasal bone " + nasal + " — aneuploidy marker, not a karyotype." });
+    var nf = anomNum("an-nf");
+    if (nf != null && nf >= NUCHAL_FOLD_UPPER) dx.push({ cls: "danger", text: "Nuchal fold " + nf.toFixed(1) + " mm (≥6 mm) — strongest second-trimester T21 sonographic marker." });
+    var orbital = anomVal("an-orbital");
+    if (orbital === "reduced") dx.push({ cls: "warn", text: "Hypotelorism — associated with holoprosencephaly spectrum." });
+    if (orbital === "increased") dx.push({ cls: "warn", text: "Hypertelorism — associated with frontal encephalocele / craniosynostosis / clefting." });
+    if (anomOn("an-cleft")) dx.push({ cls: "warn", text: "Cleft lip/palate seen." });
+    var cardc = anomNum("an-cardc"), thorc = anomNum("an-thorc"), acX = anomNum("an-ac2");
+    if (cardc != null && thorc != null && thorc > 0) {
+      var ctr = cardc / thorc;
+      if (ctr >= CTR_CIRCUMFERENCE_UPPER) dx.push({ cls: "warn", text: "Cardiothoracic circumference ratio " + ctr.toFixed(2) + " (≥0.50) — consider cardiomegaly." });
+    }
+    if (thorc != null && acX != null && acX > 0) {
+      var chestAc = thorc / acX;
+      if (chestAc < CHEST_AC_LOWER) dx.push({ cls: "warn", text: "Chest/AC " + chestAc.toFixed(2) + " (<0.83) — thoracic hypoplasia / pulmonary hypoplasia risk." });
+    }
+    var flS = anomNum("an-fl"), acS = anomNum("an-ac"), footS = anomNum("an-foot");
+    if (flS != null && acS != null && acS > 0) {
+      var flAc = flS / acS;
+      if (flAc < FL_AC_SEVERE_LOWER) dx.push({ cls: "danger", text: "FL/AC " + (flAc * 100).toFixed(1) + "% (<16%) — severe skeletal dysplasia range." });
+      else if (flAc * 100 < 20) dx.push({ cls: "warn", text: "FL/AC " + (flAc * 100).toFixed(1) + "% (<20%) — relatively large AC." });
+      else if (flAc * 100 > 24) dx.push({ cls: "warn", text: "FL/AC " + (flAc * 100).toFixed(1) + "% (>24%) — relatively small AC; consider asymmetric growth restriction." });
+    }
+    if (flS != null && footS != null && footS > 0) {
+      var flFoot = flS / footS;
+      if (flFoot < FL_FOOT_LOWER) dx.push({ cls: "danger", text: "FL/foot " + flFoot.toFixed(2) + " (<0.87) — favours dysplasia over isolated FGR." });
+    }
+    if (anomOn("an-bow") || anomOn("an-fx") || anomOn("an-mineral") || anomOn("an-clav")) {
+      var sk = [];
+      if (anomOn("an-bow")) sk.push("bowing");
+      if (anomOn("an-fx")) sk.push("fracture(s)");
+      if (anomOn("an-mineral")) sk.push("reduced mineralisation");
+      if (anomOn("an-clav")) sk.push("clavicle hypoplasia/absence");
+      dx.push({ cls: "danger", text: "Skeletal qualitative flags: " + sk.join(", ") + "." });
+    }
+    var pelvis = anomNum("an-pelvis"), rWk = anomNum("an-renal-wk"), rD = anomNum("an-renal-d");
+    var rGa = rWk != null ? rWk + (rD || 0) / 7 : null;
+    if (pelvis != null && rGa != null) {
+      var pUpper = renalPelvisUpper(rGa);
+      if (pUpper != null && pelvis > pUpper) {
+        dx.push({ cls: "warn", text: "Renal pelvis AP " + pelvis.toFixed(1) + " mm (threshold " + pUpper + " mm) — pyelectasis" + (anomVal("an-lat") === "bilateral" ? ", bilateral" : "") + "." });
+      }
+    }
+    var flc = fluidClassify();
+    if (flc && flc.kind !== "normal") dx.push({ cls: flc.cls, text: flc.text });
+    else if (flc) dx.push({ cls: "ok", text: flc.text });
+    var pThick = anomNum("an-placenta");
+    if (pThick != null) {
+      var trim = anomVal("an-trim") || "second";
+      var pc = placentaClassify(pThick, trim);
+      if (pc.cls !== "ok") dx.push({ cls: pc.cls, text: "Placental thickness " + pThick.toFixed(1) + " mm — " + pc.label + "." });
+    }
+    return dx;
+  }
+
+  function measurementDiagnoses() {
+    var dx = anomalyDiagnoses().slice();
+    var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+    var hc = calcHC(bpd, ofd);
+    var ci = calcCI(bpd, ofd);
+    if (ci != null) {
+      var ciInfo = classifyCI(ci);
+      if (ciInfo.cls !== "ok") dx.push({ cls: ciInfo.cls, text: "Cephalic index " + ci.toFixed(1) + "% — " + ciInfo.label + "." });
+    }
+    var efw = hadlockEFW(bpd, hc, ac, fl);
+    var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
+    var ga = impBestGA();
+    var weeks = ga.days != null ? ga.days / 7 : null;
+    var gaForPct = estWk != null ? (estWk + (estD || 0) / 7) : weeks;
+    if (efw && gaForPct != null) {
+      var pctRes = lookupPercentile(gaForPct, efw.grams);
+      if (pctRes && !pctRes.outOfRange) {
+        var gclass = classifyGrowth(pctRes.percentile, efw.grams);
+        dx.push({ cls: gclass.sizeCls, text: "EFW " + Math.round(efw.grams).toLocaleString() + " g — " + ordinal(pctRes.percentile) + " centile, " + gclass.sizeClass + "." });
+        if (gclass.macro) dx.push({ cls: "danger", text: gclass.macro + "." });
+      }
+    }
+    if (hc != null && ac != null && gaForPct != null && gaForPct >= 20) {
+      var hcac = hc / ac, exp = hcAcExpected(gaForPct);
+      if (hcac > exp * 1.15) dx.push({ cls: "warn", text: "HC/AC " + hcac.toFixed(2) + " (expected ≈ " + exp.toFixed(2) + ") — asymmetric / head-sparing pattern." });
+    }
+    if (fl != null && ac != null && ac > 0) {
+      var flac = (fl / ac) * 100;
+      if (flac > 24) dx.push({ cls: "warn", text: "Biometry FL/AC " + flac.toFixed(1) + "% (>24%) — relatively small AC." });
+      else if (flac < 20) dx.push({ cls: "warn", text: "Biometry FL/AC " + flac.toFixed(1) + "% (<20%) — relatively large AC." });
+    }
+    if (ac != null && gaForPct != null && gaForPct >= 14) {
+      var acGa = gaAC(ac);
+      if (acGa != null && (gaForPct - acGa) * 7 > 14) {
+        dx.push({ cls: "warn", text: "AC dates ~" + Math.round((gaForPct - acGa) * 7) + " days behind established/scan GA — small AC, FGR-pattern when size or Doppler also abnormal." });
+      }
+    }
+    var crl = num(val("d-crl")), msd = num(val("d-msd"));
+    var fca = impFcaState();
+    if (crl != null && crl >= 7 && fca === "absent") dx.push({ cls: "danger", text: "CRL " + crl.toFixed(1) + " mm ≥ 7 mm with no cardiac activity — SRU definitive embryonic demise (TV)." });
+    if (msd != null && msd >= 25 && (val("imp-embryo") === "not_seen" || crl == null)) dx.push({ cls: "danger", text: "MSD " + msd.toFixed(1) + " mm ≥ 25 mm with no embryo — SRU definitive anembryonic pregnancy (TV)." });
+    if (crl != null && crl < 7 && fca === "absent") dx.push({ cls: "warn", text: "CRL " + crl.toFixed(1) + " mm < 7 mm, no heartbeat — suspicious, not diagnostic of EPL." });
+    if (msd != null && msd >= 16 && msd < 25 && val("imp-embryo") === "not_seen") dx.push({ cls: "warn", text: "MSD " + msd.toFixed(1) + " mm (16–24 mm) with no embryo — suspicious, not diagnostic." });
+    var bpm = num(val("fhr-bpm"));
+    var fhrWk = num(val("fhr-wk")), fhrD = num(val("fhr-d"));
+    var fhrGa = fhrWk != null ? fhrWk + (fhrD || 0) / 7 : weeks;
+    if (bpm != null && fhrGa != null) {
+      if (fhrGa <= 8) {
+        var cut = fhrEarlyBradycardiaCutoff(fhrGa);
+        if (cut != null && bpm < cut) dx.push({ cls: "danger", text: "FHR " + Math.round(bpm) + " bpm below the Doubilet & Benson early-pregnancy cutoff (~" + cut + " bpm)." });
+      } else if (fhrGa >= 14) {
+        if (bpm > 160) dx.push({ cls: "warn", text: "Fetal tachycardia (>160 bpm) at ≥14 weeks." });
+        else if (bpm < 110) dx.push({ cls: "warn", text: "Fetal bradycardia (<110 bpm) at ≥14 weeks." });
+      }
+    }
+    var aedf = checked("dp-aedf"), redf = checked("dp-redf"), dvaw = checked("dp-dvaw");
+    var uapi = num(val("dp-uapi")), mcapi = num(val("dp-mcapi")), mcapsv = num(val("dp-mcapsv"));
+    var dpWk = num(val("dp-wk")), dpD = num(val("dp-d"));
+    var dpGa = dpWk != null ? dpWk + (dpD || 0) / 7 : weeks;
+    if (redf) dx.push({ cls: "danger", text: "Umbilical artery reversed end-diastolic flow." });
+    else if (aedf) dx.push({ cls: "danger", text: "Umbilical artery absent end-diastolic flow." });
+    if (uapi != null && dpGa != null && !aedf && !redf) {
+      var p95 = uaPiFromZ(1.64485, dpGa);
+      if (p95 != null && uapi > p95) dx.push({ cls: "warn", text: "UA-PI " + uapi.toFixed(2) + " above INTERGROWTH-21st 95th." });
+    }
+    if (mcapi != null && uapi != null && uapi !== 0 && mcapi / uapi < 1) dx.push({ cls: "warn", text: "CPR " + (mcapi / uapi).toFixed(2) + " (<1.0) — brain-sparing." });
+    if (mcapsv != null && dpGa != null) {
+      var mom = mcapsv / mcaPsvMedian(dpGa);
+      if (mom >= 1.5) dx.push({ cls: "danger", text: "MCA-PSV " + mom.toFixed(2) + " MoM (≥1.5) — fetal anaemia-risk threshold (Mari)." });
+    }
+    if (dvaw) dx.push({ cls: "danger", text: "Ductus venosus absent/reversed a-wave." });
+    var notch = checked("dp-notch"), utpi = num(val("dp-utpi"));
+    if (notch && dpGa != null && dpGa >= 24) dx.push({ cls: "warn", text: "Bilateral uterine-artery notching at ≥24 weeks." });
+    if (utpi != null && dpGa != null) {
+      var utp95 = utArteryP95(dpGa);
+      if (utpi > utp95) dx.push({ cls: "warn", text: "Mean uterine-artery PI " + utpi.toFixed(2) + " above the 95th for GA." });
+    }
+    var cx = num(val("imp-cx"));
+    if (cx != null && weeks != null && weeks < 24 && cx < 25) dx.push({ cls: "warn", text: "Cervical length " + cx.toFixed(1) + " mm (<25 mm before 24 weeks) — increased preterm-birth risk." });
+    var bpp = bppImpression(bppScore());
+    if (bpp && bpp.cls !== "ok") dx.push({ cls: bpp.cls, text: bpp.text });
+    else if (bpp && bpp.cls === "ok") dx.push({ cls: "ok", text: bpp.text });
+    var seen = {};
+    return dx.filter(function (d) {
+      if (seen[d.text]) return false;
+      seen[d.text] = 1;
+      return true;
+    });
+  }
+
+  function daysBetweenIso(a, b) {
+    var da = parseLocalDate(a), db = parseLocalDate(b);
+    if (!da || !db) return null;
+    return Math.round((db - da) / 86400000);
+  }
+  function fmtWD(days) {
+    var x = weeksDaysFromDays(days);
+    return x ? (x.w + "w" + x.d + "d") : "—";
+  }
+  function impBestGA() {
+    var crl = num(val("d-crl")), msd = num(val("d-msd"));
+    var scan = parseLocalDate(val("d-scandate")) || new Date();
+    var lmp = parseLocalDate(val("d-lmp"));
+    var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
+    if (crl != null) return { days: gaFromCRLmm(crl), source: "CRL", crl: crl, msd: msd, scan: scan };
+    if (msd != null) return { days: gaFromMSDmm(msd), source: "MSD", crl: crl, msd: msd, scan: scan };
+    var ivf = parseLocalDate(val("imp-ivf"));
+    if (ivf) return { days: Math.round((scan - ivf) / 86400000) + 14, source: "IVF/conception (+14 d)", crl: crl, msd: msd, scan: scan };
+    if (estWk != null) return { days: (estWk + (estD || 0) / 7) * 7, source: "established GA", crl: crl, msd: msd, scan: scan };
+    var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+    var ci = calcCI(bpd, ofd);
+    var bForGA = (ci != null && (ci < 74 || ci > 83)) ? calcCorrectedBPD(bpd, ofd) : bpd;
+    var hc = calcHC(bpd, ofd);
+    var comp = gaComposite(bForGA, hc, ac, fl);
+    if (comp) return { days: comp.weeks * 7, source: "biometry composite", crl: crl, msd: msd, scan: scan };
+    if (lmp) return { days: Math.round((scan - lmp) / 86400000), source: "LMP", crl: crl, msd: msd, scan: scan };
+    var fhrWk = num(val("fhr-wk")), fhrD = num(val("fhr-d"));
+    if (fhrWk != null) return { days: (fhrWk + (fhrD || 0) / 7) * 7, source: "FHR GA", crl: crl, msd: msd, scan: scan };
+    var dpWk = num(val("dp-wk")), dpD = num(val("dp-d"));
+    if (dpWk != null) return { days: (dpWk + (dpD || 0) / 7) * 7, source: "Doppler GA", crl: crl, msd: msd, scan: scan };
+    return { days: null, source: null, crl: crl, msd: msd, scan: scan };
+  }
+  function impFcaState() {
+    var sel = val("imp-fca");
+    if (sel === "present") return "present";
+    if (sel === "absent") return "absent";
+    if (sel === "not_assessed") return "not_assessed";
+    var bpm = num(val("fhr-bpm"));
+    if (bpm != null && bpm > 0) return "present";
+    return "unknown";
+  }
+  function impEmbryoSeen(ga) {
+    var sel = val("imp-embryo");
+    if (sel === "seen") return true;
+    if (sel === "not_seen") return false;
+    return ga && ga.crl != null;
+  }
+  function bppScore() {
+    function pts(id) {
+      var v = val(id);
+      if (v === "2") return 2;
+      if (v === "0") return 0;
+      return null;
+    }
+    var breath = pts("bpp-breath"), move = pts("bpp-move"), tone = pts("bpp-tone"), af = pts("bpp-af"), nst = pts("bpp-nst");
+    var method = anomVal("an-afmethod") || "afi";
+    var afVal = anomNum("an-afval");
+    if (af == null && afVal != null) {
+      var flc0 = fluidClassify();
+      if (flc0 && flc0.kind === "oligo") af = 0;
+      else if (flc0) af = 2;
+    }
+    var us = [breath, move, tone, af];
+    var usKnown = us.filter(function (x) { return x != null; });
+    var usSum = usKnown.reduce(function (a, b) { return a + b; }, 0);
+    var nstKnown = nst != null;
+    return {
+      breath: breath, move: move, tone: tone, af: af, nst: nst,
+      usSum: usSum, usDenom: usKnown.length * 2,
+      total: usSum + (nstKnown ? nst : 0),
+      denom: usKnown.length * 2 + (nstKnown ? 2 : 0),
+      nstKnown: nstKnown,
+      complete8: usKnown.length === 4,
+      complete10: usKnown.length === 4 && nstKnown
+    };
+  }
+  function bppImpression(b) {
+    if (!b || b.denom === 0) return null;
+    var line = "BPP " + b.total + "/" + b.denom;
+    var cls = "ok";
+    var rec = "";
+    if (b.complete10 || b.complete8) {
+      if (b.af === 0 && (b.complete10 ? b.total >= 8 : b.total >= 6)) {
+        cls = "warn";
+        line += " with oligohydramnios (fluid component 0). A numerically ‘normal’ score without a 2 cm pocket is still an abnormal fluid / modified-BPP finding.";
+        rec = "Confirm SDP/AFI, ask about leakage (PPROM), and correlate with growth and Doppler. Further surveillance or birth-timing is a clinical decision.";
+      } else if ((b.complete10 && b.total >= 8) || (b.complete8 && b.nst == null && b.total >= 8) || (b.complete8 && b.total === 8 && b.af === 2)) {
+        cls = "ok";
+        line += " — reassuring Manning score with normal fluid.";
+      } else if (b.total === 6) {
+        cls = "warn";
+        line += " — equivocal. Guideline-based next step is a prompt repeat BPP (often within 24 hours), plus Doppler if FGR is in play, rather than a one-off delivery decision from 6/10 alone.";
+        rec = "Repeat BPP; add UA/MCA Doppler and growth if not already done. If 6/10 persists with abnormal Dopplers, escalate to senior/MFM review.";
+        if (checked("dp-aedf") || checked("dp-redf") || checked("dp-dvaw")) {
+          cls = "danger";
+          line += " Equivocal score plus AEDF/REDF or abnormal DV is a high-risk combination — urgent senior review.";
+        }
+      } else {
+        cls = "danger";
+        line += " — abnormal (≤4/10 or ≤4/8). Urgent senior review; further testing versus delivery depends on gestational age and the clinical picture. This tool does not time delivery.";
+      }
+    } else {
+      line += " — incomplete (not all ultrasound components scored).";
+      cls = "warn";
+      rec = "Complete breathing, movement, tone, and fluid (or NST + fluid for a modified BPP) before using the score for management.";
+    }
+    if (b.nstKnown && b.af != null) {
+      if (b.nst === 0 || b.af === 0) {
+        if (cls === "ok") cls = "danger";
+        line += " Modified BPP (NST + fluid) is abnormal.";
+      } else if (b.nst === 2 && b.af === 2 && cls === "ok") {
+        line += " Modified BPP is normal.";
+      }
+    }
+    return { cls: cls, text: line, rec: rec };
+  }
+  function renderBppLive() {
+    var el = document.getElementById("bpp-live");
+    if (!el) return;
+    var b = bppScore();
+    var imp = bppImpression(b);
+    var html = '<div class="hairline"></div><div class="card-title" style="margin-top:0">BPP impression from entered data</div>';
+    if (!b || b.denom === 0) {
+      html += '<p class="empty">Score the components. If amniotic fluid is already on the Anomaly tab, leave the fluid row as “Use Anomaly tab” and those points are imputed.</p>';
+      el.innerHTML = html;
+      return;
+    }
+    html += '<span class="bpp-score">' + b.total + '</span><span class="result-unit">/ ' + b.denom + '</span>';
+    if (b.af != null && val("bpp-af") === "" && anomNum("an-afval") != null) {
+      html += '<div class="chip">Fluid component imputed from AFI/SDP</div>';
+    }
+    function lab(v, yes, no) {
+      if (v === 2) return yes;
+      if (v === 0) return no;
+      return "not scored";
+    }
+    html += '<table class="ref" style="margin-top:10px"><tr><th>Component</th><th>Points</th></tr>';
+    html += '<tr><td>Breathing</td><td class="num">' + lab(b.breath, "2 — present", "0 — absent") + "</td></tr>";
+    html += '<tr><td>Movement</td><td class="num">' + lab(b.move, "2 — present", "0 — absent") + "</td></tr>";
+    html += '<tr><td>Tone</td><td class="num">' + lab(b.tone, "2 — present", "0 — absent") + "</td></tr>";
+    html += '<tr><td>Amniotic fluid</td><td class="num">' + lab(b.af, "2 — pocket ≥2 cm / AFI >5", "0 — oligohydramnios") + "</td></tr>";
+    html += '<tr><td>NST</td><td class="num">' + lab(b.nst, "2 — reactive", "0 — non-reactive") + "</td></tr></table>";
+    if (imp) {
+      html += '<div class="impression ' + (imp.cls === "ok" ? "" : imp.cls) + '"><h3>Impression</h3><p>' + fEsc(imp.text) + "</p>";
+      if (imp.rec) html += "<p>" + fEsc(imp.rec) + "</p>";
+      html += "</div>";
+    }
+    el.innerHTML = html;
+  }
+
+  function buildImpression() {
+    var ga = impBestGA();
+    var findings = [];
+    var criteria = [];
+    var suspicious = [];
+    var recs = [];
+    var primary = null;
+    var primaryCls = "ok";
+    var confidence = "Low";
+    var confWhy = "Dataset incomplete.";
+
+    var loc = val("imp-location");
+    var fca = impFcaState();
+    var embryo = impEmbryoSeen(ga);
+    var weeks = ga.days != null ? ga.days / 7 : null;
+    var trimester = weeks == null ? null : (weeks < 14 ? "first" : (weeks < 28 ? "second" : "third"));
+    var approach = val("imp-approach") || "tv";
+    var ys = val("imp-ys");
+    if (!loc) {
+      if (ga.crl != null || ys === "present" || ys === "large" || embryo === true) loc = "iup";
+    }
+
+    if (weeks != null) findings.push("Gestational age ≈ " + fmtWD(ga.days) + " by " + ga.source + ".");
+    else findings.push("Gestational age not assignable from the entries so far.");
+    if (val("imp-indication")) findings.push("Indication: " + val("imp-indication") + ".");
+    if (val("imp-cycle") === "irregular") findings.push("LMP described as irregular / uncertain — calendar dating is less reliable.");
+    if (val("imp-cycle") === "ivf" || val("imp-ivf")) {
+      findings.push("Known conception / IVF date" + (val("imp-ivf") ? " " + val("imp-ivf") : "") + " — use conception dating in preference to LMP.");
+    }
+    if (val("imp-prior-note")) findings.push("Prior scan: " + val("imp-prior-note") + ".");
+    var hcg = num(val("imp-hcg"));
+    if (hcg != null) findings.push("β-hCG " + Math.round(hcg).toLocaleString() + " mIU/mL (trend, not a location test on a single value).");
+    findings.push("Approach: " + (approach === "tv" ? "transvaginal" : approach === "ta" ? "transabdominal" : "combined TA/TV") + ".");
+
+    if (loc === "pul") {
+      findings.push("No definite intrauterine gestation and no definite ectopic mass recorded — pregnancy of unknown location.");
+      criteria.push("EPL and IUFD criteria are not applied until an intrauterine pregnancy is established (SRU / early-pregnancy consensus).");
+      primary = "Pregnancy of unknown location — follow-up required.";
+      primaryCls = "warn";
+      recs.push("Do not issue a miscarriage or IUFD diagnosis from these images. Follow β-hCG and repeat ultrasound per local PUL protocol until location is resolved.");
+      confidence = "Moderate";
+      confWhy = "Location is classified as PUL on the information entered; viability criteria were not applied.";
+      return { findings: findings, criteria: criteria, suspicious: suspicious, primary: primary, primaryCls: primaryCls, recs: recs, confidence: confidence, confWhy: confWhy, bpp: bppImpression(bppScore()), extra: measurementDiagnoses() };
+    }
+    if (loc === "ectopic") {
+      findings.push("Adnexal ectopic mass with empty uterus (as entered).");
+      primary = "Findings entered as ectopic pregnancy — not an intrauterine viability assessment.";
+      primaryCls = "danger";
+      recs.push("Ectopic pregnancy is a clinical emergency pathway. This module does not grade tubal rupture. Urgent senior review.");
+      confidence = "Moderate";
+      confWhy = "Location was entered as ectopic; intrauterine EPL/IUFD rules do not apply.";
+      return { findings: findings, criteria: criteria, suspicious: suspicious, primary: primary, primaryCls: primaryCls, recs: recs, confidence: confidence, confWhy: confWhy, bpp: bppImpression(bppScore()), extra: measurementDiagnoses() };
+    }
+    if (loc === "heterotopic") {
+      findings.push("Heterotopic pregnancy entered (IUP + ectopic).");
+      primary = "Heterotopic pregnancy (as entered) — manage both sacs; intrauterine criteria below apply only to the intrauterine gestation.";
+      primaryCls = "danger";
+      recs.push("Urgent senior review. The intrauterine sac can still be assessed for viability independently.");
+    } else if (loc === "iup") {
+      findings.push("Definite intrauterine pregnancy (gestational sac with yolk sac or embryo).");
+    } else {
+      findings.push("Pregnancy location not explicitly classified.");
+    }
+
+    if (ga.crl != null) findings.push("CRL " + ga.crl.toFixed(1) + " mm.");
+    if (ga.msd != null) findings.push("MSD " + ga.msd.toFixed(1) + " mm.");
+    var ysmm = num(val("imp-ysmm"));
+    if (ga.crl != null && ga.crl >= 2 && fca === "unknown") {
+      recs.push("Cardiac activity is expected once CRL is ≥2 mm on transvaginal ultrasound; document FCA before calling the pregnancy normal.");
+    }
+    if (ga.msd != null && embryo !== true) {
+      if (ga.msd >= 16 && ga.msd < 25 && embryo === false) {
+        /* suspicious MSD handled below */
+      } else if (ga.msd >= 8 && ga.msd < 16 && ys !== "present" && ys !== "large") {
+        findings.push("At MSD ~8–10 mm a yolk sac is usually visible transvaginally.");
+      }
+    }
+    if (ys === "absent") findings.push("Yolk sac not seen.");
+    else if (ys === "present") findings.push("Yolk sac present" + (ysmm != null ? " (" + ysmm.toFixed(1) + " mm)" : "") + ".");
+    else if (ys === "large") findings.push("Yolk sac present, described as enlarged" + (ysmm != null ? " (" + ysmm.toFixed(1) + " mm)" : "") + ".");
+    if (embryo === true) findings.push("Embryo/fetus seen.");
+    else if (embryo === false) findings.push("No embryo seen.");
+    if (fca === "present") {
+      var bpm = num(val("fhr-bpm"));
+      findings.push("Cardiac activity present" + (bpm != null ? " (" + Math.round(bpm) + " bpm)" : "") + ".");
+    } else if (fca === "absent") findings.push("No fetal cardiac activity (adequate ultrasound observation as entered).");
+    else if (fca === "not_assessed") findings.push("Cardiac activity not assessed.");
+
+    var bpm = num(val("fhr-bpm"));
+    var fhrWk = num(val("fhr-wk")), fhrD = num(val("fhr-d"));
+    var fhrGa = fhrWk != null ? fhrWk + (fhrD || 0) / 7 : weeks;
+
+    var eplDef = [];
+    var eplSusp = [];
+    if (trimester === "first" || (weeks != null && weeks < 14) || (ga.crl != null || ga.msd != null)) {
+      var tv = approach !== "ta";
+      if (ga.crl != null && ga.crl >= 7 && fca === "absent") {
+        eplDef.push("CRL " + ga.crl.toFixed(1) + " mm ≥ 7 mm with no cardiac activity" + (tv ? " (SRU definitive on transvaginal ultrasound)" : " — SRU 7 mm rule is validated transvaginally; TA-only exams should not be treated as equivalently definitive"));
+      }
+      if ((embryo === false || (ga.crl == null && val("imp-embryo") === "not_seen")) && ga.msd != null && ga.msd >= 25) {
+        eplDef.push("MSD " + ga.msd.toFixed(1) + " mm ≥ 25 mm with no embryo (SRU definitive for anembryonic pregnancy on TV ultrasound)");
+      }
+      var scanIso = val("d-scandate");
+      var dNoYs = daysBetweenIso(val("imp-prior-noys"), scanIso);
+      var dYs = daysBetweenIso(val("imp-prior-ys"), scanIso);
+      if (dNoYs != null && dNoYs >= 14 && fca !== "present" && embryo !== true) {
+        eplDef.push("No embryo with cardiac activity ≥14 days after a scan showing an intrauterine GS without a yolk sac (SRU serial criterion)");
+      }
+      if (dYs != null && dYs >= 11 && fca !== "present" && embryo !== true) {
+        eplDef.push("No embryo with cardiac activity ≥11 days after a scan showing an intrauterine GS with a yolk sac (SRU serial criterion)");
+      }
+      if (ga.crl != null && ga.crl < 7 && fca === "absent") {
+        eplSusp.push("CRL " + ga.crl.toFixed(1) + " mm < 7 mm with no cardiac activity — suspicious, not diagnostic of EPL on a single scan");
+      }
+      if ((embryo === false) && ga.msd != null && ga.msd >= 16 && ga.msd < 25) {
+        eplSusp.push("MSD " + ga.msd.toFixed(1) + " mm (16–24 mm) with no embryo — suspicious, not diagnostic");
+      }
+      if (ysmm != null && ysmm > 6) eplSusp.push("Yolk sac " + ysmm.toFixed(1) + " mm (>6 mm) — enlarged; increases risk of loss but is not a standalone SRU failure criterion");
+      else if (ys === "large") eplSusp.push("Enlarged yolk sac (qualitative) — risk marker, not diagnostic of EPL");
+      if (bpm != null && fhrGa != null && fhrGa <= 8) {
+        var cut = fhrEarlyBradycardiaCutoff(fhrGa);
+        if (cut != null && bpm < cut) eplSusp.push("FHR " + Math.round(bpm) + " bpm below the Doubilet & Benson early-pregnancy red-flag cutoff (~" + cut + " bpm) — high risk of subsequent loss, not itself an SRU demise criterion");
+      }
+      if (checked("imp-irregular-sac")) eplSusp.push("Irregular sac / low implantation / large subchorionic hematoma — risk features, not diagnostic of EPL");
+      if (ga.msd != null && ga.msd >= 8 && (ys === "absent" || (!ys && ysmm == null))) {
+        eplSusp.push("Yolk sac is usually seen when MSD is about 8–10 mm (TV) and was not recorded as present");
+      }
+    }
+
+    eplDef.forEach(function (c) { criteria.push("Met: " + c + "."); });
+    if (!eplDef.length && (trimester === "first" || ga.crl != null || ga.msd != null)) {
+      criteria.push("No SRU definitive criterion for early pregnancy loss is met on the data entered.");
+    }
+    eplSusp.forEach(function (c) { suspicious.push(c + "."); });
+
+    if (eplDef.length) {
+      var anemb = eplDef.some(function (c) { return c.indexOf("MSD") === 0 || c.indexOf("anembryonic") !== -1; });
+      var serial = eplDef.some(function (c) { return c.indexOf("days after") !== -1; });
+      if (ga.crl != null && ga.crl >= 7 && fca === "absent") {
+        primary = "Early pregnancy loss (embryonic demise).";
+      } else if (anemb && !(ga.crl != null && ga.crl >= 7)) {
+        primary = "Early pregnancy loss (anembryonic pregnancy).";
+      } else if (serial) {
+        primary = "Early pregnancy loss (failed serial-interval follow-up).";
+      } else {
+        primary = "Early pregnancy loss.";
+      }
+      primaryCls = "danger";
+      recs.push("No further viability ultrasound is required to confirm demise once a definitive SRU criterion is met. Clinical correlation and management (expectant, medical, or surgical) follow local protocol — this tool does not prescribe treatment.");
+      if (approach === "ta" && ga.crl != null && ga.crl >= 7 && fca === "absent") {
+        recs.push("If this examination was transabdominal only, a transvaginal scan is preferred before counselling a definitive diagnosis.");
+      }
+      confidence = (approach === "ta") ? "Moderate" : "High";
+      confWhy = eplDef.length ? "At least one SRU definitive criterion is met." : confWhy;
+    }
+
+    var iufd = false;
+    if (!eplDef.length && weeks != null && weeks >= 20 && fca === "absent" && checked("imp-no-move")) {
+      iufd = true;
+      criteria.push("Met: no fetal cardiac activity and no fetal movements over an adequate ultrasound observation period at ≥20 weeks — diagnostic of IUFD (ultrasound confirmation; handheld Doppler/CTG alone would not suffice).");
+      if (checked("imp-spalding")) findings.push("Supportive signs of established demise entered (Spalding / maceration / edema / gas) — supportive, not required for the diagnosis.");
+      primary = "Intrauterine fetal demise at ~" + fmtWD(ga.days) + ".";
+      primaryCls = "danger";
+      recs.push("Ultrasound has confirmed fetal death. No further viability scan is needed for that confirmation. Counselling, investigation, and mode of birth follow local stillbirth / IUFD protocol. This tool does not direct labour management.");
+      confidence = "High";
+      confWhy = "IUFD criteria (absent cardiac activity and movement at ≥20 weeks on ultrasound) are met.";
+    } else if (!eplDef.length && weeks != null && weeks >= 14 && weeks < 20 && fca === "absent" && checked("imp-no-move")) {
+      criteria.push("No cardiac activity and no movement at " + fmtWD(ga.days) + " — second-trimester fetal demise (below the ≥20-week clinical IUFD/stillbirth threshold used here).");
+      primary = "Second-trimester fetal demise at ~" + fmtWD(ga.days) + " (below 20 weeks; local registration thresholds vary).";
+      primaryCls = "danger";
+      recs.push("Ultrasound indicates fetal death. Management follows local mid-trimester loss protocol. Do not label stillbirth/IUFD unless local policy uses a lower gestational cutoff.");
+      confidence = "High";
+      confWhy = "Absent cardiac activity and movement on ultrasound; GA is under 20 weeks so the IUFD label is not used.";
+    } else if (!eplDef.length && fca === "absent" && weeks != null && weeks >= 14 && !checked("imp-no-move")) {
+      suspicious.push("Cardiac activity reported absent at " + fmtWD(ga.days) + " but fetal movement observation was not confirmed — do not diagnose IUFD until both are documented on ultrasound.");
+      recs.push("Reassess with real-time ultrasound (M-mode ± Doppler) and an adequate observation for movement before issuing an IUFD report.");
+      criteria.push("IUFD criterion not fully met (movement observation not ticked).");
+    } else if (!eplDef.length && weeks != null && weeks >= 14) {
+      criteria.push("IUFD criteria not met (cardiac activity present or not documented as absent with absent movement).");
+    }
+
+    var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+    var hc = calcHC(bpd, ofd);
+    var efw = hadlockEFW(bpd, hc, ac, fl);
+    var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
+    var gaForPct = estWk != null ? (estWk + (estD || 0) / 7) : (weeks != null ? weeks : null);
+    var pctRes = (efw && gaForPct != null) ? lookupPercentile(gaForPct, efw.grams) : null;
+    var gclass = (pctRes && !pctRes.outOfRange) ? classifyGrowth(pctRes.percentile, efw.grams) : null;
+    if (efw) findings.push("EFW " + Math.round(efw.grams).toLocaleString() + " g (" + efw.label + ")" + (gclass ? ", " + ordinal(pctRes.percentile) + " centile — " + gclass.sizeClass : "") + ".");
+    if (gclass && gclass.macro) findings.push(gclass.macro + ".");
+
+    var aedf = checked("dp-aedf"), redf = checked("dp-redf"), dvaw = checked("dp-dvaw");
+    var uapi = num(val("dp-uapi")), mcapi = num(val("dp-mcapi")), mcapsv = num(val("dp-mcapsv"));
+    var dpWk = num(val("dp-wk")), dpD = num(val("dp-d"));
+    var dpGa = dpWk != null ? dpWk + (dpD || 0) / 7 : weeks;
+    var cpr = (mcapi != null && uapi != null && uapi !== 0) ? mcapi / uapi : null;
+    var uaHigh = false;
+    if (uapi != null && dpGa != null) {
+      var p95ua = uaPiFromZ(1.64485, dpGa);
+      if (p95ua != null && uapi > p95ua) uaHigh = true;
+    }
+    if (redf) findings.push("Umbilical artery reversed end-diastolic flow.");
+    else if (aedf) findings.push("Umbilical artery absent end-diastolic flow.");
+    if (cpr != null && cpr < 1) findings.push("CPR " + cpr.toFixed(2) + " (<1.0) — brain-sparing pattern.");
+    if (dvaw) findings.push("Ductus venosus absent/reversed a-wave.");
+    if (mcapsv != null && dpGa != null) {
+      var mom = mcapsv / mcaPsvMedian(dpGa);
+      if (mom >= 1.5) findings.push("MCA-PSV " + mom.toFixed(2) + " MoM (≥1.5) — fetal anaemia-risk threshold (Mari).");
+    }
+
+    var fluidDx = [];
+    var flc = fluidClassify();
+    var oligo = !!(flc && flc.kind === "oligo");
+    var poly = !!(flc && flc.kind === "poly");
+    if (flc) findings.push(flc.text);
+
+    var fgr = false, sga = false;
+    var smallAc = false, asym = false;
+    if (ac != null && gaForPct != null && gaForPct >= 14) {
+      var acGaW = gaAC(ac);
+      if (acGaW != null && (gaForPct - acGaW) * 7 > 14) {
+        smallAc = true;
+        suspicious.push("AC dates more than 14 days behind the working GA — small AC (size descriptor, not an AC centile table).");
+      }
+    }
+    if (hc != null && ac != null && gaForPct != null && gaForPct >= 20) {
+      var hcacX = hc / ac, expX = hcAcExpected(gaForPct);
+      if (hcacX > expX * 1.15) {
+        asym = true;
+        suspicious.push("HC/AC " + hcacX.toFixed(2) + " above expected ≈ " + expX.toFixed(2) + " — asymmetric / head-sparing pattern.");
+      }
+    }
+    if (!eplDef.length && !iufd && gclass) {
+      var dopAbn = aedf || redf || dvaw || (cpr != null && cpr < 1) || oligo || uaHigh;
+      if (pctRes && !pctRes.outOfRange && pctRes.percentile < 3) {
+        fgr = true;
+        suspicious.push("EFW <3rd centile — high-risk FGR by size (ISUOG/ACOG-style threshold).");
+      } else if (pctRes && !pctRes.outOfRange && pctRes.percentile < 10) {
+        sga = true;
+        suspicious.push("EFW <10th centile — SGA (size descriptor).");
+        if (dopAbn || smallAc || asym) {
+          fgr = true;
+          suspicious.push("SGA plus Doppler, oligohydramnios, or small/asymmetric AC — treat as FGR physiology rather than constitutionally small on size alone.");
+        }
+      }
+    }
+    if (!fgr && smallAc && (aedf || redf || uaHigh || oligo)) {
+      fgr = true;
+      suspicious.push("Small AC plus Doppler or oligohydramnios — FGR-pattern even if EFW centile is unavailable.");
+    }
+
+    var cx = num(val("imp-cx"));
+    if (cx != null) {
+      findings.push("Cervical length " + cx.toFixed(1) + " mm.");
+      if (weeks != null && weeks < 24 && cx < 25) suspicious.push("Cervical length <25 mm before 24 weeks — increased preterm-birth risk.");
+    }
+    var ploc = val("imp-plac-loc");
+    if (ploc === "previa") suspicious.push("Placenta previa (as entered).");
+    if (ploc === "low") suspicious.push("Low-lying placenta (as entered) — follow local re-scan policy in the third trimester.");
+    if (ploc === "abruption") suspicious.push("Findings concerning for abruption (as entered) — clinical, not a measurement diagnosis.");
+
+    var bpp = bppImpression(bppScore());
+    if (bpp) findings.push(bpp.text);
+
+    var extra = measurementDiagnoses();
+    extra.forEach(function (d) {
+      if (findings.indexOf(d.text) === -1) findings.push(d.text);
+      if ((d.cls === "danger" || d.cls === "warn") && suspicious.indexOf(d.text) === -1 && suspicious.indexOf(d.text.replace(/\.$/, "")) === -1) {
+        suspicious.push(d.text);
+      }
+    });
+
+    if (weeks != null && weeks >= 14 && fca === "present") {
+      var lmp = parseLocalDate(val("d-lmp"));
+      var scanD = parseLocalDate(val("d-scandate"));
+      if (lmp && scanD && ga.source !== "LMP") {
+        var lmpDays = Math.round((scanD - lmp) / 86400000);
+        var disc = Math.abs(lmpDays - ga.days);
+        var thr = acogThresholdDays(ga.days / 7, false);
+        if (thr != null && disc > thr) {
+          suspicious.push("Ultrasound–LMP discrepancy " + disc + " days exceeds the ACOG Committee Opinion 700 threshold of " + thr + " days at this GA — prefer the ultrasound EDD.");
+        }
+      }
+    }
+    if (weeks != null && weeks < 22) {
+      findings.push("Previable range in most settings (<22–23 weeks); this tool does not define a local viability policy.");
+    } else if (weeks != null && weeks >= 22 && weeks < 24) {
+      findings.push("Periviable window (commonly 22–24 weeks) — counselling is centre-specific.");
+    } else if (weeks != null && weeks >= 24) {
+      findings.push("≥24 weeks — generally considered viable in high-resource settings; local policy applies.");
+    }
+
+    if (!primary) {
+      if (fca === "present" && loc !== "ectopic" && loc !== "pul") {
+        var bits = [];
+        if (fgr) bits.push("suspected fetal growth restriction");
+        else if (sga) bits.push("SGA (EFW <10th)");
+        if (oligo) bits.push((flc && flc.sev === "severe" ? "severe " : "") + "oligohydramnios");
+        if (poly) bits.push((flc && flc.sev ? flc.sev + " " : "") + "polyhydramnios");
+        if (redf || aedf) bits.push(redf ? "UA REDF" : "UA AEDF");
+        if (bpp && bpp.cls === "danger") bits.push("abnormal BPP");
+        else if (bpp && bpp.cls === "warn") bits.push("equivocal / incomplete BPP");
+        var gaTxt = weeks != null ? " at ~" + fmtWD(ga.days) : "";
+        if (eplSusp.length && (trimester === "first" || weeks == null || weeks < 14)) {
+          primary = "Intrauterine pregnancy" + gaTxt + " with suspicious early-pregnancy features — not diagnostic of early pregnancy loss.";
+          primaryCls = "warn";
+          recs.push("Repeat transvaginal ultrasound in 7–10 days (or apply the 11- / 14-day empty-sac clock if a yolk sac was/was not seen). Do not counsel definitive miscarriage from suspicious findings alone.");
+          confidence = "Moderate";
+          confWhy = "Suspicious first-trimester features are present, but no SRU definitive criterion is met.";
+        } else if (bits.length) {
+          primary = "Viable intrauterine pregnancy" + gaTxt + " with " + bits.join(", ") + ".";
+          primaryCls = "warn";
+          recs.push("This is a living fetus on the data entered. Plan surveillance (serial growth, Doppler, fluid, BPP/NST) according to the complication list and local FGR/MFM pathways. This tool does not time delivery.");
+          if (fgr) recs.push("FGR work-up: serial EFW/AC, UA Doppler (AEDF/REDF outrank PI), MCA/CPR, DV if late FGR, fluid, and senior/MFM review.");
+          if (oligo) recs.push("Oligohydramnios: confirm SDP (ACOG prefers SDP <2 cm), ask about fluid leakage, and correlate with FGR/anomalies/PPROM.");
+          if (weeks != null && weeks >= 22 && weeks < 24) recs.push("This GA is in the periviable window (commonly 22–24 weeks); viability counselling is centre-specific and is not issued by this tool.");
+          if (bpp && bpp.rec) recs.push(bpp.rec);
+          confidence = (efw || extra.length || bpp) ? "Moderate" : "Low";
+          confWhy = "Cardiac activity is present; complication labels are measurement-based and remain decision support.";
+        } else {
+          primary = "Findings are consistent with a viable intrauterine pregnancy" + gaTxt + ".";
+          primaryCls = "ok";
+          recs.push("Continue routine or indication-based antenatal care. Limited views or missing anatomy/Doppler/fluid entries are not assumed normal — they are simply not entered.");
+          confidence = weeks != null && fca === "present" ? "Moderate" : "Low";
+          confWhy = "Cardiac activity is present and no definitive loss or FGR/fluid criterion was met on the fields completed.";
+        }
+      } else if (fca === "unknown" || fca === "not_assessed") {
+        primary = "Insufficient data for a definitive viability impression.";
+        primaryCls = "warn";
+        recs.push("Document location, embryo/CRL or MSD, and cardiac activity (TV when first trimester) before applying SRU or IUFD rules.");
+        confidence = "Low";
+        confWhy = "Cardiac activity and/or location incomplete.";
+      } else {
+        primary = "Serial imaging / additional fields are required before a definitive impression.";
+        primaryCls = "warn";
+        recs.push("Enter the missing SRU or IUFD elements (CRL/MSD, yolk-sac timeline, movement observation) rather than forcing a diagnosis.");
+        confidence = "Low";
+        confWhy = "Definitive criteria not met and viability not confirmed.";
+      }
+    } else if (eplSusp.length && eplDef.length === 0 && recs.length === 0) {
+      recs.push("Repeat transvaginal ultrasound in 7–10 days unless a serial 11-/14-day clock already applies.");
+    }
+
+    if (!recs.length) recs.push("Correlate with the clinical picture and departmental protocol. Decision support only.");
+
+    return {
+      findings: findings,
+      criteria: criteria,
+      suspicious: suspicious,
+      primary: primary,
+      primaryCls: primaryCls,
+      recs: recs,
+      confidence: confidence,
+      confWhy: confWhy,
+      bpp: bpp,
+      extra: extra
+    };
+  }
+
+  function renderImpression() {
+    var r = buildImpression();
+    var html = '<div class="card-title">Structured impression</div>';
+    html += '<p class="subhead">Guideline-concordant decision support. Not a substitute for the reporting clinician.</p>';
+    html += '<div class="hairline" style="margin-top:0"><h3 style="font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Findings summary</h3><ul class="imp-list">';
+    r.findings.forEach(function (x) { html += "<li>" + fEsc(x) + "</li>"; });
+    html += "</ul></div>";
+    html += '<div class="hairline"><h3 style="font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Applied criteria</h3><ul class="imp-list">';
+    (r.criteria.length ? r.criteria : ["No definitive EPL/IUFD criterion was tested or met on the current entries."]).forEach(function (x) { html += "<li>" + fEsc(x) + "</li>"; });
+    html += "</ul>";
+    if (r.suspicious.length) {
+      html += '<p class="note">Suspicious / high-risk features (not definitive demise):</p><ul class="imp-list">';
+      r.suspicious.forEach(function (x) { html += "<li>" + fEsc(x) + "</li>"; });
+      html += "</ul>";
+    }
+    html += "</div>";
+    html += '<div class="impression ' + (r.primaryCls === "ok" ? "" : r.primaryCls) + '"><h3>Impression</h3><p>' + fEsc(r.primary) + "</p></div>";
+    if (r.bpp) html += '<div class="impression ' + (r.bpp.cls === "ok" ? "" : r.bpp.cls) + '" style="margin-top:10px"><h3>Biophysical profile</h3><p>' + fEsc(r.bpp.text) + "</p>" + (r.bpp.rec ? "<p>" + fEsc(r.bpp.rec) + "</p>" : "") + "</div>";
+    html += '<div class="hairline"><h3 style="font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Recommendations</h3><ul class="imp-list">';
+    r.recs.forEach(function (x) { html += "<li>" + fEsc(x) + "</li>"; });
+    html += "</ul></div>";
+    html += '<div class="badge ' + (r.confidence === "High" ? "ok" : (r.confidence === "Moderate" ? "warn" : "danger")) + '">Confidence: ' + fEsc(r.confidence) + " — " + fEsc(r.confWhy) + "</div>";
+    set("imp-output", html);
+  }
+  function initImpression() {
+    window.__impReady = true;
+    var ids = ["imp-indication","imp-cycle","imp-ivf","imp-prior-note","imp-approach","imp-location","imp-ys","imp-ysmm","imp-embryo","imp-fca","imp-prior-noys","imp-prior-ys","imp-hcg","imp-irregular-sac","imp-no-move","imp-spalding","imp-cx","imp-plac-loc","bpp-breath","bpp-move","bpp-tone","bpp-af","bpp-nst"];
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var evt = (el.type === "checkbox" || el.tagName === "SELECT" || el.type === "date") ? "change" : "input";
+      el.addEventListener(evt, function () { renderImpression(); renderBppLive(); });
+    });
+    renderImpression();
+    renderBppLive();
+  }
+  function impressionReportHtml() {
+    var r = buildImpression();
+    var ul = function (arr) { return "<ul>" + arr.map(function (x) { return "<li>" + fEsc(x) + "</li>"; }).join("") + "</ul>"; };
+    return "<p><strong>" + fEsc(r.primary) + "</strong></p>" +
+      (r.bpp ? "<p>" + fEsc(r.bpp.text) + "</p>" : "") +
+      "<p><em>Findings</em></p>" + ul(r.findings) +
+      "<p><em>Applied criteria</em></p>" + ul(r.criteria.concat(r.suspicious)) +
+      "<p><em>Recommendations</em></p>" + ul(r.recs) +
+      "<p>Confidence: " + fEsc(r.confidence) + " — " + fEsc(r.confWhy) + "</p>";
   }
 
   /* =========================================================================
@@ -3464,7 +4490,7 @@
     return out;
   }
 
-  function renderClinical() { renderBiometry(); renderDating(); renderDoppler(); }
+  function renderClinical() { renderBiometry(); renderDating(); renderDoppler(); if (window.__impReady) { renderImpression(); renderBppLive(); } if (window.__anomReady) renderAnomalyResult(); }
   function renderAll() {
     renderClinical();
     if (window.__follReady) renderFolliculometry();
@@ -3551,6 +4577,10 @@
       if (html.trim() && !hasEmpty) out.push({ title: s.title, html: html });
     });
     fReportSections().forEach(function (s) { out.push(s); });
+    try {
+      var ir = buildImpression();
+      if (ir && ir.primary) out.push({ title: "Pregnancy impression", html: impressionReportHtml() });
+    } catch (e) {}
     return out;
   }
 
@@ -3648,7 +4678,7 @@
   function onReady() {
     // Tabs
     var tabs = document.querySelectorAll(".tab");
-    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs") };
+    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress") };
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
@@ -3669,6 +4699,8 @@
       } else if (name === "follicle" && !window.__follReady) {
         window.__follReady = true;
         initFolliculometry();
+      } else if (name === "impress" && !window.__impReady) {
+        initImpression();
       }
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
