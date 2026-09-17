@@ -355,6 +355,11 @@
   }
   .jump-hit:hover, .jump-hit.active { background: var(--panel2); }
   .jump-hit span { color: var(--muted); font-size: 12px; display: block; }
+  .week-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .week-nav input { width: 72px; text-align: center; font-family: var(--mono); font-size: 18px; background: none; border: 0; border-bottom: 1px solid var(--line); color: var(--paper); }
+  .week-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .week-chip-row button { background: var(--panel2); border: 0; color: var(--paper); font-family: var(--mono); font-size: 11px; padding: 8px 10px; border-radius: 999px; min-height: 36px; }
+  .week-chip-row button.on { background: var(--accent); color: var(--on-accent); }
 
   .boot-splash {
     position: fixed; inset: 0; z-index: 1000;
@@ -391,6 +396,10 @@
     #report-body .rline { display: flex; justify-content: space-between; font-size: 12.5px; padding: 3px 0; border-bottom: 1px dotted #ddd; }
     #report-body .rflag { font-size: 12px; padding: 4px 0; color: #900; }
     .report-footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 10px; color: #666; }
+    .cert-wrap { text-align: center; padding: 28px 12px; border: 3px double #C45C4A; }
+    .cert-wrap h1 { font-size: 28px; margin: 8px 0; color: #C45C4A; }
+    .cert-wrap .cert-name { font-size: 22px; margin: 18px 0 8px; }
+    .jump-overlay, .boot-splash, .crit-bar { display: none !important; }
   }
 </style>
 </head>
@@ -428,6 +437,7 @@
 
   <nav class="tabs" aria-label="Clinical modules">
     <button class="tab" data-tab="dating">Dating &amp; EDD</button>
+    <button class="tab" data-tab="weeks">Scan weeks</button>
     <button class="tab" data-tab="biometry">Biometry</button>
     <button class="tab" data-tab="doppler">Doppler</button>
     <button class="tab" data-tab="anomaly">Anomaly</button>
@@ -514,6 +524,29 @@
         <div class="card" id="edd-card"></div>
         <div class="card" id="redate-card"></div>
         <div class="card" id="fhr-card"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== TAB: CLINICIAN SCAN WEEKS ===================== -->
+  <section class="panel-view" id="view-weeks">
+    <div class="layout">
+      <div>
+        <div class="card">
+          <div class="card-title">Gestational week</div>
+          <p class="subhead">What a sonographer should expect to see, measure, and not over-call — not a patient fruit-size chart. Ranges are windows, not single cutoffs.</p>
+          <div class="week-nav">
+            <button type="button" class="icon-btn" id="wk-prev">←</button>
+            <input id="wk-num" type="number" min="4" max="42" value="12" aria-label="Gestational week">
+            <button type="button" class="icon-btn" id="wk-next">→</button>
+          </div>
+          <button type="button" class="btn-ghost" id="wk-from-dating" style="width:100%;margin-bottom:10px;">Use GA from Dating tab</button>
+          <div class="week-chip-row" id="wk-chips"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card" id="wk-card"></div>
       </div>
     </div>
   </section>
@@ -1140,11 +1173,13 @@
       </ul>
     </div>
     <div class="card ref-block">
-      <h3>RMI, TI-RADS, Bosniak</h3>
+      <h3>RMI, TI-RADS, Bosniak, BI-RADS</h3>
       <ul>
         <li><strong>RMI-I.</strong> Jacobs et al., <em>Br J Obstet Gynaecol</em> 1990; 97:922–9. U × M × CA-125. RCOG Green-top 34 commonly uses 200 as the specialist-referral cut-off.</li>
         <li><strong>ACR TI-RADS.</strong> Tessler et al., <em>JACR</em> 2017; 14:587–95. DOI 10.1016/j.jacr.2017.01.046. Points for composition, echogenicity, shape, margin, echogenic foci; TR1–TR5 size thresholds for FNA vs follow-up.</li>
         <li><strong>Bosniak 2019.</strong> Silverman et al., <em>Radiology</em> 2019; 292:475–80 (renal cystic masses). Categories I–IV are entered as the published class; this tool does not invent a point score.</li>
+<li><strong>ACR BI-RADS Atlas 5th Edition (2013), ultrasound.</strong> Lexicon (shape, orientation, margin, echo, posterior features, special cases) plus an assessment category the reader assigns. Not a point score. Category 3 <2% malignancy; 5 ≥95%.</li>
+<li><strong>Scan-week windows.</strong> ISUOG first-trimester and midtrimester anatomy practice guidelines; FMF NT 11+0–13+6 (CRL 45–84 mm); SRU 2012/2024 early-pregnancy diagnostic criteria; ACOG Committee Opinion 700 redating; IUFD ≥20 weeks as used elsewhere in this app.</li>
       </ul>
     </div>
   </section>
@@ -2044,7 +2079,7 @@
     { id: "spleen", label: "Spleen" }, { id: "liver", label: "Liver" }, { id: "kidney", label: "Kidney" },
     { id: "pancreas", label: "Pancreas" }, { id: "bowel", label: "Bowel & Appendix" }, { id: "bladder", label: "Bladder" },
     { id: "prostate", label: "Prostate" }, { id: "uterus", label: "Uterus & Endometrium" }, { id: "ovary", label: "Ovary" },
-    { id: "vessels", label: "Abdominal Vessels" }, { id: "tirads", label: "Thyroid (TI-RADS)" }, { id: "bosniak", label: "Renal cyst (Bosniak)" }
+    { id: "vessels", label: "Abdominal Vessels" }, { id: "tirads", label: "Thyroid (TI-RADS)" }, { id: "bosniak", label: "Renal cyst (Bosniak)" }, { id: "birads", label: "Breast (BI-RADS US)" }
   ];
 
   /* Ovary — mean volume reproductive age 6.11mL, prepubertal 1.67mL (SIGO/SIE consensus, Raffone et al. 2022).
@@ -2323,6 +2358,60 @@
         '<div class="field"><label>Maximum diameter (optional)</label><div class="row"><input id="bk-size" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>';
       set("organ-inputs", html);
       wireOrganInputs(["bk-class", "bk-size"]);
+    } else if (organSection === "birads") {
+      html = '<div class="card-title">BI-RADS ultrasound lexicon (ACR Atlas 5th ed.)</div>' +
+        '<p class="subhead">This is a reporting helper, not a point score. You assign the assessment category. The engine only flags when descriptors and category are discordant.</p>' +
+        '<div class="field"><label>Shape</label><div class="row"><select id="br-shape"><option value="oval">Oval</option><option value="round">Round</option><option value="irregular">Irregular</option></select></div></div>' +
+        '<div class="field"><label>Orientation</label><div class="row"><select id="br-orient"><option value="parallel">Parallel (wider-than-tall)</option><option value="notparallel">Not parallel (taller-than-wide)</option></select></div></div>' +
+        '<div class="field"><label>Margin</label><div class="row"><select id="br-margin">' +
+        '<option value="circ">Circumscribed</option>' +
+        '<option value="indistinct">Not circumscribed \u2014 indistinct</option>' +
+        '<option value="angular">Not circumscribed \u2014 angular</option>' +
+        '<option value="microlob">Not circumscribed \u2014 microlobulated</option>' +
+        '<option value="spiculated">Not circumscribed \u2014 spiculated</option>' +
+        '</select></div></div>' +
+        '<div class="field"><label>Echo pattern</label><div class="row"><select id="br-echo">' +
+        '<option value="anechoic">Anechoic</option>' +
+        '<option value="hyper">Hyperechoic</option>' +
+        '<option value="iso">Isoechoic</option>' +
+        '<option value="hypo" selected>Hypoechoic</option>' +
+        '<option value="hetero">Heterogeneous</option>' +
+        '<option value="complex">Complex cystic and solid</option>' +
+        '</select></div></div>' +
+        '<div class="field"><label>Posterior features</label><div class="row"><select id="br-post">' +
+        '<option value="none">No posterior features</option>' +
+        '<option value="enhance">Enhancement</option>' +
+        '<option value="shadow">Shadowing</option>' +
+        '<option value="combined">Combined pattern</option>' +
+        '</select></div></div>' +
+        '<div class="field"><label>Vascularity</label><div class="row"><select id="br-vasc">' +
+        '<option value="na">Not assessed</option>' +
+        '<option value="absent">Absent</option>' +
+        '<option value="internal">Internal vascularity</option>' +
+        '<option value="rim">Vessels in rim</option>' +
+        '</select></div></div>' +
+        '<div class="field"><label>Special case</label><div class="row"><select id="br-special">' +
+        '<option value="none">None / not a special case</option>' +
+        '<option value="simple">Simple cyst</option>' +
+        '<option value="complicated">Complicated cyst</option>' +
+        '<option value="clustered">Clustered microcysts</option>' +
+        '<option value="intramammary">Intramammary lymph node</option>' +
+        '</select></div></div>' +
+        '<div class="field"><label>Maximum diameter (optional)</label><div class="row"><input id="br-size" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
+        '<div class="field"><label>Your BI-RADS assessment</label><div class="row"><select id="br-cat">' +
+        '<option value="">\u2014 assign after lexicon \u2014</option>' +
+        '<option value="0">0 Incomplete \u2014 need additional imaging</option>' +
+        '<option value="1">1 Negative</option>' +
+        '<option value="2">2 Benign</option>' +
+        '<option value="3">3 Probably benign</option>' +
+        '<option value="4a">4A Low suspicion</option>' +
+        '<option value="4b">4B Moderate suspicion</option>' +
+        '<option value="4c">4C High suspicion</option>' +
+        '<option value="5">5 Highly suggestive of malignancy</option>' +
+        '<option value="6">6 Known biopsy-proven malignancy</option>' +
+        '</select></div></div>';
+      set("organ-inputs", html);
+      wireOrganInputs(["br-shape","br-orient","br-margin","br-echo","br-post","br-vasc","br-special","br-size","br-cat"]);
     }
     renderOrganResult();
   }
@@ -2599,6 +2688,48 @@
         if (bksz != null) html += organRow("Maximum diameter", bksz.toFixed(1) + " cm", "size is recorded, not used to re-grade the class");
         html += '<div class="note">Bosniak 2019 (Silverman et al., Radiology). Class is assigned by wall/septum/nodule enhancement \u2014 do not upgrade on size alone.</div>';
       }
+    } else if (organSection === "birads") {
+      var shape = val("br-shape"), orient = val("br-orient"), margin = val("br-margin");
+      var echo = val("br-echo"), post = val("br-post"), spec = val("br-special"), cat = val("br-cat");
+      var size = num(val("br-size"));
+      var suspicious = (shape === "irregular") || (orient === "notparallel") || (margin === "angular" || margin === "microlob" || margin === "spiculated") || echo === "complex" || post === "shadow";
+      var classicBenign = spec === "simple" || (echo === "anechoic" && margin === "circ" && post === "enhance" && (shape === "oval" || shape === "round") && orient === "parallel");
+      var probablyBenignMorph = spec === "complicated" || spec === "clustered" || spec === "intramammary" || (shape === "oval" && orient === "parallel" && margin === "circ" && echo !== "complex" && echo !== "anechoic");
+      html += '<div class="card-title" style="margin-top:0">Lexicon line</div>';
+      html += '<p>' + [shape, orient === "notparallel" ? "not parallel" : "parallel", margin === "circ" ? "circumscribed" : margin, echo, post === "none" ? "no posterior features" : post].join(", ") + (spec !== "none" ? "; special case: " + spec : "") + ".</p>";
+      if (size != null) html += organRow("Maximum diameter", size.toFixed(1) + " cm", "size is recorded; BI-RADS category is not a size score");
+      if (!cat) {
+        html += '<p class="empty">Assign an assessment category. The lexicon does not compute one.</p>';
+        if (classicBenign) html += '<div class="note">Descriptors match a simple cyst pattern \u2014 ACR typically codes this BI-RADS 2 if imaging is complete.</div>';
+        else if (suspicious) html += '<div class="note">Suspicious descriptors (irregular, not parallel, angular/microlobulated/spiculated, complex cystic-solid, or shadowing) usually belong in 4 or 5, not 2 or 3.</div>';
+        else if (probablyBenignMorph) html += '<div class="note">Oval + parallel + circumscribed solid masses are the usual BI-RADS 3 morphology when the full criteria for a probably-benign mass are met. This is not automatic.</div>';
+      } else {
+        var mgmt = {
+          "0": "Additional imaging or prior comparison before a final assessment.",
+          "1": "Routine screening / clinical follow-up as indicated. Nothing to describe as a finding.",
+          "2": "Benign. Routine follow-up. Tissue sampling is not indicated for the finding as coded.",
+          "3": "Probably benign (<2% likelihood of malignancy in the ACR definition). Short-interval follow-up is the usual pathway (often 6, 12, then 24 months) \u2014 local protocol applies.",
+          "4a": "Low suspicion. Tissue diagnosis is indicated; many 4A lesions are still benign.",
+          "4b": "Moderate suspicion. Tissue diagnosis is indicated.",
+          "4c": "High suspicion. Tissue diagnosis is indicated.",
+          "5": "Highly suggestive of malignancy (\u226595% in the ACR definition). Tissue diagnosis; do not code 5 unless the imaging is classic.",
+          "6": "Known biopsy-proven malignancy \u2014 use for a cancer already diagnosed, not as a guess."
+        };
+        var cls = (cat === "5" || cat === "4c" || cat === "6") ? "danger" : ((cat === "0" || cat.indexOf("4") === 0 || cat === "3") ? "warn" : "ok");
+        html += '<div class="impression ' + cls + '"><h3>Assessment</h3><p>BI-RADS ' + cat.toUpperCase() + " \u2014 " + mgmt[cat] + "</p></div>";
+        var flags = [];
+        if (classicBenign && !(cat === "2" || cat === "0")) flags.push("Simple-cyst descriptors with a category other than 2 (or 0 if incomplete) are discordant.");
+        if (suspicious && (cat === "2" || cat === "3")) flags.push("Suspicious morphology coded as 2 or 3 is discordant \u2014 reconsider 4 or 5, or explain why the finding is still probably benign.");
+        if (cat === "5" && !suspicious && spec !== "none") flags.push("Category 5 is reserved for classic malignant morphology; special-case benign entities should not be coded 5.");
+        if (cat === "1" && (shape || echo)) flags.push("Category 1 means no finding. If you described a mass, the assessment is not 1.");
+        if (cat === "3" && margin === "spiculated") flags.push("Spiculated margin is not a BI-RADS 3 feature.");
+        if (flags.length) {
+          flags.forEach(function (f) { html += '<div class="badge warn">' + f + "</div>"; });
+        } else {
+          html += '<div class="badge ok">No lexicon\u2013category discordance flagged on the fields entered.</div>';
+        }
+      }
+      html += '<div class="note">ACR BI-RADS Atlas 5th Edition (2013), ultrasound chapter. There is no TI-RADS-style point total. Do not use this helper as a biopsy order.</div>';
     }
 
     set("organ-result", html);
@@ -3673,6 +3804,146 @@
      QUIZ — topical clinical-scenario banks. Feedback is withheld until
      the topic attempt is submitted (retrieval practice).
      ========================================================================= */
+
+  /* Clinician scan-week notes. Windows not single cutoffs. */
+  var scanWeek = 12;
+  var SCAN_WEEK_BANDS = [
+    { lo: 4, hi: 4, title: "4+0 to 4+6",
+      see: "Transvaginal: a gestational sac may first appear around 4.5–5 weeks. Many 4-week scans are empty and still normal.",
+      measure: "Mean sac diameter if a sac is seen. Do not expect a yolk sac or embryo this early.",
+      pitfall: "Calling an endometrial fluid collection a sac without a yolk sac or double decidual sign. Empty uterus + positive hCG is PUL until location is proven — not a miscarriage.",
+      next: "Repeat TVUS in 7–10 days, or earlier if pain/bleeding. β-hCG trend per local PUL protocol." },
+    { lo: 5, hi: 5, title: "5+0 to 5+6",
+      see: "Intrauterine GS; yolk sac usually visible once MSD is about 8–10 mm (TV).",
+      measure: "MSD. Hellman/Kobayashi in this app: GA(days) ≈ MSD(mm) + 30, only if CRL is not measurable.",
+      pitfall: "MSD 16–24 mm with no embryo is suspicious, not diagnostic of anembryonic pregnancy (SRU). Do not counsel miscarriage from a single 5-week scan.",
+      next: "Document yolk sac. If bleeding, measure any subchorionic hematoma but do not over-call loss." },
+    { lo: 6, hi: 6, title: "6+0 to 6+6",
+      see: "Embryo usually visible; cardiac activity is expected once CRL is ≥2 mm on TV ultrasound (usually by ~6 weeks).",
+      measure: "CRL (preferred). FHR if cardiac activity is seen. MSD only if there is no embryo.",
+      pitfall: "CRL <7 mm with no heartbeat is suspicious, not SRU-definitive embryonic demise. Transabdominal-only exams are not equivalent to the 7 mm TV rule.",
+      next: "If no FCA and CRL <7 mm: repeat TVUS rather than diagnosing EPL. If FCA present, date by CRL." },
+    { lo: 7, hi: 8, title: "7–8 weeks",
+      see: "Embryo, yolk sac, amnion. Cardiac activity should be documented.",
+      measure: "CRL is the preferred dating parameter. FHR: Doubilet & Benson early bradycardia cutoffs live on the Dating tab (e.g. <110 bpm at 7–8 weeks is a red flag, not an SRU demise criterion).",
+      pitfall: "CRL ≥7 mm with no cardiac activity on adequate TV observation is definitive embryonic demise (SRU). Do not hedge with “possible viable pregnancy.”",
+      next: "If viable: book NT/combined screening 11+0 to 13+6. If EPL criteria met: no further viability scan is required to confirm demise." },
+    { lo: 9, hi: 10, title: "9–10 weeks",
+      see: "Fetal pole, limb buds, physiological midgut herniation may still be present (normal until ~12 weeks).",
+      measure: "CRL. ACOG 700 redating: at 9+0–13+6, discrepancy >7 days vs LMP prompts redating to ultrasound.",
+      pitfall: "Calling omphalocele before 12 weeks because bowel is still outside the abdomen physiologically.",
+      next: "NT window opens at 11+0. Do not measure NT before CRL 45 mm." },
+    { lo: 11, hi: 13, title: "11+0 to 13+6 — NT window",
+      see: "CRL 45–84 mm is the FMF/ISUOG NT window. Nasal bone, ductus venosus, tricuspid, and early anatomy (skull, heart four-chamber if feasible, stomach, bladder, limbs, cord insertion) can be surveyed.",
+      measure: "CRL for dating. NT in the midsagittal plane, on, not behind, the skin. This app uses a simplified NT 3.5 mm flag — specialist centres use CRL-specific percentiles.",
+      pitfall: "NT with a flexed or hyperextended neck, including amnion as skin, or measuring after 13+6 / CRL >84 mm and still calling it an NT.",
+      next: "Raised NT: anatomy, echo, and aneuploidy pathway. Combined screening or cfDNA per local protocol. Midtrimester anatomy 18–22 weeks." },
+    { lo: 14, hi: 17, title: "14–17 weeks",
+      see: "Early anatomy is possible but incomplete. Calvarium, stomach, bladder, four-chamber heart, and limbs should be visible; detailed cardiac and brain views are still limited.",
+      measure: "Biometry (BPD/HC/AC/FL) if CRL is no longer the dating method. Nuchal fold is a second-trimester marker (best 15–20 weeks), not an NT.",
+      pitfall: "Using MSD this late. Dating by biometry is less precise than first-trimester CRL. ACOG 700: 14–15+6 discrepancy >7 days; 16–21+6 >10 days.",
+      next: "Cervical length if indicated (e.g. prior PTB). Do not diagnose a short cervix on a poorly emptied bladder TA view alone — confirm TV." },
+    { lo: 18, hi: 22, title: "18–22 weeks — midtrimester anatomy",
+      see: "ISUOG midtrimester survey: head (cavum, thalami, cerebellum, cisterna magna, atria), face, four-chamber and outflow tracts, stomach, kidneys, bladder, cord insertion, three-vessel cord, spine, limbs, placenta, cervix if indicated, sex if requested.",
+      measure: "BPD, HC, AC, FL, atrial width (<10 mm normal), CM (≤10 mm), TCD. AFI/SDP. Placental site relative to the os.",
+      pitfall: "Calling Dandy–Walker on 4th ventricle–CM communication before 20 weeks (can be normal). Lemon sign may still be present this early with open NTD; banana sign is more specific.",
+      next: "Incomplete views: rescan in 1–2 weeks, not a ‘normal anatomy’ report. Soft markers are not a karyotype. IUFD threshold used here is ≥20 weeks." },
+    { lo: 23, hi: 25, title: "23–25 weeks — periviable window",
+      see: "Anatomy catch-up. Presentation, fluid, placenta. Growth if indicated.",
+      measure: "EFW centiles in this app start at 24 weeks (Hadlock 1991 table). Below 24 weeks, size is described, not forced onto that table.",
+      pitfall: "Counselling viability from this tool. 22–23 weeks is generally previable; 22–24 periviable; ≥24 weeks viable in most high-resource settings — local policy wins.",
+      next: "If FGR/fluid/Doppler concerns: MFM. Cervical length <25 mm before 24 weeks is a PTB-risk flag, not a labour diagnosis." },
+    { lo: 26, hi: 27, title: "26–27 weeks",
+      see: "Growth, fluid, placenta, presentation. Anatomy only if previously incomplete.",
+      measure: "AC and EFW. SDP preferred by ACOG for oligohydramnios (<2 cm). UA Doppler if growth-restricted or indicated.",
+      pitfall: "UA-PI without saying whether EDF is present. AEDF/REDF outrank the PI number.",
+      next: "Surveillance interval is clinical (often 2 weeks for isolated SGA; sooner if FGR physiology)." },
+    { lo: 28, hi: 31, title: "28–31 weeks — early third trimester",
+      see: "Third-trimester growth, liquor, placenta, presentation, and fetal movements on BPP if requested.",
+      measure: "EFW/AC centiles, AFI or SDP, UA-PI. MCA-PSV if anaemia risk. BPP components on the Impression tab.",
+      pitfall: "Labelling ‘macrosomia’ from a centile — macrosomia is an absolute weight (ACOG PB 216: 4000/4500/5000 g).",
+      next: "Reduced movements: BPP/NST pathway, not a single EFW. Anti-D and GDM screens are clinical calendar items, not ultrasound findings." },
+    { lo: 32, hi: 35, title: "32–35 weeks",
+      see: "Growth, presentation, fluid, placental site (low-lying should be restated vs prior), Doppler if FGR.",
+      measure: "EFW, AC, SDP/AFI, UA ± MCA/CPR. MCA-PSV false positives rise after ~35 weeks (Mari).",
+      pitfall: "CPR <1.0 is a qualitative brain-sparing flag, not a delivery order. Angle of insonation for PSV should be 0° as near as possible.",
+      next: "Late FGR: add DV if your unit uses it. Presentation counselling if breech." },
+    { lo: 36, hi: 40, title: "36–40 weeks",
+      see: "Presentation, liquor, placental position, EFW if indicated, Doppler only if previously abnormal or new concern.",
+      measure: "SDP/AFI, EFW with the usual ±10–15% error. Document presentation and placental os relationship.",
+      pitfall: "Over-calling oligohydramnios on AFI when SDP is ≥2 cm (ACOG prefers SDP). EFW error is largest at term.",
+      next: "Post-dates surveillance is a clinical protocol (often NST/AFI). This tool does not time induction." },
+    { lo: 41, hi: 42, title: "41–42 weeks",
+      see: "Presentation, liquor, fetal breathing/movement if BPP, placenta.",
+      measure: "SDP or AFI, BPP/NST per protocol. EFW if it will change management — say the error band.",
+      pitfall: "A numerically ‘normal’ BPP with no 2 cm pocket is still an abnormal fluid / modified-BPP finding.",
+      next: "Delivery timing is obstetric, not an ultrasound conclusion." }
+  ];
+  function crlMmForDays(days) {
+    if (days == null || days < 42 || days > 98) return null;
+    var x = (days - 23.73) / 8.052;
+    if (x <= 0) return null;
+    return (x * x) / 1.037;
+  }
+  function scanWeekBand(w) {
+    for (var i = 0; i < SCAN_WEEK_BANDS.length; i++) {
+      if (w >= SCAN_WEEK_BANDS[i].lo && w <= SCAN_WEEK_BANDS[i].hi) return SCAN_WEEK_BANDS[i];
+    }
+    return SCAN_WEEK_BANDS[0];
+  }
+  function renderScanWeeks() {
+    var w = num(val("wk-num"));
+    if (w == null) w = scanWeek;
+    w = Math.round(clamp(w, 4, 42));
+    scanWeek = w;
+    var el = document.getElementById("wk-num");
+    if (el && String(el.value) !== String(w)) el.value = w;
+    var band = scanWeekBand(w);
+    var chips = document.getElementById("wk-chips");
+    if (chips) {
+      chips.innerHTML = SCAN_WEEK_BANDS.map(function (b) {
+        var on = (w >= b.lo && w <= b.hi) ? "on" : "";
+        return '<button type="button" class="' + on + '" data-w="' + b.lo + '">' + b.lo + (b.hi !== b.lo ? "–" + b.hi : "") + "</button>";
+      }).join("");
+      chips.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          scanWeek = Number(b.getAttribute("data-w"));
+          document.getElementById("wk-num").value = scanWeek;
+          renderScanWeeks();
+        });
+      });
+    }
+    var days = w * 7;
+    var crl = crlMmForDays(days);
+    var msd = (days >= 32 && days <= 56) ? (days - 30) : null;
+    var html = '<div class="card-title">' + band.title + "</div>";
+    html += '<p class="subhead">Working week ' + w + "+0. Trimester: " + (w < 14 ? "first" : (w < 28 ? "second" : "third")) + ".</p>";
+    if (crl != null) html += organRow("CRL from this app’s Robinson–Fleming (dating range)", crl.toFixed(0) + " mm", "not a population nomogram — the inverse of the dating formula");
+    if (msd != null) html += organRow("MSD from Hellman (if no embryo)", msd.toFixed(0) + " mm", "GA(days) ≈ MSD + 30");
+    html += '<div class="impression"><h3>What you should see</h3><p>' + band.see + "</p></div>";
+    html += '<div class="impression"><h3>What to measure</h3><p>' + band.measure + "</p></div>";
+    html += '<div class="impression warn"><h3>Pitfall</h3><p>' + band.pitfall + "</p></div>";
+    html += '<div class="impression"><h3>Next</h3><p>' + band.next + "</p></div>";
+    html += '<p class="note">Clinician notes, not patient education. Fruit-size analogies are omitted on purpose. Windows vary by unit; local protocol outranks this card.</p>';
+    set("wk-card", html);
+  }
+  function initScanWeeks() {
+    window.__weeksReady = true;
+    ["wk-prev","wk-next","wk-num","wk-from-dating"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (id === "wk-prev") el.addEventListener("click", function () { scanWeek = Math.max(4, scanWeek - 1); document.getElementById("wk-num").value = scanWeek; renderScanWeeks(); });
+      else if (id === "wk-next") el.addEventListener("click", function () { scanWeek = Math.min(42, scanWeek + 1); document.getElementById("wk-num").value = scanWeek; renderScanWeeks(); });
+      else if (id === "wk-num") el.addEventListener("change", function () { scanWeek = num(el.value) || 12; renderScanWeeks(); });
+      else el.addEventListener("click", function () {
+        var ga = typeof impBestGA === "function" ? impBestGA() : { days: null };
+        if (ga.days != null) { scanWeek = Math.round(clamp(ga.days / 7, 4, 42)); document.getElementById("wk-num").value = scanWeek; }
+        renderScanWeeks();
+      });
+    });
+    renderScanWeeks();
+  }
+
   var QUIZ_TOPICS = [{"id": "dating", "name": "Dating, EDD & FHR", "blurb": "LMP, CRL, MSD, ACOG 700 redating, and early fetal heart rate."}, {"id": "biometry", "name": "Biometry & growth", "blurb": "Hadlock EFW, head shape, ratios, SGA, LGA, and macrosomia."}, {"id": "doppler", "name": "Fetal Doppler", "blurb": "UA-PI, AEDF/REDF, MCA-PSV, CPR, uterine artery, and ductus venosus."}, {"id": "anomaly", "name": "Anomaly scan", "blurb": "CNS, face, thorax, skeleton, renal tract, fluid, and placenta."}, {"id": "follicle", "name": "Folliculometry", "blurb": "Serial tracking, ovulation signs, endometrium, and cycle type."}, {"id": "organ", "name": "Gynaecology & organ size", "blurb": "IOTA, endometrium, viscera, prostate, vessels, and volumes."}];
   var QUIZ_BANK = [{"topic": "dating", "q": "A woman is sure of her LMP. At 7w2d by LMP, CRL dates the pregnancy 6 days earlier. Per ACOG Committee Opinion 700, what should you do?", "options": ["Keep the LMP EDD; 6 days is within the 7-day first-trimester CRL window after 9 weeks, so LMP stands", "Redate to the ultrasound EDD — at ≤8w6d the threshold is >5 days", "Average the two EDDs", "Wait until the anatomy scan to decide"], "correct": 1, "explain": "At ≤8w6d, a discrepancy >5 days prompts redating to ultrasound. Six days exceeds that threshold."}, {"topic": "dating", "q": "CRL is 62 mm at a dating scan. Which statement is most accurate?", "options": ["MSD should be used instead because it is more precise after 8 weeks", "CRL is the preferred first-trimester dating parameter in this size range", "BPD is more accurate than CRL at this size", "Dating should be deferred until FL is measurable"], "correct": 1, "explain": "CRL remains the most accurate single dating method through the first trimester (typically until CRL ~84 mm)."}, {"topic": "dating", "q": "A 5-week scan shows a mean sac diameter of 18 mm and no embryo. How should MSD be used?", "options": ["As a precise EDD that replaces any later CRL", "As a rough GA estimate (≈ MSD mm + 30 days) only until CRL is measurable", "To diagnose miscarriage immediately", "It should never be used for dating"], "correct": 1, "explain": "MSD dating is a rule of thumb used only before CRL is available. Failure criteria are a separate judgement (e.g. large empty sac)."}, {"topic": "dating", "q": "MSD is 26 mm with no visible embryo and no yolk sac. The most appropriate concern is:", "options": ["Normal very early pregnancy — return in 4 weeks", "Early pregnancy failure until proven otherwise (large empty sac)", "Definite molar pregnancy", "Definite twin gestation"], "correct": 1, "explain": "A mean sac diameter ≥25 mm without an embryo is a recognised threshold raising concern for early pregnancy failure."}, {"topic": "dating", "q": "At 20w0d by LMP, composite ultrasound GA is 18w3d (11-day gap). ACOG 700 at 16–21w6d uses which threshold?", "options": ["5 days — redate", "7 days — keep LMP", "10 days — redate because 11 days exceeds it", "21 days — keep LMP"], "correct": 2, "explain": "16w0d–21w6d: redating if the discrepancy is >10 days."}, {"topic": "dating", "q": "A first visit at 32 weeks has no prior dating. Ultrasound and LMP differ by 12 days. Best counselling?", "options": ["Redate automatically; 12 days always exceeds every ACOG threshold", "Do not redate on third-trimester ultrasound alone if FGR is possible — the window is ±21–30 days", "CRL now is more accurate than LMP", "Ignore LMP entirely whenever any scan exists"], "correct": 1, "explain": "≥28 weeks the ACOG discrepancy threshold is 21 days, and third-trimester biometry is a poor redating tool if the fetus may be small."}, {"topic": "dating", "q": "A dolichocephalic head (CI 69) is used for second-trimester dating. Which BPD should enter the Hadlock dating equations?", "options": ["Raw BPD, always", "Shape-corrected BPD (Doubilet & Greenes), because CI is outside 74–83", "OFD instead of BPD", "AC, which is the best dating parameter"], "correct": 1, "explain": "cBPD substitutes for raw BPD in dating when CI is abnormal. EFW formulas still use raw BPD."}, {"topic": "dating", "q": "Which parameter is generally the least reliable for dating in the second and third trimesters, despite being central to growth?", "options": ["HC", "Corrected BPD", "AC", "FL"], "correct": 2, "explain": "AC is growth-sensitive, so a discordant AC more often reflects the pregnancy than an error in dates."}, {"topic": "dating", "q": "Naegele’s rule used in this app calculates EDD as:", "options": ["LMP + 266 days (conceptional age)", "LMP + 280 days", "CRL days + 40 weeks", "LMP + 9 calendar months exactly"], "correct": 1, "explain": "EDD = first day of LMP + 280 days."}, {"topic": "dating", "q": "At 6w0d a heart rate of 88 bpm is recorded. Using Doubilet & Benson week-banded limits, this is best described as:", "options": ["Normal for 6 weeks (expected ~90–110)", "Tachycardia", "A validated early-pregnancy bradycardia red flag in this band", "Not detectable at 6 weeks"], "correct": 2, "explain": "Around 6 weeks the lower cutoff is about 100 bpm (<6.3 weeks). 88 bpm is below that red-flag band and warrants close clinical correlation."}, {"topic": "dating", "q": "FHR is 168 bpm at 9w4d. The most accurate comment is:", "options": ["Pathological tachycardia — deliver", "Near the physiological peak of FHR (about 150–175 bpm at 9–10 weeks); interpret in GA context", "Below the 110–160 range so it is bradycardia", "Diagnostic of thyrotoxicosis"], "correct": 1, "explain": "FHR peaks near 9–10 weeks before declining toward 110–160 bpm by ~14 weeks."}, {"topic": "dating", "q": "From about 14 weeks onward, sustained FHR >160 bpm is termed:", "options": ["Normal variant with no name", "Tachycardia", "Bradycardia", "Deceleration"], "correct": 1, "explain": "Standard obstetric terms: tachycardia >160, bradycardia <110, after the early peak has resolved."}, {"topic": "dating", "q": "A 12-week scan has both CRL and a biparietal diameter. For dating you should prefer:", "options": ["BPD because the head is now measurable", "CRL", "Average of CRL and BPD", "MSD"], "correct": 1, "explain": "While CRL remains in range, it outranks later biometric parameters."}, {"topic": "dating", "q": "LMP EDD and CRL EDD differ by 4 days at 10w0d. Per ACOG 700 (9w0d–13w6d threshold 7 days):", "options": ["Redate to ultrasound", "LMP dating can stand", "Always discard LMP in the first trimester", "Repeat CRL in 48 hours before any EDD is issued"], "correct": 1, "explain": "4 days is within the 7-day window at 9–13+6 weeks."}, {"topic": "dating", "q": "Why should you avoid redating a 30-week fetus with a small AC solely because biometry is 18 days behind LMP?", "options": ["Third-trimester ultrasound is exact", "The fetus may be growth-restricted; changing dates can mask FGR", "AC is the best dating parameter then", "ACOG requires redating any gap >14 days after 28 weeks"], "correct": 1, "explain": "The third-trimester threshold is 21 days, and a small fetus should not be ‘made younger’ on a single late scan."}, {"topic": "dating", "q": "Which pairing of trimester label used in this app is correct?", "options": ["1st trimester <12 weeks; 2nd 12–24; 3rd ≥24", "1st <14 weeks; 2nd 14–<28; 3rd ≥28", "1st <10; 2nd 10–20; 3rd ≥20", "Trimesters are not defined"], "correct": 1, "explain": "The app uses <14, 14–<28, and ≥28 weeks."}, {"topic": "dating", "q": "A patient has no LMP and a 22-week anatomy scan only. Best dating approach in this app?", "options": ["Invent an LMP 22 weeks ago", "Use composite Hadlock biometry (preferring HC/cBPD/FL over AC)", "Use MSD", "Refuse to assign an EDD"], "correct": 1, "explain": "Composite second-trimester biometry assigns GA; AC is down-weighted for dating."}, {"topic": "dating", "q": "An FHR of 142 bpm at 6w1d, taken alone, is best described as:", "options": ["Reassuringly normal for 6 weeks", "Faster than the ~90–110 bpm band expected this early — correlate, do not over-call from one reading", "Diagnostic of twins", "Bradycardia"], "correct": 1, "explain": "At 6 weeks 140 is above the expected early band; it is ‘outside expected range’, not a diagnosis."}, {"topic": "dating", "q": "CRL-based GA is 8w0d. The corresponding EDD is obtained by:", "options": ["Adding 280 days to the scan date", "Adding (280 − GA in days) to the scan date", "Adding 40 weeks to the CRL in mm", "Subtracting 14 days from Naegele’s rule"], "correct": 1, "explain": "Ultrasound EDD = scan date + (280 − current GA in days)."}, {"topic": "dating", "q": "A 11–13+6 week nuchal scan is also used for dating. If CRL and LMP disagree by 8 days, you should:", "options": ["Keep LMP (threshold is 10 days until 14 weeks)", "Redate — the threshold from 9w0d–13w6d is >7 days", "Use NT instead of CRL for dates", "Use BPD"], "correct": 1, "explain": "8 days exceeds the 7-day ACOG window in that CRL band."}, {"topic": "biometry", "q": "BPD, HC, AC and FL are all entered. Which Hadlock EFW equation does this app select?", "options": ["Hadlock I (AC, FL)", "Hadlock II (BPD, AC, FL)", "Hadlock III (HC, AC, FL)", "Hadlock IV (BPD, HC, AC, FL)"], "correct": 3, "explain": "All four parameters trigger Hadlock IV, the preferred combination when complete."}, {"topic": "biometry", "q": "Only AC and FL are measurable (head is engaged). EFW can still be calculated using:", "options": ["No formula exists", "Hadlock I (AC+FL)", "Hadlock IV with imputed BPD", "HC-only Hadlock"], "correct": 1, "explain": "AC+FL is the minimum pair for Hadlock I."}, {"topic": "biometry", "q": "EFW is 9th centile at 34 weeks in a fetus with normal UA Doppler and serial growth along the 9th. Best label?", "options": ["Severe SGA (<3rd) and therefore definite FGR", "SGA (<10th) — size descriptor; FGR needs a pathological process, often serial + Doppler", "LGA", "Macrosomia grade 1"], "correct": 1, "explain": "SGA is a size label. FGR is a diagnosis that needs more than one small EFW."}, {"topic": "biometry", "q": "EFW 2nd centile at 30 weeks with high UA-PI and reduced AC. Most accurate statement?", "options": ["Call this ‘microsomia’ as the counterpart to macrosomia", "Severe SGA with Doppler suggesting a pathological process (FGR work-up)", "Reassuring AGA", "Macrosomia"], "correct": 1, "explain": "‘Microsomia’ is not standard. <3rd is severe SGA; Doppler/AC pattern supports an FGR pathway."}, {"topic": "biometry", "q": "Term EFW 4200 g at the 70th centile. Which is true?", "options": ["This is LGA because 4200 g is always >90th", "This meets Grade 1 macrosomia (≥4000 g) but is not LGA if still <90th", "Grade 3 macrosomia", "Macrosomia and LGA are identical"], "correct": 1, "explain": "Macrosomia is an absolute-weight threshold; LGA is percentile-based. They can diverge."}, {"topic": "biometry", "q": "Cephalic index is 88. This head shape is:", "options": ["Dolichocephaly (long, narrow)", "Brachycephaly (short, rounded)", "Mesocephaly", "Not calculable without FL"], "correct": 1, "explain": "CI >83 = brachycephaly; <74 = dolichocephaly; 74–83 normal."}, {"topic": "biometry", "q": "Why is shape-corrected BPD not substituted into Hadlock EFW?", "options": ["cBPD is less accurate than raw BPD for everything", "EFW equations were validated on raw BPD; cBPD is for dating when CI is abnormal", "ACOG forbids any BPD in EFW", "cBPD requires MRI"], "correct": 1, "explain": "Keep raw BPD in EFW; use cBPD for dates when the head is misshapen."}, {"topic": "biometry", "q": "HC/AC is 1.25 at 34 weeks (expected nearer 1.0). This pattern is most consistent with:", "options": ["Symmetric growth", "Asymmetric, head-sparing growth restriction", "Macrosomia", "Anencephaly"], "correct": 1, "explain": "A high HC/AC late in pregnancy is the classic brain-sparing / small-abdomen pattern."}, {"topic": "biometry", "q": "FL/AC is 26% at 28 weeks. Interpretation?", "options": ["Normal 20–24% band", "Suggests a relatively small AC (asymmetric restriction)", "Diagnostic of achondroplasia", "Suggests macrosomia"], "correct": 1, "explain": "FL/AC is fairly GA-independent (~22±2%). >24% implies AC small relative to femur."}, {"topic": "biometry", "q": "FL/AC is 18% with a large AC at 36 weeks. More consistent with:", "options": ["Asymmetric FGR", "A relatively large abdomen (macrosomia pattern)", "Lethal skeletal dysplasia", "Normal FL/AC"], "correct": 1, "explain": "<20% implies AC large relative to FL."}, {"topic": "biometry", "q": "At 16 weeks BPD/FL is 2.4 (this screen flags values <2 between 13–18 weeks). This result is:", "options": ["Below the screen cutoff, so concerning for dysplasia", "Above 2, so this particular early dysplasia screen is not failed", "Diagnostic of thanatophoric dysplasia", "Uninterpretable before 24 weeks"], "correct": 1, "explain": "Wang et al.: BPD/FL <2 between 13–18 weeks is the concerning direction. 2.4 is above that cut, so the screen is not failed."}, {"topic": "biometry", "q": "Hadlock EFW inputs must be in:", "options": ["Millimetres for all equations", "Centimetres (the app converts if you toggle mm)", "Inches", "Z-scores"], "correct": 1, "explain": "Published Hadlock log10 equations use centimetres."}, {"topic": "biometry", "q": "Growth centiles in this app apply to which GA window?", "options": ["12–42 weeks", "24–41 weeks (Hadlock 1991 / Gardosi–Mikolajczyk SD method)", "Any GA after CRL", "Term only"], "correct": 1, "explain": "The embedded table is 24–41 weeks; outside that the app flags out-of-range."}, {"topic": "biometry", "q": "A single EFW at the 8th centile without a prior scan. Best practice?", "options": ["Diagnose FGR now", "Describe SGA if <10th, and plan serial growth ± Doppler rather than a one-off label of FGR", "Diagnose constitutional smallness with certainty", "Ignore because 8th is AGA"], "correct": 1, "explain": "FGR needs a pathological trajectory, not one size point."}, {"topic": "biometry", "q": "Grade 2 macrosomia in ACOG PB 216 is:", "options": ["≥3500 g", "≥4000 g", "≥4500 g", "≥90th centile regardless of grams"], "correct": 2, "explain": "Grade 1 ≥4000, Grade 2 ≥4500, Grade 3 ≥5000 g."}, {"topic": "biometry", "q": "BPD 9.2 cm, OFD 11.5 cm. HC in this app is:", "options": ["π×(9.2+11.5)", "1.62×(9.2+11.5) ≈ 33.5 cm", "(9.2+11.5)/2", "BPD×OFD"], "correct": 1, "explain": "HC = 1.62×(BPD+OFD)."}, {"topic": "biometry", "q": "A fetus plots on the 50th at 28 weeks and the 8th at 34 weeks. This change matters because:", "options": ["Centile crossing is irrelevant if still >3rd", "A falling centile with a small AC is more concerning than a stable 9th-centile fetus", "You should redate to make the second scan 50th", "This is LGA"], "correct": 1, "explain": "Trajectory is the growth signal; a dropping centile prompts Doppler and surveillance."}, {"topic": "biometry", "q": "Why might Hadlock I (AC+FL only) be less accurate than Hadlock IV?", "options": ["It uses the wrong units", "It omits head measurements that usually improve the estimate when they are valid", "AC is not in Hadlock I", "Hadlock I is for twins only"], "correct": 1, "explain": "Adding BPD and/or HC generally improves accuracy when the head is measurable and unmoulded."}, {"topic": "biometry", "q": "CI is 78. Shape-corrected BPD compared with raw BPD should be:", "options": ["Much larger", "Nearly identical", "Equal to OFD", "Undefined"], "correct": 1, "explain": "Near-normal CI means cBPD ≈ raw BPD."}, {"topic": "biometry", "q": "LGA is defined as EFW:", "options": ["≥4000 g at any GA", "≥90th percentile for GA", "≥97th only", "≥50th"], "correct": 1, "explain": "LGA is percentile-based; macrosomia is not."}, {"topic": "doppler", "q": "At 32 weeks UA-PI is above the INTERGROWTH 95th but end-diastolic flow is present. Next priority?", "options": ["Deliver tonight solely on PI", "Correlate with AC/EFW trend and repeat; AEDF/REDF would outrank the number", "Ignore PI if the 50th is unpublished", "Diagnose anaemia"], "correct": 1, "explain": "Elevated PI is a surveillance prompt. Absent/reversed EDF are the qualitative emergencies."}, {"topic": "doppler", "q": "Reversed umbilical end-diastolic flow is noted. PI is 0.90. Interpretation?", "options": ["PI is normal so REDF can be ignored", "REDF is a critical finding regardless of the PI value", "This is physiological after 34 weeks", "Calculate CPR only; skip qualitative flow"], "correct": 1, "explain": "AEDF/REDF override the PI numeral."}, {"topic": "doppler", "q": "MCA-PSV is 1.55 MoM at 28 weeks in an alloimmunised pregnancy. This meets Mari’s threshold for:", "options": ["Preeclampsia", "Moderate-to-severe fetal anaemia risk", "Brain-sparing (that is CPR, not PSV)", "Mandatory immediate CS without further testing"], "correct": 1, "explain": "≥1.5 MoM is Mari’s anaemia-risk threshold. Management still follows the clinical pathway."}, {"topic": "doppler", "q": "MCA-PSV 1.6 MoM at 37 weeks. Extra caution because:", "options": ["The threshold falls after 35 weeks", "False positives for anaemia rise after about 35 weeks", "MCA-PSV cannot be measured after 34 weeks", "MoM is invalid at term"], "correct": 1, "explain": "Mari 2005: specificity worsens late in gestation."}, {"topic": "doppler", "q": "MCA-PI 1.10, UA-PI 1.25. CPR is:", "options": ["1.14 — normal (≥1.0)", "0.88 — <1.0, qualitative brain-sparing pattern", "2.35 — uterine artery", "Not calculable without PSV"], "correct": 1, "explain": "CPR = MCA-PI/UA-PI = 1.10/1.25 = 0.88."}, {"topic": "doppler", "q": "Bilateral uterine notching at 16 weeks. Best comment?", "options": ["Diagnostic of preeclampsia now", "May still be physiological this early; reassess at 22–24 weeks before treating as abnormal", "Impossible before 24 weeks", "Equivalent to REDF"], "correct": 1, "explain": "Notching often persists into the mid-second trimester normally."}, {"topic": "doppler", "q": "Bilateral notching plus uterine PI above the 95th at 24 weeks. Associated with:", "options": ["Lower FGR/preeclampsia risk", "Increased preeclampsia/FGR risk (independent of a single fetal PI)", "Fetal anaemia specifically", "Normal placentation guaranteed"], "correct": 1, "explain": "Persistent notching ≥24 weeks and high UtA-PI are maternal-side risk markers."}, {"topic": "doppler", "q": "Ductus venosus a-wave is reversed in a 29-week FGR fetus. This most specifically suggests:", "options": ["A normal variant of high PI", "Central decompensation — urgent senior review of timing", "Isolated renal disease", "That UA Doppler can be skipped"], "correct": 1, "explain": "Absent/reversed DV a-wave is a late FGR staging flag."}, {"topic": "doppler", "q": "INTERGROWTH UA-PI in this app is based on:", "options": ["A single 95th cutoff of 1.45 at all gestations", "Published LMS equations (λ, μ, σ) so 5th/50th/95th and an approximate centile can be shown", "MoM adjusted for maternal weight", "RI, not PI"], "correct": 1, "explain": "Drukker et al. AJOG 2020 Table 6."}, {"topic": "doppler", "q": "First-trimester (11–13+6) uterine-artery PI 95th used here is about:", "options": ["1.00", "1.60", "2.35", "5.0"], "correct": 2, "explain": "Early pregnancy resistance is higher; ~2.35 vs ~1.60 later."}, {"topic": "doppler", "q": "MCA-PSV median in this app uses:", "options": ["A flat 40 cm/s", "e^(2.31 + 0.046×GA weeks) (Mari 2000)", "GA × 2", "UA-PI × 10"], "correct": 1, "explain": "Exponential median rising with GA."}, {"topic": "doppler", "q": "CPR 1.2 with AEDF in the umbilical artery. Which dominates the impression?", "options": ["CPR ≥1 so the fetus is fine", "AEDF — a significant qualitative UA finding even if CPR is not <1", "Uterine notch only", "MCA-PSV"], "correct": 1, "explain": "Never let a ratio hide absent end-diastolic flow."}, {"topic": "doppler", "q": "UA-PI below the 5th with forward diastolic flow. Typically:", "options": ["Equivalent to REDF", "Low impedance; isolated low PI is not the concerning pattern", "Mandatory steroids", "Anaemia until proven otherwise"], "correct": 1, "explain": "High PI / AEDF / REDF are the placental-resistance problems."}, {"topic": "doppler", "q": "Why is uterine PI here not a customised MoM?", "options": ["MoM is obsolete", "The app uses population 95ths; ethnicity, weight and height adjustments are more precise where available", "UtA Doppler is not used in obstetrics", "Only the notch matters"], "correct": 1, "explain": "Scope note: fixed 95th, not fully customised."}, {"topic": "doppler", "q": "DV PI of 0.48 at 38 weeks versus an expected ~0.44. Best reading?", "options": ["Grossly abnormal — deliver now", "Close to the expected late-gestation trend; the a-wave quality matters more", "PI should rise throughout the third trimester", "DV cannot be sampled after 32 weeks"], "correct": 1, "explain": "PI declines slowly; a-wave direction is the red flag."}, {"topic": "doppler", "q": "Brain-sparing means:", "options": ["UA-PI lower than MCA-PI", "MCA-PI lower than UA-PI (CPR <1)", "High MCA-PSV only", "Uterine notching"], "correct": 1, "explain": "Redistribution lowers MCA impedance relative to the umbilical artery."}, {"topic": "doppler", "q": "A free-loop UA sample shows REDF; a sample at the fetal end does not. You should:", "options": ["Ignore both", "Document site: impedance is higher toward the fetus; still treat any true REDF as significant and repeat with standard technique", "Average them", "Use only uterine Doppler"], "correct": 1, "explain": "Sampling site changes PI; standardised free-loop technique is preferred, but REDF is never dismissed casually."}, {"topic": "doppler", "q": "MCA Doppler for anaemia must be sampled:", "options": ["Near the corpus callosum at 0° is optional", "In the proximal MCA, near the origin, with a low insonation angle", "In a free loop of cord", "Only transabdominally after 40 weeks"], "correct": 1, "explain": "Mari technique: proximal MCA, angle-corrected."}, {"topic": "doppler", "q": "Elevated UA-PI plus CPR <1 plus small AC at 34 weeks is a package most consistent with:", "options": ["Isolated macrosomia", "Placental insufficiency / FGR physiology", "Open neural tube defect", "Inevitable TTTS"], "correct": 1, "explain": "Size + high UA resistance + brain-sparing is the classic FGR Doppler picture."}, {"topic": "doppler", "q": "If UA EDF is present and PI is at the 50th, MCA-PSV 1.1 MoM, CPR 1.4 — the anaemia and placental-resistance screens are:", "options": ["Both frankly abnormal", "Neither meeting usual action thresholds in this app", "AEDF by definition", "UtA notching equivalent"], "correct": 1, "explain": "All sit in reassuring bands; still correlate clinically."}, {"topic": "anomaly", "q": "Atrial width 13 mm at 22 weeks. Classification used here:", "options": ["Normal (<10 mm)", "Mild (10–12 mm)", "Moderate (13–15 mm)", "Severe (>15 mm)"], "correct": 2, "explain": "13–15 mm is moderate ventriculomegaly; atrium is largely GA-independent."}, {"topic": "anomaly", "q": "Lemon sign, banana sign, effaced cisterna magna, and a lumbosacral defect. Expected cisterna magna:", "options": ["Enlarged >10 mm (Dandy–Walker)", "Obliterated/effaced (Chiari II with open spinal defect)", "Normal 8 mm", "Irrelevant"], "correct": 1, "explain": "Chiari II pulls the hindbrain down and obliterates the cisterna magna."}, {"topic": "anomaly", "q": "Cisterna magna 12 mm, absent vermis, splayed hemispheres at 24 weeks. Most consistent with:", "options": ["Chiari II", "Dandy–Walker malformation spectrum", "Holoprosencephaly", "Normal variant at this GA"], "correct": 1, "explain": "Enlarged cisterna magna + vermian agenesis/hypoplasia = Dandy–Walker continuum."}, {"topic": "anomaly", "q": "At 18 weeks a communication is seen between the 4th ventricle and cisterna magna, vermis otherwise formed. You should:", "options": ["Diagnose Dandy–Walker immediately", "Know this connection can still be physiological before 20 weeks — follow rather than over-call", "Diagnose Chiari II", "Assume anencephaly"], "correct": 1, "explain": "The vermis completes later; isolated early ‘communication’ is not diagnostic."}, {"topic": "anomaly", "q": "NT 9 mm at 12 weeks. Among aneuploidy associations, this degree is most often linked with:", "options": ["Trisomy 21 only", "Turner syndrome (very large NT, typically ≥8.5 mm)", "A normal variant", "Isolated clubfoot"], "correct": 1, "explain": "Rough bands: <4.5 mm more T21; 4.5–8.4 more T18/13; ≥8.5 more Turner — never a karyotype on NT alone."}, {"topic": "anomaly", "q": "Second-trimester nuchal fold 6.2 mm. ACOG/SMFM regard this as:", "options": ["Irrelevant after 14 weeks", "The strongest second-trimester sonographic T21 marker (~17-fold)", "Diagnostic of hydrops", "A first-trimester NT equivalent at any GA"], "correct": 1, "explain": "NF ≥6 mm is a major soft marker, not a diagnosis."}, {"topic": "anomaly", "q": "Hypotelorism and a monoventricle. Most associated spectrum:", "options": ["Frontal encephalocele", "Holoprosencephaly", "Chiari II", "Achondroplasia"], "correct": 1, "explain": "Reduced interorbital distance tracks with holoprosencephaly."}, {"topic": "anomaly", "q": "Hypertelorism plus a midline frontal skull defect. Look specifically for:", "options": ["Renal agenesis", "Frontal encephalocele", "Duodenal atresia", "Posterior urethral valves"], "correct": 1, "explain": "Wide spacing with a frontal defect suggests encephalocele."}, {"topic": "anomaly", "q": "Cardiothoracic circumference ratio 0.58. This suggests:", "options": ["Normal (<0.5)", "Cardiomegaly (circumference method)", "Pulmonary hypoplasia specifically", "You used the area-method cutoff by mistake and it is normal"], "correct": 1, "explain": "Circumference CTR <0.5 is the convention in this app. 0.58 is high. Area-method normals are ~0.25–0.35 — do not mix."}, {"topic": "anomaly", "q": "Chest/AC 0.75, bowed femurs, narrow thorax. Greatest immediate concern beyond the bones:", "options": ["Isolated IUGR", "Pulmonary hypoplasia from thoracic constraint", "Macrosomia", "Placenta praevia"], "correct": 1, "explain": "Chest/AC <0.83 with a narrow chest is a pulmonary-hypoplasia risk pattern in severe dysplasia."}, {"topic": "anomaly", "q": "FL/foot 0.75 with short bowed femurs. Versus isolated FGR, this ratio:", "options": ["Stays near 1 in dysplasia and falls in FGR", "Falls in severe dysplasia (cut ~0.87) while FGR tends to keep femur ≈ foot", "Diagnoses T21", "Is unused before 30 weeks"], "correct": 1, "explain": "Femur and foot track together in FGR; dysplasia shortens the femur more."}, {"topic": "anomaly", "q": "Multiple fractures, poor mineralisation, bowed bones. Most like:", "options": ["Achondroplasia", "Osteogenesis imperfecta", "Cleidocranial dysplasia", "Normal"], "correct": 1, "explain": "Fractures + demineralisation point to OI more than isolated rhizomelia."}, {"topic": "anomaly", "q": "Achondroplasia, unlike thanatophoric dysplasia, is often:", "options": ["Lethal and obvious at 12 weeks", "Not sonographically obvious until later in the third trimester", "A clavicle-only disease", "Diagnosed by NT"], "correct": 1, "explain": "Heterozygous achondroplasia frequently presents late."}, {"topic": "anomaly", "q": "Male fetus, thick-walled dilated bladder, bilateral pyelectasis, oligohydramnios. Lead diagnosis to exclude:", "options": ["Unilateral UPJ obstruction", "Posterior urethral valves", "Simple renal cyst", "Physiological pyelectasis only"], "correct": 1, "explain": "Bladder-outlet pattern in a male is classic PUV until proven otherwise."}, {"topic": "anomaly", "q": "Unilateral 8 mm pelvis, normal bladder, normal contralateral kidney at 24 weeks (threshold 5 mm at 21–30w). More like:", "options": ["PUV", "Unilateral UPJ obstruction (or isolated pyelectasis) — follow", "Bilateral renal agenesis", "Always vesicoureteric reflux only"], "correct": 1, "explain": "Unilateral without bladder changes is not PUV."}, {"topic": "anomaly", "q": "AFI 4 cm, normal anatomy, normal growth. First question for the mother:", "options": ["Family history of dysplasia", "Fluid leakage (possible PPROM)", "Recent air travel", "Preferred mode of delivery"], "correct": 1, "explain": "Unexplained oligohydramnios → ask about rupture. ACOG prefers SDP <2 cm to label oligohydramnios."}, {"topic": "anomaly", "q": "AFI 28 cm and a double-bubble. Most likely fetal explanation:", "options": ["Renal agenesis", "Duodenal atresia (polyhydramnios from obstructed swallowing pathway)", "PPROM", "Placental insufficiency"], "correct": 1, "explain": "GI obstruction + polyhydramnios is the classic pairing."}, {"topic": "anomaly", "q": "Which does not cause polyhydramnios?", "options": ["Maternal diabetes", "Impaired swallowing", "Bilateral renal agenesis", "Hydrops"], "correct": 2, "explain": "No fetal urine → oligohydramnios, not polyhydramnios."}, {"topic": "anomaly", "q": "Placental thickness 65 mm at 34 weeks. This meets a common third-trimester placentomegaly flag of:", "options": [">20 mm", ">40 mm (that is the second-trimester flag)", ">60 mm in the third trimester", "100 mm only"], "correct": 2, "explain": "Second trimester ~40 mm; third ~60 mm."}, {"topic": "anomaly", "q": "Absent nasal bone at 12 weeks is best treated as:", "options": ["A normal variant to ignore", "An aneuploidy marker that modifies NT-based risk, not a standalone karyotype", "Proof of T18", "A dating parameter"], "correct": 1, "explain": "Soft marker — combine with NT/biochemistry/NIPT pathway."}, {"topic": "follicle", "q": "Natural cycle, CD 12, single follicle mean 21 mm, trilaminar endometrium 9 mm, smooth wall. Best label in this app?", "options": ["Confirmed ovulation", "Pre-ovulatory follicle with peri-ovulatory endometrium — impending ovulation is possible, not proven", "Baseline", "LUFS"], "correct": 1, "explain": "Size + trilaminar lining ≠ oocyte release. Need serial signs."}, {"topic": "follicle", "q": "Yesterday 22 mm smooth follicle; today collapsed cyst, small POD fluid, typical corpus luteum. Impression?", "options": ["Indeterminate — need five more signs", "Findings consistent with recent ovulation (collapse + CL + fluid)", "Anovulation", "Ectopic pregnancy diagnosed"], "correct": 1, "explain": "A cluster of independent signs supports ‘consistent with ovulation’, still not laboratory proof of oocyte release."}, {"topic": "follicle", "q": "Cycle length 35 days, luteal length assumed 14. Expected ovulation is around day:", "options": ["14 always", "21 (35 − 14)", "28", "7"], "correct": 1, "explain": "Do not assume a 28-day cycle."}, {"topic": "follicle", "q": "Irregular cycles 40–90 days. A single CD 14 scan with no follicle ≥10 mm means:", "options": ["Proven anovulation for the year", "Calendar-day rules are unreliable — you cannot call anovulation from day 14 in an irregular cycle", "Ovulation has already happened because day 14 passed", "IUI should be booked today"], "correct": 1, "explain": "Irregular cycles need serial tracking or biochemistry, not a 14-day assumption."}, {"topic": "follicle", "q": "A 22 mm follicle persists 4 days past the expected window, secretory endometrium, no collapse. Concern for:", "options": ["Confirmed ovulation", "Possible LUFS / unruptured follicle — do not assume oocyte release", "Normal corpus luteum", "Ovarian torsion only"], "correct": 1, "explain": "Persistent mature follicle without collapse ± luteinised wall/secretory lining raises LUFS."}, {"topic": "follicle", "q": "Which combination is the weakest evidence of ovulation?", "options": ["Collapse + CL + POD fluid", "A 22 mm follicle on a presumed day 14", "Crenation + new internal echoes + secretory shift", "Typical ring-of-fire CL after documented shrinkage"], "correct": 1, "explain": "Diameter and calendar day are not ovulation."}, {"topic": "follicle", "q": "hCG trigger this morning; lead follicle 18 mm in an IUI gonadotropin cycle. Best counselling from this tool?", "options": ["The app schedules IUI automatically at 12 hours", "Oocyte maturation is typically ~36–40 h after hCG; IUI timing follows local protocol (often 24–36 h), and the tool does not book procedures", "Trigger is only used when the follicle is ≥25 mm", "No scan is needed after trigger"], "correct": 1, "explain": "Protocol-dependent timing; the app does not schedule."}, {"topic": "follicle", "q": "Endometrium 5.5 mm, trilaminar, on trigger day in IVF. Fair comment?", "options": ["Pregnancy is impossible", "<7 mm is often called thin in ART series; pattern still matters and it is not an absolute barrier", "Thickness >12 mm is required", "Secretory lining is required before trigger"], "correct": 1, "explain": "Thin lining is a risk factor, not a veto."}, {"topic": "follicle", "q": "Natural-cycle growth from 14 mm to 17 mm in 48 hours. Rate is:", "options": ["0.5 mm/day — stagnant", "1.5 mm/day — within the usual ~1–2 mm/day follicular-phase range", "5 mm/day — always OHSS", "Negative, so ovulation occurred"], "correct": 1, "explain": "3 mm / 2 days = 1.5 mm/day."}, {"topic": "follicle", "q": "Growth <0.5 mm/day over ≥48 h while still follicular, no ovulation signs. This app treats that as:", "options": ["Normal slowing before every ovulation", "Stagnation — a prompt to reassess, not a diagnosis by itself", "Proof of LUFS", "A reason to ignore endometrium"], "correct": 1, "explain": "Slow growth is a trend flag."}, {"topic": "follicle", "q": "Corpus luteum typically appears as:", "options": ["Thin-walled simple cyst, avascular", "Thick-walled crenulated cystic structure, often with peripheral (‘ring of fire’) flow", "Solid shadowing dermoid", "Free fluid without an ovarian lesion"], "correct": 1, "explain": "CL supports ovulation, not pregnancy."}, {"topic": "follicle", "q": "ART stimulation with 18 follicles ≥12 mm. The folliculometry module should:", "options": ["Calculate a numeric OHSS risk score", "Note the multiple large-follicle cohort and defer OHSS-risk tools to the treating protocol — this app does not score OHSS", "Call this a natural cycle", "Assume all will ovulate spontaneously today"], "correct": 1, "explain": "Scope limit: no OHSS calculator."}, {"topic": "follicle", "q": "Single visit, CD 11, 16 mm follicle, no prior scan. Final interpretation should say:", "options": ["Confirmed ovulation", "Serial imaging is insufficient to confirm ovulation; a further scan is needed", "Anovulation", "LUFS"], "correct": 1, "explain": "Folliculometry is trend-based. One visit cannot prove rupture."}, {"topic": "follicle", "q": "Clomiphene cycle: lead follicle 23 mm, endometrium 8 mm trilaminar. Compared with many gonadotropin protocols:", "options": ["Clomiphene follicles are often larger at trigger/ovulation (commonly ~20–24 mm)", "Clomiphene must trigger at exactly 14 mm", "Endometrium is irrelevant on clomiphene", "Size 23 mm proves rupture"], "correct": 0, "explain": "Oral-agent cycles often ovulate from larger follicles than gonadotropin/IUI cutoffs."}, {"topic": "follicle", "q": "How should mean follicle diameter be entered?", "options": ["Longest diameter only", "Mean of 2 or 3 orthogonal diameters in mm", "Volume-only, never linear", "In centimetres to match Hadlock"], "correct": 1, "explain": "Two diameters if round; three if >15 mm and asymmetric."}, {"topic": "follicle", "q": "Trilaminar lining becoming homogeneous/secretory after collapse is:", "options": ["Proof of intrauterine pregnancy", "Supportive endometrial shift, not standalone proof of rupture", "A miscarriage sign", "Always an artefact"], "correct": 1, "explain": "One sign among several."}, {"topic": "follicle", "q": "Dominant follicle in nomenclature terms is typically:", "options": ["<2 mm", "About 10–16 mm and clearly ahead of the cohort", "Always ≥25 mm", "Any anechoic structure"], "correct": 1, "explain": "NICHD imaging bands: dominant antral ~10–15 mm, pre-ovulatory often ≥16 mm."}, {"topic": "follicle", "q": "After agonist trigger, a 20 mm follicle is still smooth 12 hours later. You should:", "options": ["Diagnose failed trigger at 12 hours", "Wait — collapse is assessed later (typically 36–48 h), not at 12 h", "Assume LUFS", "Convert to IUI immediately solely on smoothness"], "correct": 1, "explain": "Too early to expect collapse."}, {"topic": "follicle", "q": "Free fluid in the POD after documented collapse. Differential includes:", "options": ["Follicular rupture fluid — supportive if other signs fit, not specific for ectopic", "Always ruptured ectopic", "Always ascites from OHSS even in a natural cycle with one follicle", "Always bladder"], "correct": 0, "explain": "Small POD fluid is a supportive ovulation sign; context matters."}, {"topic": "follicle", "q": "Why does this app refuse a single millimetre cut-off for ‘mature’?", "options": ["Because the literature shows a range (natural ~18–25 mm, stimulated protocols often ~16–22 mm) and individuals vary", "Because follicles cannot be measured", "Because only LH kits matter", "Because 14 mm is universally mature"], "correct": 0, "explain": "Ranges, not a magic number."}, {"topic": "organ", "q": "Premenopausal woman, 45 mm simple ovarian cyst, no M-features, acoustic shadows absent, colour score 1. IOTA Simple Rules most likely:", "options": ["Malignant because of size alone", "Benign if B-features are present without M-features", "Inconclusive automatically at 45 mm", "ADNEX 80% risk — the app calculates this"], "correct": 1, "explain": "Size alone is not an M-feature. B without M = benign. ADNEX is not implemented."}, {"topic": "organ", "q": "A mass has both a B-feature and an M-feature. Simple Rules result is:", "options": ["Malignant", "Benign", "Inconclusive — expert ultrasound or a validated model, not a forced binary", "Always physiological"], "correct": 2, "explain": "M + B together, or neither, = inconclusive."}, {"topic": "organ", "q": "IOTA colour score 4 (very strong flow) is:", "options": ["B5 (benign)", "M5 (malignant feature)", "Irrelevant to Simple Rules", "The same as score 1"], "correct": 1, "explain": "Score 1 = no flow = B5; score 4 = M5."}, {"topic": "organ", "q": "Postmenopausal woman with bleeding, endometrium 3 mm, no focal lesion. Using this app’s bleeding-context threshold (~≤5 mm):", "options": ["High-risk until hysterectomy", "Below the usual reassuring cutoff in the bleeding context — still correlate, not a biopsy veto by software", "The 11 mm asymptomatic cutoff applies", "Thickness is ignored after menopause"], "correct": 1, "explain": "Bleeding: lower threshold (~4–5 mm). Asymptomatic: higher (~11 mm)."}, {"topic": "organ", "q": "Asymptomatic postmenopausal lining 12 mm. Compared with the ~11 mm asymptomatic flag:", "options": ["Reassuring by that particular threshold", "Above the asymptomatic cutoff used here — needs clinical correlation (and the bleeding cutoff is different)", "Diagnostic of cancer", "Normal secretory phase"], "correct": 1, "explain": "Context switches the number."}, {"topic": "organ", "q": "Reproductive-age endometrium must be read with:", "options": ["One 5 mm rule for everyone", "Cycle phase (menstrual / proliferative / peri-ovulatory / secretory)", "Only BMI", "Only CA-125"], "correct": 1, "explain": "Premenopausal thickness is phase-dependent."}, {"topic": "organ", "q": "Adult spleen 22 cm. This app additionally flags:", "options": ["Normal Rosenberg adult length", "Massive splenomegaly (>20 cm), beyond a simple ‘above age reference’", "Cirrhosis specifically", "A Riedel lobe"], "correct": 1, "explain": ">20 cm is called massive here."}, {"topic": "organ", "q": "Riedel lobe on a liver-span measurement. You should:", "options": ["Always call hepatomegaly", "Treat it as a recognised anatomical variant, not true hepatomegaly by itself", "Diagnose cirrhosis", "Ignore all liver measurements"], "correct": 1, "explain": "A tongue of right lobe can mimic a long span."}, {"topic": "organ", "q": "Paediatric kidney length in this app is framed as:", "options": ["A hard pass/fail upper limit like adult 12 cm", "A population mean comparator, not a strict cutoff", "Identical to spleen tables", "Unused"], "correct": 1, "explain": "Emamian means vs Rosenberg-style upper limits."}, {"topic": "organ", "q": "Bladder wall looks thick on a near-empty bladder. Next step:", "options": ["Report trabeculation as definite", "Recheck on a comfortably distended bladder — thresholds differ with fill", "Measure PVR only in children", "Ignore wall thickness always"], "correct": 1, "explain": "Apparent thickening is often underfilling."}, {"topic": "organ", "q": "Adult PVR 250 mL after attempted void. Flagged because:", "options": ["PVR >50 mL is used", "PVR >200 mL in an adult suggests incomplete emptying in this app", "Any urine left is pathological", "PVR is only for prostate volume"], "correct": 1, "explain": ">200 mL adult flag."}, {"topic": "organ", "q": "Prostate volume uses which formula?", "options": ["Length only", "0.52 × L × W × H (ellipsoid — same convention as bladder and ovary)", "PSA × 2", "Weight in grams from CT"], "correct": 1, "explain": "Consistent ellipsoid coefficient 0.52."}, {"topic": "organ", "q": "IPP 12 mm with a comfortably full bladder. Grade?", "options": ["I (<5 mm)", "II (5–10 mm)", "III (>10 mm)", "Not graded if volume <30 cc"], "correct": 2, "explain": "Grade III >10 mm. IPP correlates only weakly with volume."}, {"topic": "organ", "q": "IPP should be measured with the bladder:", "options": ["Bone-dry", "Comfortably full (~150–250 mL)", "Overdistended to 1 L", "Fill does not matter"], "correct": 1, "explain": "Same principle as wall thickness."}, {"topic": "organ", "q": "Infrarenal aorta 3.4 cm. This meets:", "options": ["Normal calibre", "AAA definition (≥3 cm or >1.5× the expected segment)", "The 5.5 cm elective-repair discussion threshold", "Portal hypertension"], "correct": 1, "explain": "Aneurysm definition ≠ repair threshold (often 5.5 cm)."}, {"topic": "organ", "q": "Portal vein 15 mm with otherwise unexplained splenomegaly. Concern for:", "options": ["Normal portal calibre (≤13 mm here)", "Possible portal hypertension — check flow direction/velocity", "AAA", "Hepatic artery diameter, which this app uses instead of RI"], "correct": 1, "explain": "PV >13 mm prompts a portal-hypertension look. Hepatic artery is RI, not diameter."}, {"topic": "organ", "q": "Hepatic artery RI 0.85 (app normal <0.7). This is:", "options": ["A diameter problem", "An elevated resistive index — interpret with transplant/parenchymal context, not a calibre", "Proof of AAA", "Ignored because veins matter more"], "correct": 1, "explain": "No standard HA diameter; RI is the parameter."}, {"topic": "organ", "q": "Small-bowel ‘rule of 3s’ does NOT include:", "options": ["Wall <3 mm", "Diameter <3 cm", "≤3 air-fluid levels", "Length <30 cm"], "correct": 3, "explain": "Length is not part of the rule of 3s."}, {"topic": "organ", "q": "Colon 7.5 cm, caecum 8.0 cm. Using this app’s thresholds (colon <6, caecum <9):", "options": ["Both dilated", "Colon dilated; caecum still under 9 cm", "Both normal", "Appendix-only disease"], "correct": 1, "explain": "Caecum is allowed more distension."}, {"topic": "organ", "q": "Why does the app refuse a single postmenopausal ovarian-volume cutoff?", "options": ["Volumes cannot be measured", "The literature does not agree on one number; visibility of a discrete ovary/mass matters more than a fabricated millilitre line", "All postmenopausal ovaries are 6.1 mL", "IOTA requires a volume"], "correct": 1, "explain": "Honest scope limit."}];
   var quizTopic = null;
@@ -3680,6 +3951,8 @@
   var quizIndex = 0;
   var quizSubmitted = false;
 
+  QUIZ_TOPICS = QUIZ_TOPICS.concat([{id:'lexicon', name:'Lexicon, TI-RADS & scan windows', blurb:'BI-RADS helper, ACR TI-RADS, Bosniak, NT and anatomy windows.'}]);
+  QUIZ_BANK = QUIZ_BANK.concat([{"topic": "lexicon", "q": "A simple breast cyst is anechoic, circumscribed, and shows posterior enhancement. What is the usual ACR BI-RADS ultrasound assessment if imaging is complete?", "options": ["BI-RADS 1", "BI-RADS 2", "BI-RADS 3", "BI-RADS 4A"], "correct": 1, "explain": "A simple cyst is a benign finding (category 2). Category 1 means no finding at all."}, {"topic": "lexicon", "q": "Why does this app refuse to output a BI-RADS ‘point total’ the way it does for TI-RADS?", "options": ["BI-RADS ultrasound has no published lexicon", "BI-RADS is a mammography-only system", "ACR BI-RADS US is a lexicon plus an assessment you assign; it is not a summed point score", "Category 4 cannot be subdivided"], "correct": 2, "explain": "TI-RADS adds points. BI-RADS US descriptors inform a category the reader assigns (0–6, with 4A/4B/4C)."}, {"topic": "lexicon", "q": "A solid breast mass is oval, parallel, and circumscribed. Spiculated margin is also ticked. Which statement is correct?", "options": ["This is a classic BI-RADS 3 mass", "Spiculated margin is not a probably-benign (3) feature", "Parallel orientation overrides spiculation", "Code BI-RADS 1 because it is oval"], "correct": 1, "explain": "BI-RADS 3 solid masses are typically oval, parallel, and circumscribed. Spiculation is a suspicious (4/5) descriptor."}, {"topic": "lexicon", "q": "ACR BI-RADS category 3 is defined as a likelihood of malignancy of:", "options": ["Zero", "<2%", "About 10%", "≥95%"], "correct": 1, "explain": "Probably benign is <2%. Category 5 is ≥95%. Category 4 is subdivided because the range in between is wide."}, {"topic": "lexicon", "q": "BI-RADS 0 on ultrasound means:", "options": ["Normal examination", "Benign finding", "Incomplete — additional imaging or comparison is needed before a final assessment", "Known cancer"], "correct": 2, "explain": "0 is incomplete. Do not issue a final 2–5 until the assessment can be completed."}, {"topic": "lexicon", "q": "ACR TI-RADS 2017: a solid hypoechoic nodule that is taller-than-wide with punctate echogenic foci. Composition 2, echogenicity 2, shape 3, margin 0, foci 3. What is the TR level?", "options": ["TR3 (3 points)", "TR4 (4–6 points)", "TR5 (≥7 points)", "TR2"], "correct": 2, "explain": "2+2+3+0+3 = 10 points → TR5. FNA if ≥1.0 cm; follow if ≥0.5 cm."}, {"topic": "lexicon", "q": "TI-RADS TR3 (3 points) FNA size threshold is:", "options": ["≥0.5 cm", "≥1.0 cm", "≥1.5 cm", "≥2.5 cm"], "correct": 3, "explain": "TR3: FNA ≥2.5 cm; follow ≥1.5 cm (Tessler et al., JACR 2017)."}, {"topic": "lexicon", "q": "A spongiform thyroid nodule scores how many composition points?", "options": ["0", "1", "2", "3"], "correct": 0, "explain": "Cystic/almost cystic and spongiform are 0 composition points."}, {"topic": "lexicon", "q": "Bosniak 2019 class IIF is managed how in typical protocols?", "options": ["Ignore — benign", "Follow-up imaging; a minority prove malignant", "Immediate nephrectomy without options", "Treat as Bosniak I"], "correct": 1, "explain": "IIF is follow-up (often 6 and 12 months then per protocol). About 5–10% are malignant in series."}, {"topic": "lexicon", "q": "Bosniak IV is defined by:", "options": ["Size >3 cm alone", "Hairline septa", "Enhancing soft-tissue nodule independent of wall or septum", "Any calcification"], "correct": 2, "explain": "Class is morphology/enhancement, not size. Size does not upgrade the class by itself."}, {"topic": "lexicon", "q": "The nuchal translucency window used here is:", "options": ["Any time in the first trimester", "10+0 to 12+0, any CRL", "11+0 to 13+6 with CRL 45–84 mm", "18–22 weeks"], "correct": 2, "explain": "FMF/ISUOG NT: 11+0–13+6, CRL 45–84 mm. Later it is a nuchal fold, not an NT."}, {"topic": "lexicon", "q": "Physiological midgut herniation should not be called omphalocele before about:", "options": ["8 weeks", "10 weeks", "12 weeks", "20 weeks"], "correct": 2, "explain": "Bowel may still be outside the abdomen as a normal midgut herniation until around 12 weeks."}, {"topic": "lexicon", "q": "The preferred dating parameter at a 12-week scan with CRL 60 mm is:", "options": ["MSD", "CRL", "BPD", "FL"], "correct": 1, "explain": "CRL remains preferred through the first trimester while it is measurable in its valid range."}, {"topic": "lexicon", "q": "ISUOG midtrimester anatomy is typically scheduled at:", "options": ["11–13 weeks only", "14–16 weeks", "18–22 weeks", "28 weeks"], "correct": 2, "explain": "The routine anomaly survey is 18–22 weeks in ISUOG guidance. NT is a different examination."}, {"topic": "lexicon", "q": "A connection between the 4th ventricle and cisterna magna at 18 weeks:", "options": ["Is diagnostic of Dandy–Walker malformation", "Can still be a normal finding before 20 weeks and should not be over-called in isolation", "Proves Chiari II", "Requires no follow-up ever"], "correct": 1, "explain": "Vermian closure can be incomplete before 20 weeks. Pair with vermis/hemisphere findings before labelling DWM."}, {"topic": "lexicon", "q": "RMI-I is calculated as:", "options": ["CA-125 alone", "U × M × CA-125", "IOTA colour score × CA-125", "EFW × CA-125"], "correct": 1, "explain": "Jacobs 1990: ultrasound score U (0/1/3) × menopausal M (1 or 3) × CA-125. RCOG often uses 200 as the referral cut-off."}, {"topic": "lexicon", "q": "IOTA Simple Rules: M-features and B-features both present. Verdict?", "options": ["Malignant", "Benign", "Inconclusive — about 1 in 4 masses; expert ultrasound is the preferred next step", "RMI automatically malignant"], "correct": 2, "explain": "Both, or neither, → inconclusive. That is an expected result, not a failure of the system."}, {"topic": "lexicon", "q": "This app’s IUFD label requires:", "options": ["Handheld Doppler silence at 18 weeks", "No cardiac activity and no movement on ultrasound at ≥20 weeks", "CTG deceleration alone", "Maternal perception of reduced movements"], "correct": 1, "explain": "IUFD is confirmed on ultrasound, not Pinard/handheld Doppler/CTG alone. The clinical definition used here is ≥20 weeks."}, {"topic": "lexicon", "q": "AFI is 5.0 cm. Oligohydramnios by the threshold used here?", "options": ["No — oligohydramnios is AFI <5", "Yes — AFI ≤5 cm", "Only if SDP is also <1 cm", "AFI cannot diagnose oligohydramnios"], "correct": 1, "explain": "Oligohydramnios: SDP <2 cm or AFI ≤5 cm. ACOG prefers SDP because it flags fewer cases without worse outcomes."}, {"topic": "lexicon", "q": "A quiz certificate from this app is:", "options": ["CME/CPD accreditation accepted by RCOG/ARDMS", "An FDA device clearance", "A local self-assessment record, not a professional licence or CME certificate", "A licence to report independently"], "correct": 2, "explain": "Certificates document that you sat the topic on this device. They are not accredited CME and not a credential."}]);
   function topicQuestions(id) {
     return QUIZ_BANK.filter(function (q) { return q.topic === id; });
   }
@@ -3756,7 +4029,7 @@
 
   function renderQuizHome() {
     var html = '<div class="card-title">Clinical quiz</div>';
-    html += '<p class="subhead">Six topics covering every module. Each bank has 20 scenario-based questions. Pick a topic; explanations appear only after you submit that topic.</p>';
+    html += '<p class="subhead">Seven topics covering every module, plus lexicon and scan windows. Each bank has 20 scenario-based questions. Explanations appear after you submit that topic. Certificates are a local self-assessment record — not CME.</p>';
     html += '<div class="topic-grid">';
     QUIZ_TOPICS.forEach(function (t) {
       var n = topicQuestions(t.id).length;
@@ -3801,6 +4074,7 @@
     html += '<div class="badge ' + (pct >= 75 ? "ok" : (pct >= 60 ? "warn" : "danger")) + '">' + quizGradeLabel(pct) + '</div>';
     html += '<div class="btn-row" style="margin-top:14px;">';
     html += '<button class="btn-primary" id="quiz-retake" style="width:auto;">Retake this topic</button>';
+    html += '<button class="btn-ghost" id="quiz-cert">Print certificate</button>';
     html += '<button class="btn-ghost" id="quiz-home-2">Choose another topic</button>';
     html += '</div>';
     html += '<div class="hairline"></div>' + rows;
@@ -3814,6 +4088,46 @@
       quizSubmitted = false;
       renderQuiz();
     });
+    var certBtn = document.getElementById("quiz-cert");
+    if (certBtn) certBtn.addEventListener("click", function () { printQuizCertificate(meta, correctCount, bank.length, pct); });
+  }
+
+  function printQuizCertificate(meta, correctCount, total, pct) {
+    var initials = window.prompt("Initials for the certificate (optional, stays on this device):", "") || "";
+    initials = String(initials).replace(/[<>]/g, "").slice(0, 24);
+    var dateStr = new Date().toISOString().slice(0, 10);
+    var passed = pct >= 75;
+    var titleEl = document.querySelector("#report-view .report-title");
+    var metaEl = document.getElementById("report-meta");
+    var body = document.getElementById("report-body");
+    var foot = document.querySelector("#report-view .report-footer");
+    var oldTitle = titleEl ? titleEl.innerHTML : "";
+    var oldMeta = metaEl ? metaEl.textContent : "";
+    var oldBody = body ? body.innerHTML : "";
+    var oldFoot = foot ? foot.textContent : "";
+    if (titleEl) titleEl.textContent = "Babsinogen — topic certificate";
+    if (metaEl) metaEl.textContent = dateStr;
+    body.innerHTML = '<div class="cert-wrap">' +
+      "<h1>Self-assessment record</h1>" +
+      "<p>This certifies that</p>" +
+      '<p class="cert-name">' + (initials ? esc(initials) : "a Babsinogen user") + "</p>" +
+      "<p>completed the topic</p>" +
+      "<p><strong>" + esc(meta.name) + "</strong></p>" +
+      "<p>Score: " + correctCount + " / " + total + " (" + pct + "%) — " + esc(quizGradeLabel(pct)) + "</p>" +
+      "<p>" + (passed ? "Threshold for a passed record on this device: ≥75%." : "Below 75% — recorded as attempted, not passed.") + "</p>" +
+      "<p style='margin-top:24px;font-size:12px;'>Not CME, not a licence, not FDA clearance. Generated locally; nothing was uploaded.</p>" +
+      "</div>";
+    if (foot) foot.textContent = "Babsinogen decision-support self-assessment. Correlate with clinical training and departmental protocol.";
+    function restore() {
+      if (titleEl) titleEl.innerHTML = oldTitle;
+      if (metaEl) metaEl.textContent = oldMeta;
+      if (body) body.innerHTML = oldBody;
+      if (foot) foot.textContent = oldFoot;
+      window.removeEventListener("afterprint", restore);
+    }
+    window.addEventListener("afterprint", restore);
+    window.print();
+    setTimeout(restore, 1500);
   }
 
   function initQuiz() { renderQuiz(); }
@@ -4914,6 +5228,8 @@
     { name: "Ovary / IOTA / RMI", hint: "adnexal mass, CA-125", tab: "organ", organ: "ovary" },
     { name: "Thyroid TI-RADS", hint: "ACR 2017 points and FNA size", tab: "organ", organ: "tirads" },
     { name: "Bosniak renal cyst", hint: "2019 class I–IV", tab: "organ", organ: "bosniak" },
+    { name: "Breast BI-RADS US", hint: "lexicon helper, not a point score", tab: "organ", organ: "birads" },
+    { name: "Scan weeks", hint: "what to see and measure by GA", tab: "weeks" },
     { name: "Uterus & endometrium", hint: "thickness, postmenopausal bleeding", tab: "organ", organ: "uterus" },
     { name: "Reports & log", hint: "print, save locally", tab: "log" },
     { name: "Quiz", hint: "clinical scenarios", tab: "quiz" },
@@ -4998,7 +5314,7 @@
   function onReady() {
     // Tabs
     var tabs = document.querySelectorAll(".tab");
-    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress") };
+    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks") };
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
@@ -5021,6 +5337,8 @@
         initFolliculometry();
       } else if (name === "impress" && !window.__impReady) {
         initImpression();
+      } else if (name === "weeks" && !window.__weeksReady) {
+        initScanWeeks();
       }
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
