@@ -404,6 +404,32 @@
 </style>
 </head>
 <body>
+<div id="err-overlay" class="jump-overlay" hidden>
+  <div class="jump-box">
+    <label class="card-title" for="err-text">Report an error (stays on this device)</label>
+    <p class="note">Nothing is uploaded. Copy the text into an email or issue if you want the maintainers to see it. Do not paste patient identifiers.</p>
+    <div class="field"><label>Section</label><div class="row"><select id="err-sec">
+      <option value="dating">Dating & EDD</option>
+      <option value="biometry">Biometry</option>
+      <option value="doppler">Doppler</option>
+      <option value="anomaly">Anomaly</option>
+      <option value="impress">Impression / BPP</option>
+      <option value="follicle">Folliculometry</option>
+      <option value="organ">Organ / lexicon</option>
+      <option value="quiz">Quiz</option>
+      <option value="protocol">Protocols</option>
+      <option value="other">Other</option>
+    </select></div></div>
+    <div class="field"><label>What is wrong</label>
+      <textarea id="err-text" rows="5" placeholder="e.g. AFI oligohydramnios line, quiz item, missing citation" style="width:100%;margin-top:6px;min-height:120px;background:var(--panel2);color:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px;font-family:var(--sans);font-size:14px;"></textarea>
+    </div>
+    <div class="btn-row" style="margin-top:12px;">
+      <button type="button" class="btn-primary" id="err-copy" style="width:auto;">Copy report</button>
+      <button type="button" class="btn-ghost" id="err-close">Close</button>
+    </div>
+    <p class="note" id="err-status"></p>
+  </div>
+</div>
 <div id="jump-overlay" class="jump-overlay" hidden>
   <div class="jump-box">
     <label class="card-title" for="jump-q">Jump to a module or calculator</label>
@@ -438,6 +464,7 @@
   <nav class="tabs" aria-label="Clinical modules">
     <button class="tab" data-tab="dating">Dating &amp; EDD</button>
     <button class="tab" data-tab="weeks">Scan weeks</button>
+    <button class="tab" data-tab="protocol">Protocols</button>
     <button class="tab" data-tab="biometry">Biometry</button>
     <button class="tab" data-tab="doppler">Doppler</button>
     <button class="tab" data-tab="anomaly">Anomaly</button>
@@ -547,6 +574,27 @@
       </div>
       <div>
         <div class="card" id="wk-card"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== TAB: PROTOCOLS & PITFALLS ===================== -->
+  <section class="panel-view" id="view-protocol">
+    <div class="layout">
+      <div>
+        <div class="card">
+          <div class="card-title">Exam protocol</div>
+          <p class="subhead">ISUOG-style checklists, published pitfalls, and a look-up atlas of ultrasound red flags. Local protocol outranks this card. Ticks stay on this device only — no patient identifiers.</p>
+          <div class="unit-toggle" id="proto-mode" style="margin-bottom:12px;">
+            <button type="button" data-mode="check" class="on">Checklists</button>
+            <button type="button" data-mode="flags">Red flags</button>
+          </div>
+          <div class="chips" id="proto-picker"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card" id="proto-card"></div>
       </div>
     </div>
   </section>
@@ -1087,6 +1135,8 @@
           <li><strong>Redating.</strong> ACOG/AIUM/SMFM Committee Opinion 700 (2017): ≤8w6d >5 days; 9w0d–13w6d >7 days; 14–15w6d >7 days; 16–21w6d >10 days; 22–27w6d >14 days; ≥28 weeks >21 days.</li>
           <li><strong>Later dating rank.</strong> Chervenak et al., <em>AJR</em> 1991 — shape-corrected BPD and HC (plus FL in the third trimester) outperform AC for dating.</li>
           <li><strong>FHR.</strong> Doubilet & Benson, <em>AJR</em> 1995. Peak near 9–10 weeks; 110–160 bpm from about 14 weeks. Ibrahim et al., <em>J Perinat Med</em> 2022.</li>
+          <li><strong>Fertile window.</strong> Wilcox et al., <em>NEJM</em> 1995;333:1517–21 — conception documented from intercourse 5 days before ovulation through the day of ovulation. Displayed as a cycle estimate, not contraception.</li>
+          <li><strong>Screening windows.</strong> NT 11+0–13+6 (FMF/ISUOG); midtrimester anatomy 18–22 weeks (ISUOG 2022); GDM screen commonly 24–28 weeks (ACOG PB 190); anti-D often 28 weeks if RhD-negative (local protocol may add a later dose); GBS 36+0–37+6 (ACOG PB 797).</li>
         </ul>
       </div>
       <div class="card ref-block">
@@ -1150,6 +1200,7 @@
         <h3>Gynaecology & organ size</h3>
         <ul>
           <li><strong>IOTA Simple Rules.</strong> Timmerman et al., <em>BMJ</em> 2008. Malignant = M-feature(s) and no B-feature; both or neither = inconclusive. ADNEX is not implemented.</li>
+          <li><strong>PCOM.</strong> Rotterdam ESHRE/ASRM 2003: \u226512 follicles 2–9 mm in either ovary and/or ovarian volume >10 mL. AE-PCOS 2014 (Dewailly et al.): with modern TV transducers, FNPO \u226520 is preferred; volume >10 mL remains an alternative. International evidence-based PCOS guideline 2018/2023: FNPO \u226520 and/or volume \u226510 mL (8 MHz+ TV). Exclude a dominant follicle >10 mm or corpus luteum. PCOM is not a PCOS diagnosis.</li>
           <li><strong>Cyst follow-up.</strong> Levine et al., SRU consensus. Ovarian volume: Raffone/SIGO-SIE 2022. No single postmenopausal cutoff is asserted.</li>
           <li><strong>Endometrium.</strong> Postmenopausal bleeding often ≤5 mm reassuring; asymptomatic postmenopausal often ~≤11 mm; premenopausal by cycle phase.</li>
           <li><strong>Spleen.</strong> Rosenberg et al., <em>AJR</em> 1991. <strong>Kidney.</strong> Emamian et al., <em>AJR</em> 1993 (paediatric mean). <strong>Uterus.</strong> Kelsey et al., PLOS ONE 2016.</li>
@@ -1168,7 +1219,10 @@
       <ul>
         <li>International charts (Hadlock, INTERGROWTH-21st, SRU) may not match every local population.</li>
         <li>TI-RADS, RMI, Bosniak, and IOTA classify a pattern — they are not a histopathology or FNA result.</li>
-        <li>Red-flag banners flag published criteria; they do not time delivery or replace an emergency call.</li>
+        <li>Red-flag banners flag published criteria; they do not time delivery or replace an emergency call. The Protocols → Red flags atlas is a look-up, not a live monitor.</li>
+<li><strong>Vasa previa.</strong> SMFM Consult Series #37 (reaffirmed 2024): unprotected fetal vessels over/near the internal os; TV + colour and pulsed Doppler to show a fetal waveform. Some series use <2 cm from the os.</li>
+<li><strong>PAS.</strong> FIGO / SMFM descriptive ultrasound signs (lacunae, bridging vessels, loss of clear zone). Not a point score in this app.</li>
+<li><strong>Abruption.</strong> Clinical diagnosis; ultrasound is insensitive and a normal scan does not exclude it.</li>
         <li>Play Store / Microsoft Store packaging is not part of this web PWA. Install from the browser (“Add to Home Screen”) for offline use.</li>
       </ul>
     </div>
@@ -1180,6 +1234,10 @@
         <li><strong>Bosniak 2019.</strong> Silverman et al., <em>Radiology</em> 2019; 292:475–80 (renal cystic masses). Categories I–IV are entered as the published class; this tool does not invent a point score.</li>
 <li><strong>ACR BI-RADS Atlas 5th Edition (2013), ultrasound.</strong> Lexicon (shape, orientation, margin, echo, posterior features, special cases) plus an assessment category the reader assigns. Not a point score. Category 3 <2% malignancy; 5 ≥95%.</li>
 <li><strong>Scan-week windows.</strong> ISUOG first-trimester and midtrimester anatomy practice guidelines; FMF NT 11+0–13+6 (CRL 45–84 mm); SRU 2012/2024 early-pregnancy diagnostic criteria; ACOG Committee Opinion 700 redating; IUFD ≥20 weeks as used elsewhere in this app.</li>
+        <li><strong>Midtrimester protocol.</strong> Salomon et al., ISUOG Practice Guidelines (updated): routine mid-trimester fetal ultrasound scan. <em>Ultrasound Obstet Gynecol</em> 2022; 59:840–56. DOI 10.1002/uog.24888. PMID 35592929.</li>
+        <li><strong>ALARA / Doppler in the first trimester.</strong> ISUOG statement on the safe use of Doppler in the 11 to 13+6-week examination. <em>Ultrasound Obstet Gynecol</em> 2011; 37:628. SOGC No. 359: heating concern when TI exceeds 1; teaching/research often aims TI ≤0.7 and MI ≤1.0.</li>
+        <li><strong>GBS window.</strong> ACOG Committee Opinion 797 (2020): antenatal GBS screening 36+0 to 37+6 weeks.</li>
+        <li><strong>GDM window.</strong> ACOG Practice Bulletin 190: typically 24–28 weeks in patients not already known to have diabetes.</li>
       </ul>
     </div>
   </section>
@@ -1188,6 +1246,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
+    <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
   </footer>
 
 </div>
@@ -1908,6 +1967,25 @@
         eddHtml += '<div class="compare-row"><span class="compare-label">GA by ' + usLabel + ', at scan</span><span class="compare-value">' + uwd.w + 'w' + uwd.d + 'd</span></div>';
         eddHtml += '<div class="note">' + trimesterLabel(usDays) + '</div>';
       }
+      var prefEDD = usEDD || lmpEDD;
+      if (lmp) {
+        var ovDayN = cycle - luteal;
+        var ovDate = addDays(lmp, ovDayN);
+        eddHtml += '<div class="hairline"></div><p class="note">Cycle timing from LMP (ovulation \u2248 day ' + ovDayN + '). Fertile-window estimate is not contraception.</p>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">Estimated ovulation</span><span class="compare-value">' + formatDate(ovDate) + '</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">Fertile window (Wilcox 1995)</span><span class="compare-value">' + formatDate(addDays(ovDate, -5)) + ' – ' + formatDate(ovDate) + '</span></div>';
+      }
+      if (prefEDD) {
+        eddHtml += '<div class="hairline"></div><p class="note">Screening calendar from the preferred EDD (ultrasound if present). Gestational windows, not booked appointments. Local protocol outranks these dates.</p>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">Conception (EDD \u2212 266 d)</span><span class="compare-value">' + formatDate(addDays(prefEDD, -266)) + '</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">T1 ends 13+6 / T2 starts 14+0</span><span class="compare-value">' + formatDate(addDays(prefEDD, 97 - 280)) + ' / ' + formatDate(addDays(prefEDD, 98 - 280)) + '</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">T3 starts 28+0</span><span class="compare-value">' + formatDate(addDays(prefEDD, 196 - 280)) + '</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">NT / combined 11+0–13+6</span><span class="compare-value">' + formatDate(addDays(prefEDD, 77 - 280)) + ' – ' + formatDate(addDays(prefEDD, 97 - 280)) + '</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">Anatomy (ISUOG 18+0–22+6)</span><span class="compare-value">' + formatDate(addDays(prefEDD, 126 - 280)) + ' – ' + formatDate(addDays(prefEDD, 160 - 280)) + '</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">GDM screen often 24–28 w</span><span class="compare-value">' + formatDate(addDays(prefEDD, 168 - 280)) + ' – ' + formatDate(addDays(prefEDD, 196 - 280)) + '</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">Anti-D often 28 w if RhD-negative</span><span class="compare-value">' + formatDate(addDays(prefEDD, 196 - 280)) + '</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">GBS screen often 36+0–37+6</span><span class="compare-value">' + formatDate(addDays(prefEDD, 252 - 280)) + ' – ' + formatDate(addDays(prefEDD, 265 - 280)) + '</span></div>';
+      }
     }
     set("edd-card", eddHtml);
 
@@ -2259,6 +2337,15 @@
         '</div>' +
         '<div class="field"><label>Height</label><div class="row"><input id="ov-h" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
         '<div class="hairline">' +
+        '<p class="subhead">PCOM (polycystic ovarian morphology) \u2014 Rotterdam 2003 vs AE-PCOS 2014. An ultrasound descriptor, not a PCOS diagnosis.</p>' +
+        '<div class="grid2">' +
+        '<div class="field"><label>FNPO this ovary (follicles 2\u20139 mm)</label><div class="row"><input id="ov-fnpo" type="number" inputMode="numeric" min="0" max="80" placeholder="\u2014"></div></div>' +
+        '<div class="field"><label>FNPO other ovary (optional)</label><div class="row"><input id="ov-fnpo2" type="number" inputMode="numeric" min="0" max="80" placeholder="\u2014"></div></div>' +
+        '</div>' +
+        '<label class="check-row"><input type="checkbox" id="ov-pcom-excl"> Dominant follicle >10 mm or corpus luteum present \u2014 do not apply PCOM on this scan</label>' +
+        '<p class="note">Rotterdam 2003: \u226512 follicles 2\u20139 mm in either ovary and/or ovarian volume >10 mL. AE-PCOS 2014 (modern TV transducers): FNPO \u226520 is preferred; volume >10 mL remains an alternative if FNPO cannot be counted. PCOS still requires a clinical syndrome (2 of 3 Rotterdam criteria).</p>' +
+        '</div>' +
+        '<div class="hairline">' +
         '<p class="subhead">Cyst / adnexal structure, quick size &amp; follow-up-band descriptor</p>' +
         '<div class="field"><label>Maximum diameter</label><div class="row"><input id="ov-cyst" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
         '<div class="field"><label>Morphology</label><div class="row"><select id="ov-morph"><option value="simple">Simple (unilocular, anechoic, thin wall)</option><option value="complex">Complex (septations, solid component, or mixed echogenicity)</option></select></div></div>' +
@@ -2294,7 +2381,7 @@
         '<p class="note">RCOG Green-top Guideline 34 commonly uses RMI \u2265200 for gynae-oncology referral. RMI does not replace IOTA in an inconclusive mass.</p>' +
         '</div>';
       set("organ-inputs", html);
-      wireOrganInputs(["ov-stage", "ov-l", "ov-w", "ov-h", "ov-cyst", "ov-morph", "ov-structure", "ov-irregular", "ov-diam", "ov-soliddiam", "ov-shadows", "ov-ascites", "ov-papillary", "ov-colorscore", "ov-meno", "ov-ca125", "rmi-multi", "rmi-solid", "rmi-bilat", "rmi-ascites", "rmi-mets"]);
+      wireOrganInputs(["ov-stage", "ov-l", "ov-w", "ov-h", "ov-fnpo", "ov-fnpo2", "ov-pcom-excl", "ov-cyst", "ov-morph", "ov-structure", "ov-irregular", "ov-diam", "ov-soliddiam", "ov-shadows", "ov-ascites", "ov-papillary", "ov-colorscore", "ov-meno", "ov-ca125", "rmi-multi", "rmi-solid", "rmi-bilat", "rmi-ascites", "rmi-mets"]);
     } else if (organSection === "vessels") {
       html = '<div class="card-title">Abdominal Vessels</div>' +
         '<div class="grid2">' +
@@ -2558,6 +2645,35 @@
         }
       } else {
         html += '<p class="empty">Enter length, width, and height for volume.</p>';
+      }
+      var fnpo = num(val("ov-fnpo")), fnpo2 = num(val("ov-fnpo2"));
+      var pcomExcl = checked("ov-pcom-excl");
+      if (pcomExcl || fnpo != null || fnpo2 != null || ovVol != null) {
+        html += '<div class="hairline"></div><div class="card-title" style="margin-top:0">PCOM (not PCOS)</div>';
+        if (pcomExcl) {
+          html += '<div class="badge warn">PCOM not assessed \u2014 a dominant follicle >10 mm or corpus luteum is present. Rotterdam/AE-PCOS exclude that ovary from PCOM counting.</div>';
+        } else if (ovStage === "postmenopausal") {
+          html += '<div class="note">PCOM criteria are for reproductive-age ovaries. Do not apply Rotterdam FNPO counts after menopause.</div>';
+        } else {
+          var fnMax = null;
+          if (fnpo != null && fnpo2 != null) fnMax = Math.max(fnpo, fnpo2);
+          else if (fnpo != null) fnMax = fnpo;
+          else if (fnpo2 != null) fnMax = fnpo2;
+          if (fnMax != null) html += organRow("Highest FNPO (2\u20139 mm)", String(fnMax), "Rotterdam \u226512; AE-PCOS 2014 \u226520 with modern TV");
+          if (ovVol != null) html += organRow("Volume vs PCOM", ovVol.toFixed(1) + " mL", ">10 mL is the volume alternative in both statements");
+          var rot = (fnMax != null && fnMax >= 12) || (ovVol != null && ovVol > 10);
+          var ae = (fnMax != null && fnMax >= 20) || (ovVol != null && ovVol > 10);
+          if (fnMax == null && ovVol == null) {
+            html += '<p class="empty">Enter FNPO and/or volume.</p>';
+          } else {
+            html += '<div class="badge ' + (rot ? "warn" : "ok") + '">Rotterdam 2003 PCOM: ' + (rot ? "criteria met on FNPO \u226512 and/or volume >10 mL" : "criteria not met on the fields entered") + "</div>";
+            html += '<div class="badge ' + (ae ? "warn" : "ok") + '">AE-PCOS 2014 PCOM (modern transducer): ' + (ae ? "criteria met on FNPO \u226520 and/or volume >10 mL" : "FNPO <20 and volume not >10 mL") + "</div>";
+            if (rot && !ae && fnMax != null && fnMax >= 12 && fnMax < 20 && !(ovVol != null && ovVol > 10)) {
+              html += '<div class="note">FNPO ' + fnMax + " meets 2003 (\u226512) but not the 2014 FNPO threshold (\u226520). Say which statement you used. Volume >10 mL would still count on both.</div>";
+            }
+            html += '<div class="note">PCOM is one of three Rotterdam PCOS criteria (with oligo/anovulation and hyperandrogenism). Ultrasound alone is not a PCOS diagnosis. The 2018/2023 international PCOS guideline also prefers FNPO \u226520 and/or volume \u226510 mL with an 8 MHz+ TV probe.</div>';
+          }
+        }
       }
       var ovCyst = num(val("ov-cyst")), ovMorph = val("ov-morph");
       if (ovCyst != null) {
@@ -3927,6 +4043,302 @@
     html += '<p class="note">Clinician notes, not patient education. Fruit-size analogies are omitted on purpose. Windows vary by unit; local protocol outranks this card.</p>';
     set("wk-card", html);
   }
+
+  var protoId = "t2";
+  var PROTO_STORE = "babsinogen.protoChecks.v1";
+  function protoLoad() {
+    try { return JSON.parse(localStorage.getItem(PROTO_STORE) || "{}") || {}; } catch (e) { return {}; }
+  }
+  function protoSave(map) {
+    try { localStorage.setItem(PROTO_STORE, JSON.stringify(map)); } catch (e) {}
+  }
+  var PROTOCOLS = [
+    { id: "t1v", label: "T1 viability",
+      when: "Positive pregnancy test, pain, bleeding, or unsure dates. Transvaginal is the SRU standard for diagnostic criteria.",
+      safety: "B-mode. Avoid routine pulsed Doppler on the embryo. Watch on-screen TI/MI (ALARA). SOGC 359: heating concern when TI exceeds 1.",
+      views: ["IUP vs empty uterus vs PUL (do not call miscarriage from an empty uterus + hCG)", "Gestational sac: location, MSD if no embryo", "Yolk sac when present", "Embryo + CRL once measurable", "Cardiac activity: present/absent; FHR if seen", "Adnexa and cul-de-sac fluid if pain/bleeding"],
+      measures: "CRL (Robinson–Fleming) once an embryo is seen. MSD only if no CRL. Do not date by yolk-sac size.",
+      pitfalls: ["Central endometrial fluid is not an IUP — wait for a yolk sac or double decidual sign.", "CRL <7 mm without a heartbeat is suspicious, not SRU-definitive (TV).", "The 7 mm / 25 mm rules are transvaginal. Repeat TV before counselling demise on TA images alone.", "Do not mistake the yolk sac for the embryo."],
+      jump: { tab: "impress" } },
+    { id: "nt", label: "NT 11+0–13+6",
+      when: "CRL 45–84 mm (FMF/ISUOG). Combined screening or early anatomy as locally offered.",
+      safety: "ISUOG 2011: do not use pulsed Doppler routinely at 11–13+6. Use it only if it changes aneuploidy/anomaly work-up. Keep dwell time short.",
+      views: ["CRL midsagittal", "NT: on (not behind) the skin; neck neither flexed nor hyperextended; amnion separate", "Nasal bone if in protocol", "Skull, four-chamber if feasible, stomach, bladder, limbs, cord insertion", "Do not call omphalocele — midgut herniation can still be physiological until ~12 weeks"],
+      measures: "CRL for dates. NT in millimetres. This app flags NT ≥3.5 mm — specialist software uses CRL-specific percentiles.",
+      pitfalls: ["Amnion included as skin inflates NT.", "NT after CRL >84 mm is not an NT; later it is a nuchal fold.", "Hyperextended neck falsely raises NT."],
+      jump: { tab: "weeks" } },
+    { id: "t2", label: "T2 anatomy 18–22w",
+      when: "Routine midtrimester survey. ISUOG 2022 (Salomon et al., UOG 59:840–56).",
+      safety: "ALARA. Colour/pulsed Doppler when indicated (heart, cord, placenta), not as a default cine.",
+      views: ["Head: transventricular, transthalamic, transcerebellar (cavum, atria, cerebellum, cisterna magna)", "Face: both orbits, profile if offered, intact upper lip", "Chest/heart: four-chamber (left-sided), outflow tracts, 3VV or 3VT; no diaphragmatic hernia", "Abdomen: stomach, kidneys, bladder, cord insertion, 3-vessel cord", "Spine sagittal + transverse, limbs and extremities", "Placenta site vs os, fluid (AFI or SDP), cervix if indicated"],
+      measures: "BPD (transthalamic), HC, AC, FL. Atrium <10 mm normal. CM ≤10 mm. TCD. Fluid. Placental thickness if bulky.",
+      pitfalls: ["Wrong BPD plane (not thalami/cavum) biases dates and HC.", "Mixing cardiothoracic area-ratio normals (~0.25–0.35) with circumference CTR (flag ≥0.5).", "Lemon sign alone is not an open NTD — look at the spine and cisterna magna.", "4th ventricle–CM communication can still be normal before 20 weeks.", "Signing ‘normal anatomy’ with missing outflow tracts."],
+      jump: { tab: "anomaly" } },
+    { id: "t3", label: "T3 growth",
+      when: "Size, fluid, presentation, placenta, Doppler if FGR/SGA/indicated. Centiles in this app: 24–41 weeks.",
+      safety: "Spectral Doppler as indicated. Angle ~0° for MCA-PSV. Document EDF quality, not only PI.",
+      views: ["Presentation", "Biometry BPD/HC/AC/FL", "Fluid SDP (ACOG preferred for oligohydramnios) or AFI", "Placenta vs os", "UA ± MCA/CPR/DV as indicated", "BPP components if requested"],
+      measures: "EFW (Hadlock). Use the established dating standard, not today’s composite, for centiles. SDP <2 cm or AFI ≤5 cm = oligohydramnios here.",
+      pitfalls: ["One 8th-centile EFW is SGA as a size label, not automatic FGR.", "AFI ≤5 while SDP ≥2 cm — ACOG prefers SDP to label oligohydramnios.", "A normal PI does not cancel REDF.", "Macrosomia is grams (4000/4500/5000), not a centile.", "Redating a late small fetus to make it ‘50th’ can hide FGR."],
+      jump: { tab: "biometry" } },
+    { id: "gyn", label: "Pelvis / PUL",
+      when: "Pain, bleeding, mass, fertility work-up. Pregnancy test before you interpret an empty uterus.",
+      safety: "TV for diagnostic SRU criteria. Doppler on an adnexal mass: IOTA colour score, not a homemade vascularity grade.",
+      views: ["Uterus: orientation, endometrium in context (bleeding vs asymptomatic vs phase)", "Both ovaries / adnexa", "Cul-de-sac fluid", "IUP vs PUL vs suspected ectopic — location first"],
+      measures: "Endometrial thickness with the matching cutoff (bleeding ~4–5 mm vs asymptomatic ~11 mm here). IOTA Simple Rules. RMI-I if CA-125 known. Ovarian volume 0.52×L×W×H.",
+      pitfalls: ["Empty uterus + positive hCG = PUL until location is proven — not a miscarriage.", "Corpus luteum ring-of-fire is not an ectopic.", "IOTA M + B together is inconclusive, not malignant.", "A single postmenopausal ovarian millilitre cutoff is not agreed in the literature — this app does not invent one.", "Rotterdam PCOM (2003) used ≥12 follicles 2–9 mm in either ovary and/or volume >10 mL; AE-PCOS (2014) often uses ≥20 follicles with modern transducers. Do not diagnose PCOS on ultrasound alone."],
+      jump: { tab: "organ", organ: "ovary" } },
+    { id: "foll", label: "Folliculometry",
+      when: "Serial tracking. Natural, irregular, stimulated, IUI, or ART — enter cycle type.",
+      safety: "TV. Colour for CL ‘ring of fire’ after suspected rupture, not to ‘prove’ pregnancy.",
+      views: ["Both ovaries: mean diameter of follicles that matter (2 or 3 orthogonal planes)", "Endometrium: thickness + pattern", "Cul-de-sac fluid", "Compare with the previous scan on this patient record"],
+      measures: "Trend: growth mm/day, dominant emergence, collapse, crenation, CL. Mature size is a range (natural often ~18–25 mm; stimulated often ~16–22 mm).",
+      pitfalls: ["A 22 mm follicle on a presumed day 14 is not ovulation.", "Calendar day 14 is meaningless in a 40–90 day cycle.", "Collapse is not expected 12 hours after hCG.", "This tool does not score OHSS or book IUI."],
+      jump: { tab: "follicle" } },
+    { id: "safe", label: "ALARA / safety",
+      when: "Every obstetric scan. Medical indication only — not entertainment cine loops.",
+      safety: "ISUOG: routine B-mode is not contraindicated. Spectral Doppler deposits the most heat, especially near bone and in the first trimester.",
+      views: ["Confirm medical indication", "Use obstetric preset", "Watch displayed TI and MI throughout", "Remove the probe when not imaging", "First-trimester pulsed Doppler only when it changes management (ISUOG 11–13+6 statement)"],
+      measures: "No calculator. Teaching/research (SOGC 359): aim TI ≤0.7 and MI ≤1.0 when feasible. Clinical scanning: keep indices as low as reasonably achievable; extra caution if TI exceeds 1.",
+      pitfalls: ["A tiny colour box can raise output.", "Long dwell on one calvarium in late pregnancy heats bone.", "Do not treat a single TIS/MI pair as a universal machine law — watch the displayed indices and use ALARA.", "This app does not read your machine’s TI."],
+      jump: { tab: "refs" } }
+  ];
+
+  var protoMode = "check";
+  var flagId = "ectopic";
+  var RED_FLAGS = [
+    { id: "ectopic", name: "Ectopic / PUL", sev: "critical",
+      def: "Pregnancy implanted outside the endometrial cavity, or location not yet proven (PUL).",
+      criteria: ["Empty uterus + positive hCG is PUL until location is proven — not a miscarriage.", "An adnexal mass separate from the ovary, a tubal ring, or an extrauterine GS with yolk sac/embryo supports ectopic.", "Cul-de-sac fluid, especially echogenic, raises concern but is not specific.", "Heterotopic pregnancy: IUP plus an ectopic — do not stop at a reassuring IUP if the clinical picture is severe."],
+      actions: ["Do not delay emergency gynaecology/ED review for pain, bleeding, or haemodynamic instability.", "Follow β-hCG and repeat ultrasound per local PUL protocol if the patient is stable and location is unproven.", "This tool does not interpret a single hCG number as a location."],
+      ddx: ["Early IUP too small to see", "Complete miscarriage after a previously documented IUP", "Corpus luteum (ring-of-fire on the ovary)", "Degenerating fibroid"],
+      source: "SRU 2013/2024 first-trimester consensus (Doubilet et al., NEJM 2013). ACOG PB 193 ectopic pregnancy.",
+      jump: { tab: "impress" } },
+    { id: "epl", name: "Definitive EPL (SRU)", sev: "urgent",
+      def: "Ultrasound criteria that diagnose a non-viable intrauterine pregnancy (early pregnancy loss).",
+      criteria: ["TV: CRL ≥7 mm with no cardiac activity.", "TV: MSD ≥25 mm with no embryo.", "No embryo with heartbeat ≥14 days after a GS without a yolk sac.", "No embryo with heartbeat ≥11 days after a GS with a yolk sac."],
+      actions: ["Once a definitive TV criterion is met, further viability scans are not required to confirm demise.", "Management (expectant, medical, surgical) is local protocol — this app does not prescribe treatment.", "TA-only images are not equivalent to the 7 mm / 25 mm TV rules."],
+      ddx: ["Suspicious but not definitive: CRL <7 mm silent, MSD 16–24 mm empty", "Wrong dates", "PUL if no IUP is established"],
+      source: "SRU / Doubilet NEJM 2013; SRU 2024 lexicon. Criteria unchanged.",
+      jump: { tab: "impress" } },
+    { id: "iufd", name: "IUFD / stillbirth", sev: "critical",
+      def: "Fetal death at ≥20 weeks as labelled here (some jurisdictions register stillbirth at 22 or 24 weeks).",
+      criteria: ["Real-time ultrasound: no cardiac activity and no movement over an adequate observation (M-mode ± Doppler).", "Handheld Doppler, Pinard, or CTG silence is not diagnostic.", "Supportive only: Spalding sign, maceration, Robert sign (gas)."],
+      actions: ["Confirm with a credentialed operator. Do not diagnose from a clinic Doppler alone.", "No further viability scan is needed once ultrasound confirmation is documented.", "Counselling, investigation, and birth follow local stillbirth protocol — this tool does not time delivery."],
+      ddx: ["Severe bradycardia misread as asystole — watch long enough", "Maternal vessel mistaken for fetal heart"],
+      source: "ACOG stillbirth / reVITALize; ultrasound confirmation required.",
+      jump: { tab: "impress" } },
+    { id: "redf", name: "UA REDF", sev: "critical",
+      def: "Reversed umbilical-artery end-diastolic flow — a qualitative waveform emergency in FGR physiology.",
+      criteria: ["Spectral UA from a free loop (site changes PI). REDF is reversed diastolic flow.", "A ‘normal’ PI numeral does not cancel REDF.", "Angle and fetal breathing can artefact waveforms — repeat if the trace is poor."],
+      actions: ["Urgent senior/MFM review the same day the waveform is confirmed.", "This app does not time caesarean section or steroids.", "Document EDF quality in the report, not only PI."],
+      ddx: ["Wrong gate (maternal vessel)", "Excessive gain/filter erasing true EDF"],
+      source: "ISUOG Doppler practice guideline (fetal growth restriction). Qualitative AEDF/REDF outrank PI.",
+      jump: { tab: "doppler" } },
+    { id: "aedf", name: "UA AEDF", sev: "critical",
+      def: "Absent umbilical-artery end-diastolic flow — significant placental-resistance finding.",
+      criteria: ["No forward diastolic flow on a technically adequate UA trace.", "Less extreme than REDF but still a qualitative red flag.", "PI above the 95th with EDF present is a surveillance prompt, not this banner."],
+      actions: ["Same-day senior review; interval and steroids/MgSO4 follow local FGR staging, not this calculator."],
+      ddx: ["High-pass filter set too high", "Sampling at an extreme fetal abdominal insertion without a free-loop check"],
+      source: "ISUOG Doppler guideline. INTERGROWTH UA-PI LMS is for PI, not a substitute for EDF quality.",
+      jump: { tab: "doppler" } },
+    { id: "dv", name: "DV reversed a-wave", sev: "critical",
+      def: "Absent or reversed ductus-venosus a-wave — late FGR / cardiac decompensation flag.",
+      criteria: ["Forward a-wave is expected. Absent/reversed a-wave is the qualitative emergency.", "A mildly high DV-PI with a forward a-wave is not equivalent."],
+      actions: ["Urgent MFM/senior review, especially with UA REDF or an equivocal BPP.", "Not a delivery order from software."],
+      ddx: ["Inferior vena cava sampled instead of DV", "Fetal breathing"],
+      source: "ISUOG FGR Doppler staging. DV a-wave direction outranks an isolated PI.",
+      jump: { tab: "doppler" } },
+    { id: "mca", name: "MCA-PSV anaemia risk", sev: "urgent",
+      def: "Middle-cerebral-artery peak systolic velocity ≥1.5 MoM (Mari) in an at-risk fetus (alloimmunisation, parvovirus, suspected anaemia).",
+      criteria: ["Proximal MCA, angle as near 0° as possible.", "≥1.5 multiples of the median is Mari’s moderate-to-severe anaemia-risk threshold.", "False positives rise after about 35 weeks."],
+      actions: ["MFM / fetal-medicine pathway (MCA trend, MCA-PSV MoM, possible IUT) — not a labour-ward crash call from this number alone.", "Do not use MCA-PSV as the main FGR test; that is UA/CPR/DV."],
+      ddx: ["Angle error inflating PSV", "Wrong vessel"],
+      source: "Mari et al. NEJM 2000; Mari 2005 late-gestation specificity.",
+      jump: { tab: "doppler" } },
+    { id: "oligo", name: "Oligohydramnios", sev: "urgent",
+      def: "Too little amniotic fluid by SDP or AFI as used in this app.",
+      criteria: ["SDP <2 cm (ACOG preferred), or AFI ≤5 cm.", "SDP <1 cm is called severe here.", "A numerically ‘normal’ BPP with no 2 cm pocket is still an abnormal fluid / modified-BPP finding."],
+      actions: ["Ask about leakage (PPROM). Check fetal kidneys/bladder and growth/Doppler.", "Delivery timing is obstetric, not an AFI number from this app."],
+      ddx: ["PPROM", "Renal agenesis / dysplasia / obstruction", "FGR / placental insufficiency", "Post-term"],
+      source: "ACOG amniotic fluid. SDP <2 cm or AFI ≤5 cm.",
+      jump: { tab: "anomaly" } },
+    { id: "poly", name: "Polyhydramnios", sev: "urgent",
+      def: "Excess liquor. Mild/moderate/severe bands in this app: SDP ≥8 / 12 / 16 cm; AFI ≥24 / 30 / 35 cm.",
+      criteria: ["SDP ≥8 cm or AFI ≥24 cm (some series use ≥25 for AFI).", "Severe: SDP ≥16 cm or AFI ≥35 cm."],
+      actions: ["Look for GI obstruction (double bubble), swallowing problems, hydrops, maternal diabetes.", "Idiopathic in a large fraction — still correlate."],
+      ddx: ["Maternal diabetes / macrosomia", "Duodenal atresia", "Impaired swallowing / aneuploidy", "Hydrops / anaemia", "Idiopathic"],
+      source: "ACOG; SMFM polyhydramnios consult. Bands as coded on the Anomaly tab.",
+      jump: { tab: "anomaly" } },
+    { id: "vasa", name: "Vasa previa", sev: "critical",
+      def: "Unprotected fetal vessels in the membranes over or within ~2 cm of the internal os.",
+      criteria: ["TV + colour Doppler: vessels over/near the os.", "Pulsed Doppler: fetal arterial (FHR) or venous waveform — not maternal.", "Type I velamentous insertion; type II succenturiate/bilobed connecting vessels.", "About 1 in 5 second-trimester diagnoses resolve — recheck in the third trimester."],
+      actions: ["Urgent MFM/senior obstetric review the day it is recognised.", "Do not time hospitalisation or 34–37 week birth from this app — SMFM CS #37 is a clinical pathway.", "Document cord insertion and succenturiate lobes on anatomy scans."],
+      ddx: ["Maternal cervical vessels (maternal heart rate)", "Marginal placental sinus", "Cord presentation without membranous vessels"],
+      source: "SMFM Consult Series #37 (reaffirmed 2024). Some series use <2 cm from the os.",
+      jump: { tab: "anomaly" } },
+    { id: "previa", name: "Placenta previa (bleeding)", sev: "critical",
+      def: "Placenta covering the internal os. Bleeding previa is a clinical emergency even if the scan looks static.",
+      criteria: ["TV is the accurate test of os relationship.", "Complete covering vs low-lying (often <2 cm from os — local definition).", "A previously low placenta may resolve; restated vs prior."],
+      actions: ["Bleeding: obstetric emergency pathway, not a home-going decision from software.", "Quiet, incidental previa: local antenatal pathway (often avoid PV, plan site of birth)."],
+      ddx: ["Vasa previa", "Succenturiate lobe", "Contracted lower segment mimicking a low placenta on TA only"],
+      source: "RCOG Green-top 27a / ACOG placenta previa. Distance bands are unit-defined.",
+      jump: { tab: "anomaly" } },
+    { id: "pas", name: "PAS (accreta spectrum)", sev: "critical",
+      def: "Placenta accreta spectrum — abnormal adherence. Ultrasound signs are suggestive, not a FIGO grade from this app.",
+      criteria: ["Highest risk: previa + prior caesarean.", "Suggestive signs (FIGO/SMFM descriptive): placental lacunae, turbulent lacuna flow, loss of clear zone, myometrial thinning, bladder-wall interruption, bridging vessels.", "This is not a point score."],
+      actions: ["Antenatal MFM / PAS centre referral when signs plus risk factors are present.", "Do not book caesarean hysterectomy from a software checklist."],
+      ddx: ["Normal lacunae in a thick placenta", "Bladder varices", "Overfilled bladder thinning the interface"],
+      source: "FIGO PAS ultrasound descriptors; SMFM PAS consult. No homemade score.",
+      jump: { tab: "anomaly" } },
+    { id: "abrupt", name: "Abruption", sev: "critical",
+      def: "Premature placental separation. Ultrasound is insensitive; the diagnosis is clinical.",
+      criteria: ["Pain, bleeding, tetanic uterus, fetal compromise — treat clinically even if the scan is ‘normal’.", "If seen: retroplacental haematoma, heterogeneous placenta, jelly-like placenta — supportive, not required.", "A negative scan does not exclude abruption."],
+      actions: ["Obstetric emergency care first. Scan only if it will not delay resuscitation or birth.", "This app has no abruption ‘score’."],
+      ddx: ["Fibroid", "Uterine contraction", "Circumvallate placenta", "Previa bleeding"],
+      source: "ACOG / SMFM: clinical diagnosis; US can miss even large abruptions.",
+      jump: { tab: "impress" } },
+    { id: "cordp", name: "Cord presentation / prolapse", sev: "critical",
+      def: "Cord below the presenting part. Prolapse with ruptured membranes is a clinical crash call.",
+      criteria: ["Ultrasound may show the cord in the cervix or in front of the presenting part (cord presentation) with intact membranes.", "Prolapse is diagnosed on vaginal examination after ROM — do not wait for a scan."],
+      actions: ["Prolapse: immediate obstetric emergency manoeuvres and birth pathway.", "Isolated cord presentation on US: senior review; do not manage from this card."],
+      ddx: ["Loops beside the head in a high presenting part", "Vasa previa (membranous fetal vessels)"],
+      source: "RCOG / ACOG cord prolapse. Ultrasound adjunct, not the definition of prolapse.",
+      jump: { tab: "impress" } },
+    { id: "rupture", name: "Uterine rupture", sev: "critical",
+      def: "Full-thickness uterine wall disruption. Clinical shock / loss of station outranks any image.",
+      criteria: ["US, if obtained without delay, may show an empty uterus, fetus in the peritoneal cavity, and haemoperitoneum.", "Do not complete a biometry worksheet before calling for help."],
+      actions: ["Crash obstetric/surgical response. This card is recognition, not a protocol timer."],
+      ddx: ["Advanced abdominal pregnancy (rare)", "Massive abruption"],
+      source: "Clinical diagnosis. Ultrasound is adjunctive only.",
+      jump: { tab: "impress" } },
+    { id: "hydrops", name: "Hydrops fetalis", sev: "urgent",
+      def: "Fluid in two or more compartments (ascites, pleural, pericardial, skin oedema). Not a grade from this app.",
+      criteria: ["Two compartments. Skin oedema often >5 mm when used as a compartment.", "Look for anaemia (MCA-PSV), arrhythmia, structural anomaly, infection."],
+      actions: ["Same-day MFM. MCA-PSV if anaemia is in the differential.", "This tool does not distinguish immune vs non-immune hydrops."],
+      ddx: ["Isolated ascites (one compartment — not hydrops yet)", "Cystic hygroma without second compartment"],
+      source: "SMFM hydrops consult. Two-compartment definition.",
+      jump: { tab: "anomaly" } },
+    { id: "fgr", name: "FGR physiology", sev: "urgent",
+      def: "Pathological smallness, not a single centile. Severe SGA is EFW <3rd as a size label.",
+      criteria: ["SGA: EFW <10th. Severe SGA: <3rd (this app’s size language).", "FGR wants a pathological package: small/falling AC or EFW plus Doppler or fluid clues.", "One 8th-centile EFW with normal Doppler is not ‘FGR diagnosed’ here."],
+      actions: ["Serial growth + UA Doppler per local SGA/FGR pathway.", "AEDF/REDF/DV a-wave escalate immediately (see those flags)."],
+      ddx: ["Constitutional SGA tracking along the 9th", "Wrong dates (do not redate a late small fetus to hide FGR)"],
+      source: "ISUOG FGR; ACOG/SMFM SGA-FGR. No homemade FGR points.",
+      jump: { tab: "biometry" } },
+    { id: "macro", name: "Macrosomia / LGA", sev: "caution",
+      def: "Macrosomia is grams; LGA is a centile. They are not the same.",
+      criteria: ["ACOG PB 216: grade 1 ≥4000 g, grade 2 ≥4500 g, grade 3 ≥5000 g.", "LGA: EFW ≥90th for GA.", "EFW error is typically ±10–15% and largest at term."],
+      actions: ["Counselling and mode of birth are obstetric, not an automated CS from EFW.", "Do not label macrosomia from a centile alone."],
+      ddx: ["Constitutional large fetus", "Diabetes", "Wrong dates"],
+      source: "ACOG Practice Bulletin 216.",
+      jump: { tab: "biometry" } },
+    { id: "cx", name: "Short cervix", sev: "urgent",
+      def: "TV cervical length <25 mm before 24 weeks is a preterm-birth risk flag (Iams), not a labour diagnosis.",
+      criteria: ["Transvaginal, empty bladder. TA with a full bladder falsely lengthens the cervix.", "<25 mm before 24 weeks is the common research threshold used here as a flag.", "Funneling without a short residual length is weaker than the residual length itself."],
+      actions: ["Offer the local PTB-prevention pathway (progesterone / cerclage criteria are unit-specific).", "This app does not prescribe progesterone."],
+      ddx: ["Underfilled bladder TA ‘short cervix’", "Contraction"],
+      source: "Iams et al.; ISUOG cervical-length practice. Local protocol for treatment.",
+      jump: { tab: "weeks" } },
+    { id: "not-us", name: "Not ultrasound diagnoses", sev: "caution",
+      def: "The master list also named severe preeclampsia, ‘fetal distress’, and ‘cord compression’. Those are clinical (or CTG) diagnoses.",
+      criteria: ["UtA notching / high PI is a preeclampsia-risk marker, not a PET diagnosis.", "CTG ‘distress’ is not an ultrasound label.", "Cord compression is not a specific B-mode diagnosis."],
+      actions: ["Treat blood pressure, neurology, and CTG on clinical pathways.", "Use Doppler flags (AEDF/REDF/DV) when the waveform is the problem."],
+      ddx: ["See UA REDF, AEDF, DV, FGR cards"],
+      source: "ISSHP / ACOG hypertensive disease; FIGO CTG. Honest scope.",
+      jump: { tab: "doppler" } }
+  ];
+  function renderProtocolPicker() {
+    var list = protoMode === "flags" ? RED_FLAGS : PROTOCOLS;
+    set("proto-picker", list.map(function (p) {
+      var on = protoMode === "flags" ? (p.id === flagId) : (p.id === protoId);
+      var lab = p.label || p.name;
+      return '<button type="button" data-section="' + p.id + '" class="' + (on ? "on" : "") + '">' + lab + "</button>";
+    }).join(""));
+    document.querySelectorAll("#proto-picker button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var id = b.getAttribute("data-section");
+        if (protoMode === "flags") flagId = id; else protoId = id;
+        renderProtocol();
+      });
+    });
+  }
+  function renderProtocol() {
+    renderProtocolPicker();
+    if (protoMode === "flags") {
+      var f = null;
+      for (var i = 0; i < RED_FLAGS.length; i++) if (RED_FLAGS[i].id === flagId) f = RED_FLAGS[i];
+      if (!f) return;
+      var sevCls = f.sev === "critical" ? "danger" : (f.sev === "urgent" ? "warn" : "");
+      var html = '<div class="card-title">' + f.name + "</div>";
+      html += '<div class="badge ' + (f.sev === "critical" ? "danger" : (f.sev === "urgent" ? "warn" : "ok")) + '">' + f.sev + "</div>";
+      html += '<div class="impression ' + sevCls + '"><h3>Definition</h3><p>' + f.def + "</p></div>";
+      html += '<div class="impression"><h3>Criteria</h3><ul class="imp-list">';
+      f.criteria.forEach(function (x) { html += "<li>" + x + "</li>"; });
+      html += "</ul></div>";
+      html += '<div class="impression warn"><h3>Immediate actions</h3><ul class="imp-list">';
+      f.actions.forEach(function (x) { html += "<li>" + x + "</li>"; });
+      html += "</ul></div>";
+      html += '<div class="impression"><h3>Differentials</h3><ul class="imp-list">';
+      f.ddx.forEach(function (x) { html += "<li>" + x + "</li>"; });
+      html += "</ul></div>";
+      html += '<p class="note">' + f.source + " This atlas does not time delivery or replace an emergency call.</p>";
+      html += '<button type="button" class="btn-ghost" id="proto-jump" style="width:auto;">Open related calculator</button>';
+      set("proto-card", html);
+      var j = document.getElementById("proto-jump");
+      if (j && f.jump) j.addEventListener("click", function () { goJump(f.jump.tab, f.jump.organ); });
+      return;
+    }
+    var p = null;
+    for (var i = 0; i < PROTOCOLS.length; i++) if (PROTOCOLS[i].id === protoId) p = PROTOCOLS[i];
+    if (!p) return;
+    var checks = protoLoad();
+    var key = p.id;
+    var mine = checks[key] || {};
+    var html = '<div class="card-title">' + p.label + "</div>";
+    html += '<p class="subhead">' + p.when + "</p>";
+    html += '<div class="impression"><h3>Safety</h3><p>' + p.safety + "</p></div>";
+    html += '<div class="impression"><h3>Minimum views / steps</h3><ul class="imp-list">';
+    p.views.forEach(function (v, ix) {
+      var id = "pv-" + key + "-" + ix;
+      var on = !!mine[ix];
+      html += '<li><label class="check-row" style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" data-ix="' + ix + '" id="' + id + '"' + (on ? " checked" : "") + "> <span>" + v + "</span></label></li>";
+    });
+    html += "</ul></div>";
+    html += '<div class="impression"><h3>What to measure</h3><p>' + p.measures + "</p></div>";
+    html += '<div class="impression warn"><h3>Pitfalls</h3><ul class="imp-list">';
+    p.pitfalls.forEach(function (x) { html += "<li>" + x + "</li>"; });
+    html += "</ul></div>";
+    html += '<p class="note">Checklist ticks are a personal aide-memoire on this device. They are not a completed legal report and they store no patient name.</p>';
+    html += '<button type="button" class="btn-ghost" id="proto-jump" style="width:auto;">Open related calculator</button>';
+    set("proto-card", html);
+    document.querySelectorAll("#proto-card input[type=checkbox]").forEach(function (cb) {
+      cb.addEventListener("change", function () {
+        var m = protoLoad();
+        if (!m[key]) m[key] = {};
+        m[key][cb.getAttribute("data-ix")] = cb.checked;
+        protoSave(m);
+      });
+    });
+    var j = document.getElementById("proto-jump");
+    if (j && p.jump) j.addEventListener("click", function () { goJump(p.jump.tab, p.jump.organ); });
+  }
+  function initProtocols() {
+    window.__protoReady = true;
+    var modeBox = document.getElementById("proto-mode");
+    if (modeBox && !modeBox.getAttribute("data-wired")) {
+      modeBox.setAttribute("data-wired", "1");
+      modeBox.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          protoMode = b.getAttribute("data-mode") || "check";
+          modeBox.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); });
+          renderProtocol();
+        });
+      });
+    }
+    renderProtocol();
+  }
+
   function initScanWeeks() {
     window.__weeksReady = true;
     ["wk-prev","wk-next","wk-num","wk-from-dating"].forEach(function (id) {
@@ -5228,10 +5640,16 @@
     { name: "Impression / BPP", hint: "EPL, IUFD, FGR, Manning BPP", tab: "impress" },
     { name: "Folliculometry", hint: "serial follicles, ovulation", tab: "follicle" },
     { name: "Ovary / IOTA / RMI", hint: "adnexal mass, CA-125", tab: "organ", organ: "ovary" },
+    { name: "PCOM (Rotterdam / AE-PCOS)", hint: "FNPO 12 vs 20, volume >10 mL, not PCOS", tab: "organ", organ: "ovary" },
     { name: "Thyroid TI-RADS", hint: "ACR 2017 points and FNA size", tab: "organ", organ: "tirads" },
     { name: "Bosniak renal cyst", hint: "2019 class I–IV", tab: "organ", organ: "bosniak" },
     { name: "Breast BI-RADS US", hint: "lexicon helper, not a point score", tab: "organ", organ: "birads" },
     { name: "Scan weeks", hint: "what to see and measure by GA", tab: "weeks" },
+    { name: "Protocols & pitfalls", hint: "ISUOG checklists, ALARA, common errors", tab: "protocol" },
+    { name: "Red flags", hint: "ectopic, REDF, vasa previa, PAS, IUFD", tab: "protocol", organ: "flags" },
+    { name: "Vasa previa", hint: "fetal vessels over the os", tab: "protocol", organ: "vasa" },
+    { name: "Ectopic / PUL", hint: "empty uterus + hCG is PUL", tab: "protocol", organ: "ectopic" },
+    { name: "UA REDF", hint: "reversed end-diastolic flow", tab: "protocol", organ: "redf" },
     { name: "Uterus & endometrium", hint: "thickness, postmenopausal bleeding", tab: "organ", organ: "uterus" },
     { name: "Reports & log", hint: "print, save locally", tab: "log" },
     { name: "Quiz", hint: "clinical scenarios", tab: "quiz" },
@@ -5273,6 +5691,11 @@
     q = (q || "").toLowerCase();
     var hits = JUMP_INDEX.filter(function (j) {
       return !q || (j.name + " " + j.hint + " " + j.tab).toLowerCase().indexOf(q) !== -1;
+    }).sort(function (a, b) {
+      if (!q) return 0;
+      var an = a.name.toLowerCase().indexOf(q) !== -1 ? 0 : 1;
+      var bn = b.name.toLowerCase().indexOf(q) !== -1 ? 0 : 1;
+      return an - bn;
     }).slice(0, 8);
     set("jump-hits", hits.map(function (j, i) {
       return '<button type="button" class="jump-hit' + (i === 0 ? " active" : "") + '" data-tab="' + j.tab + '" data-organ="' + (j.organ || "") + '">' + fEsc(j.name) + "<span>" + fEsc(j.hint) + "</span></button>";
@@ -5284,8 +5707,22 @@
   function goJump(tab, organ) {
     var ov = document.getElementById("jump-overlay");
     if (ov) { ov.classList.remove("open"); ov.hidden = true; }
+    if (tab === "protocol") {
+      if (organ === "flags" || (organ && RED_FLAGS.some(function (f) { return f.id === organ; }))) {
+        protoMode = "flags";
+        if (organ && organ !== "flags") flagId = organ;
+      } else {
+        protoMode = "check";
+        if (organ) protoId = organ;
+      }
+      window.__protoReady = false;
+    }
     if (window.__showTab) window.__showTab(tab);
     if (organ && tab === "organ" && typeof selectOrganSection === "function") selectOrganSection(organ);
+    var modeBox = document.getElementById("proto-mode");
+    if (modeBox && tab === "protocol") {
+      modeBox.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x.getAttribute("data-mode") === protoMode); });
+    }
   }
   function initChrome() {
     try {
@@ -5303,20 +5740,46 @@
     });
     if (ov) ov.addEventListener("click", function (e) { if (e.target === ov) { ov.classList.remove("open"); ov.hidden = true; } });
     if (qel) qel.addEventListener("input", function () { renderJump(qel.value); });
+    var errOpen = document.getElementById("err-open");
+    var errOv = document.getElementById("err-overlay");
+    function closeErr() { if (errOv) { errOv.classList.remove("open"); errOv.hidden = true; } }
+    if (errOpen && errOv) errOpen.addEventListener("click", function () { errOv.hidden = false; errOv.classList.add("open"); var tx = document.getElementById("err-text"); if (tx) tx.focus(); });
+    if (errOv) errOv.addEventListener("click", function (e) { if (e.target === errOv) closeErr(); });
+    var errClose = document.getElementById("err-close");
+    if (errClose) errClose.addEventListener("click", closeErr);
+    var errCopy = document.getElementById("err-copy");
+    if (errCopy) errCopy.addEventListener("click", function () {
+      var sec = val("err-sec") || "other";
+      var body = (document.getElementById("err-text") || {}).value || "";
+      var report = "Babsinogen error report (local only)\nSection: " + sec + "\n" + body.trim() + "\nDo not include patient identifiers.";
+      function done(ok) {
+        var st = document.getElementById("err-status");
+        if (st) st.textContent = ok ? "Copied. Paste into an email or GitHub issue if you wish. Nothing left this device." : "Copy failed — select the text manually.";
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(report).then(function () { done(true); }).catch(function () { done(false); });
+      } else { done(false); }
+      try {
+        var prev = [];
+        try { prev = JSON.parse(localStorage.getItem("babsinogen.errors.v1") || "[]"); } catch (e1) {}
+        prev.push({ t: new Date().toISOString(), sec: sec, n: body.length });
+        localStorage.setItem("babsinogen.errors.v1", JSON.stringify(prev.slice(-20)));
+      } catch (e2) {}
+    });
     document.addEventListener("keydown", function (e) {
       var tag = (e.target && e.target.tagName) || "";
       if (e.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") {
         e.preventDefault();
         if (open) open.click();
       }
-      if (e.key === "Escape" && ov) { ov.classList.remove("open"); ov.hidden = true; }
+      if (e.key === "Escape") { if (ov) { ov.classList.remove("open"); ov.hidden = true; } closeErr(); }
     });
   }
 
   function onReady() {
     // Tabs
     var tabs = document.querySelectorAll(".tab");
-    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks") };
+    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol") };
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
@@ -5341,6 +5804,8 @@
         initImpression();
       } else if (name === "weeks" && !window.__weeksReady) {
         initScanWeeks();
+      } else if (name === "protocol" && !window.__protoReady) {
+        initProtocols();
       }
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
