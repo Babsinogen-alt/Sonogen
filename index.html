@@ -473,6 +473,7 @@
     <button class="tab" data-tab="organ">Organ Size</button>
     <button class="tab" data-tab="log">Reports &amp; Log</button>
     <button class="tab" data-tab="quiz">Quiz</button>
+    <button class="tab" data-tab="cases">Cases</button>
     <button class="tab" data-tab="refs">References</button>
   </nav>
   <div id="crit-bar" class="crit-bar" role="status" aria-live="polite"></div>
@@ -1119,6 +1120,10 @@
     <div class="card" id="quiz-area"></div>
   </section>
 
+  <section class="panel-view" id="view-cases">
+    <div class="card" id="case-area"></div>
+  </section>
+
   <!-- ===================== TAB 8: REFERENCES ===================== -->
   <section class="panel-view" id="view-refs">
     <div class="card">
@@ -1246,6 +1251,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
+    <p class="note">Babsinogen 1.5 · Cases module uses the same published rules as the calculators. Last reviewed with those sources.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
   </footer>
 
@@ -5632,12 +5638,117 @@
   /* =========================================================================
      WIRING
      ========================================================================= */
+
+  var CASE_STORE = "babsinogen.cases.v1";
+  var caseId = null;
+  var caseFilter = "all";
+  var CASE_BANK = [{"id": "epl-crl5", "mod": "EPL / SRU", "tab": "impress", "title": "6-week bleed, CRL 5 mm, no heartbeat", "hx": "G1, TV scan for bleeding. Sure LMP 6 weeks ago.", "findings": ["Intrauterine GS with yolk sac", "CRL 5 mm", "No cardiac activity over adequate TV observation"], "q": "SRU classification on this single TV scan?", "options": ["Definitive embryonic demise (CRL ≥7 mm rule)", "Suspicious for early pregnancy loss — CRL <7 mm without heartbeat is not definitive; repeat TV rather than treat", "Anembryonic pregnancy (MSD ≥25 mm)", "IUFD"], "correct": 1, "outcome": "CRL 5 mm is below the 7 mm TV threshold. Repeat in 7–10 days. Do not start medical or surgical management on this visit.", "teach": "SRU size criteria are set for essentially zero false-positive demise. Suspicious ≠ diagnostic."}, {"id": "epl-crl8", "mod": "EPL / SRU", "tab": "impress", "title": "CRL 8 mm, no cardiac activity, TV", "hx": "TV follow-up of a 6-week scan.", "findings": ["CRL 8 mm", "No cardiac activity", "Adequate transvaginal observation"], "q": "Verdict?", "options": ["Still only suspicious until CRL is 10 mm", "Definitive embryonic demise (CRL ≥7 mm, no FCA, TV)", "Anembryonic pregnancy", "Viable because TA would differ"], "correct": 1, "outcome": "Embryonic demise can be reported. Further viability scans are not required to ‘confirm’ death. Management (expectant/medical/surgical) is local protocol.", "teach": "Match the criterion: CRL-silent embryo vs empty large sac are different rules."}, {"id": "epl-msd20", "mod": "EPL / SRU", "tab": "impress", "title": "MSD 20 mm, no embryo", "hx": "Unsure dates, TV for painless spotting.", "findings": ["MSD 20 mm", "No yolk sac", "No embryo"], "q": "SRU?", "options": ["Definitive anembryonic pregnancy", "Suspicious (MSD 16–24 mm without embryo) — not definitive", "Normal 8-week sac", "IUFD"], "correct": 1, "outcome": "Do not treat 20 mm as 25 mm. Repeat TV. Counsel uncertainty, not miscarriage.", "teach": "The empty-sac diagnostic line is MSD ≥25 mm."}, {"id": "epl-msd26", "mod": "EPL / SRU", "tab": "impress", "title": "MSD 27 mm, no embryo, TV", "hx": "Repeat TV 10 days after an empty 18 mm sac.", "findings": ["MSD 27 mm", "No embryo"], "q": "SRU?", "options": ["Still suspicious until 30 mm", "Definitive anembryonic pregnancy (MSD ≥25 mm, no embryo)", "Live IUP", "PUL"], "correct": 1, "outcome": "Empty sac at ≥25 mm TV is anembryonic pregnancy.", "teach": "Time-based clocks (11 days with YS, 14 days without) are an alternative when size is still below the line."}, {"id": "pul", "mod": "EPL / SRU", "tab": "impress", "title": "Empty uterus, positive hCG, no adnexal mass", "hx": "β-hCG 890 IU/L, mild pain, no bleeding.", "findings": ["Empty endometrial cavity", "No adnexal mass", "No free fluid"], "q": "Location diagnosis?", "options": ["Miscarriage until proven otherwise", "Pregnancy of unknown location (PUL) until location is proven — not a miscarriage and not an ectopic by default", "Definite ectopic", "IUFD"], "correct": 1, "outcome": "PUL protocol (repeat hCG ± TV). Do not apply intrauterine SRU demise rules to an empty uterus.", "teach": "Ectopic is a location, not a default for every empty uterus."}, {"id": "iufd21", "mod": "EPL / SRU", "tab": "impress", "title": "21 weeks, silent heart, no movement", "hx": "Reduced movements. Handheld Doppler silent in clinic.", "findings": ["No cardiac activity on ultrasound", "No fetal movement on ultrasound", "GA 21+2 by early CRL"], "q": "Label used in this app?", "options": ["Early pregnancy loss", "IUFD / stillbirth (≥20 weeks), confirmed on ultrasound — not on handheld Doppler alone", "Miscarriage, first trimester", "Viable because CTG was not done"], "correct": 1, "outcome": "Document both absent cardiac activity and absent movement. Handheld Doppler can miss a live fetus.", "teach": "IUFD is an ultrasound diagnosis in this tool. The 20-week line is a labelling choice aligned with common stillbirth definitions."}, {"id": "acog5d", "mod": "Dating", "tab": "dating", "title": "7w2d by LMP, CRL 6 days earlier", "hx": "Sure LMP. First visit.", "findings": ["CRL dates 6 days behind LMP", "GA by CRL in the ≤8w6d band"], "q": "ACOG 700?", "options": ["Keep LMP (threshold is 7 days after 9 weeks)", "Redate to ultrasound — at ≤8w6d the discrepancy threshold is >5 days", "Average the EDDs", "Wait for anatomy"], "correct": 1, "outcome": "Six days exceeds 5. Use the CRL EDD and document the change.", "teach": "Committee Opinion 700 windows: >5 d ≤8+6; >7 d at 9–13+6; later biometry windows are wider."}, {"id": "late-redate", "mod": "Dating", "tab": "dating", "title": "First visit at 32 weeks, 12-day gap", "hx": "No prior ultrasound. AC looks small.", "findings": ["Composite biometry 12 days behind LMP", "No earlier dating scan"], "q": "Best counselling?", "options": ["Redate automatically; 12 days always exceeds every ACOG threshold", "Do not redate on third-trimester ultrasound alone if FGR is possible — ≥28 weeks the window is 21 days, and a small fetus should not be ‘made younger’", "CRL now is more accurate", "Ignore LMP whenever any scan exists"], "correct": 1, "outcome": "Treat as suboptimally dated if no scan before 22 weeks. Growth surveillance, not a new birthday.", "teach": "Redating a late small fetus can hide FGR."}, {"id": "hadlock-iv", "mod": "Growth", "tab": "biometry", "title": "Complete biometry for EFW", "hx": "34-week growth scan, head not engaged.", "findings": ["BPD, HC, AC, FL all measured", "CI 78"], "q": "Which Hadlock EFW equation does this app select?", "options": ["Hadlock I (AC, FL)", "Hadlock II (BPD, AC, FL)", "Hadlock III (HC, AC, FL)", "Hadlock IV (BPD, HC, AC, FL)"], "correct": 3, "outcome": "All four parameters trigger Hadlock IV. CI is normal so raw BPD is used in EFW (cBPD is for dating when CI is abnormal).", "teach": "EFW equations were validated on raw BPD. Shape-corrected BPD is a dating tool."}, {"id": "sga-not-fgr", "mod": "Growth", "tab": "biometry", "title": "Single 9th-centile EFW, normal Doppler", "hx": "34 weeks, first growth scan, normal UA EDF.", "findings": ["EFW 9th centile", "UA-PI 50th, EDF present", "No prior scan"], "q": "Best label?", "options": ["Severe SGA and definite FGR", "SGA (<10th) as a size descriptor; FGR needs a pathological process (serial ± Doppler)", "LGA", "Microsomia"], "correct": 1, "outcome": "Plan serial growth. Do not diagnose FGR from one size point.", "teach": "SGA is a percentile. FGR is a process."}, {"id": "macro-lga", "mod": "Growth", "tab": "biometry", "title": "Term 4200 g at the 70th centile", "hx": "39+1, diabetes on diet.", "findings": ["EFW 4200 g", "70th centile for GA"], "q": "Which is true?", "options": ["LGA because 4200 g is always >90th", "Grade 1 macrosomia (≥4000 g) but not LGA if still <90th", "Grade 3 macrosomia", "Macrosomia and LGA are identical"], "correct": 1, "outcome": "Macrosomia is grams (ACOG PB 216). LGA is a centile. They can diverge.", "teach": "Do not call macrosomia from a centile, or LGA from grams alone."}, {"id": "aedf", "mod": "Doppler", "tab": "doppler", "title": "REDF with a ‘normal’ PI", "hx": "29-week FGR, AC <3rd.", "findings": ["Umbilical REDF", "PI 0.90"], "q": "Interpretation?", "options": ["PI is normal so REDF can be ignored", "REDF is a critical qualitative finding regardless of the PI value", "Physiological after 34 weeks", "Skip to CPR only"], "correct": 1, "outcome": "Urgent senior/MFM review. This tool does not time delivery.", "teach": "AEDF/REDF override the PI numeral."}, {"id": "mca-psv", "mod": "Doppler", "tab": "doppler", "title": "MCA-PSV 1.55 MoM at 28 weeks, alloimmunised", "hx": "Anti-D, rising titres.", "findings": ["MCA-PSV 1.55 MoM", "Proximal MCA, low angle"], "q": "Mari threshold?", "options": ["Preeclampsia", "Moderate-to-severe fetal anaemia risk (≥1.5 MoM) — still a clinical pathway, not an automated transfusion order", "Brain-sparing (that is CPR, not PSV)", "Mandatory CS tonight"], "correct": 1, "outcome": "Refer along the anaemia pathway. False positives rise after ~35 weeks.", "teach": "Do not conflate MCA-PSV (anaemia) with MCA-PI/CPR (redistribution)."}, {"id": "cpr", "mod": "Doppler", "tab": "doppler", "title": "CPR 0.88", "hx": "34 weeks, small AC.", "findings": ["MCA-PI 1.10", "UA-PI 1.25", "EDF present"], "q": "CPR and meaning?", "options": ["1.14 — normal (≥1.0)", "0.88 — <1.0, qualitative brain-sparing pattern — not a delivery order", "Uterine artery value", "Not calculable without PSV"], "correct": 1, "outcome": "CPR = 1.10/1.25 = 0.88. Surveillance, not an automated CS.", "teach": "Brain-sparing means cerebral impedance has fallen relative to the umbilical artery."}, {"id": "afi-sdp", "mod": "Fluid", "tab": "anomaly", "title": "AFI 5.0 cm, SDP 2.4 cm", "hx": "37 weeks, reduced movements.", "findings": ["AFI 5.0 cm", "SDP 2.4 cm", "Normal anatomy"], "q": "Oligohydramnios in this app / ACOG preference?", "options": ["AFI 5.0 is oligohydramnios (≤5). ACOG prefers SDP; 2.4 cm is not <2, so do not also force an SDP-oligo label", "Oligohydramnios only if both are low", "SDP 2.4 is severe oligohydramnios", "AFI cannot be used at all"], "correct": 0, "outcome": "Report both numbers. This app flags AFI ≤5. ACOG prefers SDP because it labels fewer women oligohydramnios without worse outcomes.", "teach": "Do not hide a 2.4 cm pocket behind an AFI of 5."}, {"id": "bpp-fluid0", "mod": "BPP", "tab": "impress", "title": "BPP 8/8 with no 2 cm pocket", "hx": "Modified vs full BPP after reduced movements.", "findings": ["Breathing, movement, tone all 2", "Fluid 0 (no 2 cm pocket)", "NST not done"], "q": "This app’s reading?", "options": ["Reassuring because 8/8", "A numerically ‘normal’ ultrasound BPP without a 2 cm pocket is still an abnormal fluid / modified-BPP finding", "Ignore fluid if the fetus is moving", "Polyhydramnios"], "correct": 1, "outcome": "Score fluid honestly. Confirm SDP/AFI and leakage.", "teach": "Manning arithmetic must not conceal oligohydramnios."}, {"id": "bpp6", "mod": "BPP", "tab": "impress", "title": "BPP 6/10, Dopplers normal", "hx": "36 weeks, reduced movements, EDF present.", "findings": ["BPP 6/10", "UA EDF present, PI mid-range"], "q": "Next step taught here?", "options": ["Immediate caesarean from this app", "Equivocal — prompt repeat BPP (often within 24 hours), plus correlation; not a one-off delivery decision", "Reassuring 8/10 equivalent", "Equal to ≤4/10"], "correct": 1, "outcome": "If 6/10 persists with abnormal Doppler, escalate. Isolated 6/10 is not an automated CS.", "teach": "≤4/10 is the frankly abnormal Manning band."}, {"id": "foll-preov", "mod": "Follicle", "tab": "follicle", "title": "CD 12, 21 mm follicle, trilaminar 9 mm", "hx": "Natural-cycle tracking, regular 28-day cycles.", "findings": ["Single mean diameter 21 mm, smooth wall", "Endometrium 9 mm trilaminar", "No prior scan this cycle"], "q": "Best label?", "options": ["Confirmed ovulation", "Pre-ovulatory follicle with peri-ovulatory endometrium — impending ovulation is possible, not proven", "Baseline", "LUFS"], "correct": 1, "outcome": "Need serial signs (collapse, CL, fluid, endometrial shift). One visit cannot prove oocyte release.", "teach": "Size + trilaminar lining ≠ ovulation."}, {"id": "foll-ov", "mod": "Follicle", "tab": "follicle", "title": "Yesterday 22 mm, today collapse + CL + POD fluid", "hx": "Natural cycle, CD 14 then CD 15.", "findings": ["Lead follicle collapsed", "Typical thick-walled CL, ring-of-fire", "Small POD fluid"], "q": "Impression language?", "options": ["Laboratory-proven oocyte release", "Findings consistent with recent ovulation (collapse + CL + fluid) — still not histopathology", "Anovulation", "Ectopic diagnosed"], "correct": 1, "outcome": "Use ‘consistent with’. A CL is not a pregnancy test.", "teach": "Multi-sign scoring, conservative wording."}, {"id": "iota-inc", "mod": "Gynaecology", "tab": "organ", "title": "Adnexal mass with both a B-feature and an M-feature", "hx": "Premenopausal, pelvic pain.", "findings": ["Unilocular cyst (B)", "Colour score 4 (M5)"], "q": "IOTA Simple Rules?", "options": ["Malignant", "Benign", "Inconclusive — expert ultrasound (this app does not run ADNEX)", "Always physiological"], "correct": 2, "outcome": "About 1 in 4 masses. Inconclusive is a valid result.", "teach": "Do not force a binary. RMI is a different tool, not a tie-breaker average."}, {"id": "rmi720", "mod": "Gynaecology", "tab": "organ", "title": "Postmenopausal mass, U=3, CA-125=80", "hx": "65 years, complex cyst, solid area, ascites.", "findings": ["Two+ ultrasound features (U = 3)", "Postmenopausal (M = 3)", "CA-125 80"], "q": "RMI-I and usual RCOG cut-off?", "options": ["80", "240", "720 (3 × 3 × 80), above the common 200 gynae-oncology referral cut-off", "Not calculable"], "correct": 2, "outcome": "Triage to gynae-oncology per local protocol. RMI is not histology and does not replace IOTA when Simple Rules are inconclusive.", "teach": "RMI-I = U × M × CA-125. Jacobs 1990."}, {"id": "pcom", "mod": "Gynaecology", "tab": "organ", "title": "FNPO 14 and 16, volumes 8.2 and 8.8 mL", "hx": "28-year-old, oligo-ovulation, TV 8 MHz. No dominant follicle.", "findings": ["FNPO 14 and 16 (2–9 mm)", "Volumes 8.2 and 8.8 mL"], "q": "PCOM?", "options": ["Rotterdam 2003 PCOM met (≥12 follicles in either ovary); AE-PCOS 2014 modern-TV FNPO ≥20 not met; still not a PCOS diagnosis", "PCOS is proven by ultrasound alone", "AE-PCOS 2014 PCOM because any follicle count counts", "Ignore Rotterdam after 2003"], "correct": 0, "outcome": "State which statement you used. PCOS still needs a clinical syndrome.", "teach": "PCOM ≠ PCOS. Dominant follicle >10 mm or a CL voids the count on that ovary."}, {"id": "tirads", "mod": "Lexicon", "tab": "organ", "title": "Solid hypoechoic taller-than-wide nodule, punctate foci, 1.2 cm", "hx": "Incidental thyroid nodule.", "findings": ["Composition solid 2", "Hypoechoic 2", "Taller-than-wide 3", "Smooth margin 0", "Punctate foci 3", "Size 1.2 cm"], "q": "ACR TI-RADS 2017?", "options": ["TR3, FNA ≥2.5 cm", "TR4 (4–6 points)", "TR5 (≥7 points; 10 here) — FNA size ≥1.0 cm is met; this is not a biopsy order from software", "TR2, no FNA"], "correct": 2, "outcome": "10 points = TR5. Extra-thyroidal extension and nodes also matter.", "teach": "TI-RADS adds points. BI-RADS ultrasound does not."}, {"id": "birads", "mod": "Lexicon", "tab": "organ", "title": "Anechoic, circumscribed, posterior enhancement", "hx": "Palpable lump, complete US.", "findings": ["Oval, parallel, circumscribed", "Anechoic, posterior enhancement"], "q": "Usual BI-RADS assessment?", "options": ["1 Negative", "2 Benign (simple cyst)", "3 Probably benign", "4A"], "correct": 1, "outcome": "If you described a cyst, it is not category 1 (no finding). Not a point score.", "teach": "The helper flags discordance (e.g. spiculated + category 3)."}, {"id": "bosniak", "mod": "Lexicon", "tab": "organ", "title": "Bosniak IIF cyst", "hx": "Incidental renal cyst on US, CT pending for class.", "findings": ["Multiple septa, minimal wall thickening", "No enhancing nodule"], "q": "Typical management of IIF?", "options": ["Ignore — benign as I/II", "Follow-up imaging; a minority prove malignant", "Immediate nephrectomy without options", "Upgrade to IV because of size"], "correct": 1, "outcome": "Class is morphology/enhancement, not size. This app does not auto-score kinetics.", "teach": "Bosniak 2019: I/II no follow-up for the cyst; IIF follow; III/IV discuss treatment."}, {"id": "nt-window", "mod": "Anatomy window", "tab": "weeks", "title": "CRL 90 mm labelled as NT", "hx": "Late booking, ‘12-week’ appearance.", "findings": ["CRL 90 mm", "Nuchal measurement 2.1 mm"], "q": "Can this be an NT?", "options": ["Yes if the fetus looks 12 weeks", "No — FMF/ISUOG NT is CRL 45–84 mm (11+0–13+6). Later it is not an NT", "It is automatically a nuchal fold", "Invalid until 18 weeks"], "correct": 1, "outcome": "Date by CRL still if in range; do not print an NT risk from a 90 mm CRL.", "teach": "Nuchal fold is a second-trimester marker (often 15–20 weeks, ≥6 mm)."}, {"id": "anatomy-incomplete", "mod": "Anatomy window", "tab": "anomaly", "title": "20-week survey, outflow tracts not seen", "hx": "Maternal habitus, back-up.", "findings": ["Four-chamber heart seen", "Outflows not obtained", "Spine, kidneys, brain views complete"], "q": "Report?", "options": ["‘Normal anatomy’ because the four-chamber was seen", "State incomplete views and plan a rescan — not a normal anatomy report", "Diagnose CHD", "Skip outflows after 20+0 forever"], "correct": 1, "outcome": "Missing views stay missing until shown.", "teach": "ISUOG midtrimester checklist is not optional decoration."}, {"id": "ventricle", "mod": "Anatomy window", "tab": "anomaly", "title": "Atrial width 13 mm at 22 weeks", "hx": "Routine anatomy.", "findings": ["Atrium 13 mm", "Cisterna magna 8 mm, vermis formed"], "q": "Classification used here?", "options": ["Normal (<10 mm)", "Mild (10–12 mm)", "Moderate (13–15 mm)", "Severe (>15 mm)"], "correct": 2, "outcome": "Atrium is largely GA-independent. Pair with the rest of the brain. Not a karyotype.", "teach": "Mild 10–12, moderate 13–15, severe >15 mm (SMFM-style bands in this app)."}, {"id": "foll-irregular", "mod": "Follicle", "tab": "follicle", "title": "CD 14, no follicle ≥10 mm, cycles 40–90 days", "hx": "Oligomenorrhoea, first monitoring visit.", "findings": ["Antral cohort <10 mm", "CD labelled 14 from a bleed"], "q": "Does this prove anovulation?", "options": ["Yes — day 14 has passed", "No — calendar-day rules are unreliable in irregular cycles; you cannot call anovulation from one day-14 scan", "Ovulation already happened", "Book IUI today"], "correct": 1, "outcome": "Serial tracking or biochemistry. Do not assume a 28-day clock.", "teach": "The folliculometry module is cycle-aware on purpose."}, {"id": "bpp-redf", "mod": "BPP", "tab": "impress", "title": "BPP 6/10 plus UA REDF", "hx": "31-week FGR.", "findings": ["BPP 6/10", "Umbilical REDF"], "q": "Reading?", "options": ["Still just ‘repeat in 24 hours’ without urgency", "Equivocal BPP plus REDF is a high-risk combination — urgent senior review", "Reassuring", "Modified BPP normal"], "correct": 1, "outcome": "Do not read 6/10 in isolation when qualitative Doppler is already critical. This app does not time CS.", "teach": "Stack independent red flags; do not average them."}];
+  function caseProgress() {
+    try { return JSON.parse(localStorage.getItem(CASE_STORE) || "{}") || {}; } catch (e) { return {}; }
+  }
+  function caseMark(id, ok) {
+    var p = caseProgress();
+    p[id] = { ok: !!ok, t: Date.now() };
+    try { localStorage.setItem(CASE_STORE, JSON.stringify(p)); } catch (e) {}
+  }
+  function caseById(id) {
+    for (var i = 0; i < CASE_BANK.length; i++) if (CASE_BANK[i].id === id) return CASE_BANK[i];
+    return null;
+  }
+  function renderCases() {
+    if (caseId) { renderCaseDetail(caseById(caseId)); return; }
+    var p = caseProgress();
+    var mods = [];
+    CASE_BANK.forEach(function (c) { if (mods.indexOf(c.mod) === -1) mods.push(c.mod); });
+    var done = 0;
+    CASE_BANK.forEach(function (c) { if (p[c.id]) done++; });
+    var html = '<div class="card-title">Case-based learning</div>';
+    html += '<p class="subhead">Thirty anonymized decision cases. Same thresholds as the calculators. History is fictional. Reveal the teaching point after you commit to an answer. Not CME, not a logbook.</p>';
+    html += '<p class="note">' + done + " of " + CASE_BANK.length + " attempted on this device.</p>";
+    html += '<div class="week-chip-row" id="case-filters">';
+    html += '<button type="button" class="' + (caseFilter === "all" ? "on" : "") + '" data-f="all">All</button>';
+    mods.forEach(function (m) {
+      html += '<button type="button" class="' + (caseFilter === m ? "on" : "") + '" data-f="' + encodeURIComponent(m) + '">' + m + "</button>";
+    });
+    html += "</div><div class='topic-grid'>";
+    CASE_BANK.forEach(function (c) {
+      if (caseFilter !== "all" && c.mod !== caseFilter) return;
+      var st = p[c.id];
+      html += '<button class="topic-card" data-case="' + c.id + '">';
+      html += '<span class="count">' + c.mod + (st ? (st.ok ? " · correct" : " · review") : "") + "</span>";
+      html += "<h3>" + esc(c.title) + "</h3>";
+      html += "<p>" + esc(c.hx) + "</p></button>";
+    });
+    html += "</div>";
+    set("case-area", html);
+    document.querySelectorAll("#case-filters button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        caseFilter = b.getAttribute("data-f") === "all" ? "all" : decodeURIComponent(b.getAttribute("data-f"));
+        renderCases();
+      });
+    });
+    document.querySelectorAll("#case-area .topic-card").forEach(function (b) {
+      b.addEventListener("click", function () { caseId = b.getAttribute("data-case"); renderCases(); });
+    });
+  }
+  function renderCaseDetail(c) {
+    if (!c) { caseId = null; renderCases(); return; }
+    var picked = renderCaseDetail._pick;
+    if (renderCaseDetail._id !== c.id) { picked = null; renderCaseDetail._id = c.id; }
+    var html = '<button class="quiz-back" id="case-home">← All cases</button>';
+    html += '<div class="card-title">' + esc(c.title) + "</div>";
+    html += '<p class="note">' + esc(c.mod) + "</p>";
+    html += '<div class="impression"><h3>History</h3><p>' + esc(c.hx) + "</p></div>";
+    html += "<ul>";
+    c.findings.forEach(function (f) { html += "<li>" + esc(f) + "</li>"; });
+    html += "</ul>";
+    html += '<p class="quiz-stem">' + esc(c.q) + "</p>";
+    c.options.forEach(function (opt, i) {
+      var cls = "quiz-option";
+      if (picked != null) {
+        if (i === c.correct) cls += " sel";
+      } else if (picked === i) cls += " sel";
+      html += '<button class="' + cls + '" data-i="' + i + '"' + (picked != null ? " disabled" : "") + ">" + esc(opt) + "</button>";
+    });
+    if (picked == null) {
+      html += '<p class="note">Commit to an option. The teaching point stays hidden until then.</p>';
+    } else {
+      var ok = picked === c.correct;
+      html += '<div class="badge ' + (ok ? "ok" : "danger") + '">' + (ok ? "Aligned with this app’s published rule" : "Not the rule used here") + "</div>";
+      html += '<div class="impression"><h3>Outcome</h3><p>' + esc(c.outcome) + "</p></div>";
+      html += '<div class="impression warn"><h3>Teaching point</h3><p>' + esc(c.teach) + "</p></div>";
+      html += '<div class="btn-row"><button class="btn-primary" id="case-jump" style="width:auto;">Open related module</button>';
+      html += '<button class="btn-ghost" id="case-next" style="width:auto;">Next case</button></div>';
+    }
+    set("case-area", html);
+    document.getElementById("case-home").addEventListener("click", function () { caseId = null; renderCaseDetail._pick = null; renderCases(); });
+    document.querySelectorAll("#case-area .quiz-option").forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (picked != null) return;
+        var i = Number(b.getAttribute("data-i"));
+        renderCaseDetail._pick = i;
+        caseMark(c.id, i === c.correct);
+        renderCaseDetail(c);
+      });
+    });
+    var jmp = document.getElementById("case-jump");
+    if (jmp) jmp.addEventListener("click", function () { if (window.__showTab) window.__showTab(c.tab); });
+    var nx = document.getElementById("case-next");
+    if (nx) nx.addEventListener("click", function () {
+      var idx = 0;
+      for (var i = 0; i < CASE_BANK.length; i++) if (CASE_BANK[i].id === c.id) { idx = i; break; }
+      var n = CASE_BANK[(idx + 1) % CASE_BANK.length];
+      caseId = n.id; renderCaseDetail._pick = null; renderCaseDetail._id = null; renderCases();
+    });
+  }
+  function initCases() { window.__casesReady = true; renderCases(); }
+
   var JUMP_INDEX = [
-    { name: "Dating & EDD", hint: "LMP, CRL, MSD, cycle-adjusted Naegele", tab: "dating" },
+    { name: "Dating & EDD", hint: "LMP, CRL, MSD, cycle-adjusted Naegele", tab: "dating", keys: "naegele due date conception fertile GBS GDM" },
     { name: "Biometry & EFW", hint: "Hadlock, BPD, HC, AC, FL, centiles", tab: "biometry" },
     { name: "Doppler", hint: "UA-PI, AEDF/REDF, MCA, CPR, DV", tab: "doppler" },
     { name: "Anomaly", hint: "ventricle, NT, fluid, placenta", tab: "anomaly" },
-    { name: "Impression / BPP", hint: "EPL, IUFD, FGR, Manning BPP", tab: "impress" },
+    { name: "Impression / BPP", hint: "EPL, IUFD, FGR, Manning BPP", tab: "impress", keys: "miscarriage demise stillbirth manning nst" },
     { name: "Folliculometry", hint: "serial follicles, ovulation", tab: "follicle" },
     { name: "Ovary / IOTA / RMI", hint: "adnexal mass, CA-125", tab: "organ", organ: "ovary" },
     { name: "PCOM (Rotterdam / AE-PCOS)", hint: "FNPO 12 vs 20, volume >10 mL, not PCOS", tab: "organ", organ: "ovary" },
@@ -5653,6 +5764,7 @@
     { name: "Uterus & endometrium", hint: "thickness, postmenopausal bleeding", tab: "organ", organ: "uterus" },
     { name: "Reports & log", hint: "print, save locally", tab: "log" },
     { name: "Quiz", hint: "clinical scenarios", tab: "quiz" },
+    { name: "Cases", hint: "decision cases, SRU, Doppler, IOTA", tab: "cases" },
     { name: "References & limitations", hint: "sources, FDA, safety", tab: "refs" }
   ];
   function applyTheme(dark) {
@@ -5690,7 +5802,8 @@
   function renderJump(q) {
     q = (q || "").toLowerCase();
     var hits = JUMP_INDEX.filter(function (j) {
-      return !q || (j.name + " " + j.hint + " " + j.tab).toLowerCase().indexOf(q) !== -1;
+      var blob = (j.name + " " + j.hint + " " + j.tab + " " + (j.keys || "")).toLowerCase();
+      return !q || blob.indexOf(q) !== -1;
     }).sort(function (a, b) {
       if (!q) return 0;
       var an = a.name.toLowerCase().indexOf(q) !== -1 ? 0 : 1;
@@ -5779,7 +5892,7 @@
   function onReady() {
     // Tabs
     var tabs = document.querySelectorAll(".tab");
-    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol") };
+    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol"), cases: document.getElementById("view-cases") };
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
@@ -5806,6 +5919,8 @@
         initScanWeeks();
       } else if (name === "protocol" && !window.__protoReady) {
         initProtocols();
+      } else if (name === "cases" && !window.__casesReady) {
+        initCases();
       }
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });

@@ -1,4 +1,4 @@
-const CACHE_NAME = "babsinogen-v20";
+const CACHE_NAME = "babsinogen-v21";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./logo-mark.png", "./favicon.svg", "./apple-touch.png"];
 
 self.addEventListener("install", (event) => {
