@@ -540,6 +540,50 @@
           <p class="note">The Biometry tab's composite second/third-trimester dating is pulled in automatically below when available.</p>
         </div>
         <div class="card">
+          <div class="card-title">Dating hierarchy (ACOG 700)</div>
+          <p class="subhead">Accuracy over consistency. A first-trimester CRL or ART date locks the EDD. Later biometry is for growth, not a new birthday.</p>
+          <div class="field">
+            <label>ART / embryo transfer date</label>
+            <div class="row"><input id="d-art" type="date"></div>
+          </div>
+          <div class="field">
+            <label>Embryo age at transfer</label>
+            <div class="row">
+              <select id="d-embryo">
+                <option value="">Not ART</option>
+                <option value="0">Day 0 — retrieval / known fertilization</option>
+                <option value="3">Day 3 embryo</option>
+                <option value="5">Day 5 blastocyst</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Previously assigned EDD (from an earlier CRL or ART cycle)</label>
+            <div class="row"><input id="d-prior-edd" type="date"></div>
+          </div>
+          <div class="field">
+            <label>Source of that EDD</label>
+            <div class="row">
+              <select id="d-prior-src">
+                <option value="crl">First-trimester CRL</option>
+                <option value="art">ART / known conception</option>
+                <option value="lmp">LMP only</option>
+                <option value="other">Other / unknown</option>
+              </select>
+            </div>
+          </div>
+          <label class="check-row"><input type="checkbox" id="d-lock"> Lock the preferred EDD on this device — later scans will not overwrite it</label>
+          <div class="hairline"></div>
+          <p class="note" style="margin-top:0;">Exclude a parameter from <em>dating</em> only when it is distorted or pathological. Do not average a small AC into the due date if you already suspect FGR.</p>
+          <label class="check-row"><input type="checkbox" id="d-x-fgr"> Suspected FGR — exclude AC from dating</label>
+          <label class="check-row"><input type="checkbox" id="d-x-macro"> Suspected macrosomia / maternal diabetes — exclude AC from dating</label>
+          <label class="check-row"><input type="checkbox" id="d-x-acdist"> AC distorted (ascites, omphalocele, mass) — exclude AC</label>
+          <label class="check-row"><input type="checkbox" id="d-x-skel"> Suspected skeletal dysplasia / familial short limbs — exclude FL</label>
+          <label class="check-row"><input type="checkbox" id="d-x-cranial"> Hydrocephalus / ventriculomegaly / cranial anomaly — exclude raw BPD (HC used)</label>
+          <label class="check-row"><input type="checkbox" id="d-x-hc"> Severe microcephaly or macrocephaly — exclude HC from dating</label>
+          <label class="check-row"><input type="checkbox" id="d-x-twins"> Twins / multiples — date from the larger fetus (enter that fetus here)</label>
+        </div>
+        <div class="card">
           <div class="card-title">Fetal Heart Rate</div>
           <div class="grid2">
             <div class="field"><div class="row"><input id="fhr-wk" type="number" inputMode="numeric" placeholder="wk"></div></div>
@@ -550,6 +594,7 @@
       </div>
       <div>
         <div class="card" id="edd-card"></div>
+        <div class="card" id="ga-audit-card"></div>
         <div class="card" id="redate-card"></div>
         <div class="card" id="fhr-card"></div>
       </div>
@@ -1137,6 +1182,10 @@
           <li><strong>Naegele’s rule.</strong> Classic EDD = LMP + 280 days (28-day cycle, ovulation day 14). Cycle-adjusted: EDD = LMP + cycle − luteal + 266.</li>
           <li><strong>CRL.</strong> Robinson HP, Fleming JEE. <em>Br J Obstet Gynaecol</em> 1975. Corrected form: GA(days) = 8.052√(CRL×1.037) + 23.73.</li>
           <li><strong>MSD.</strong> Hellman/Kobayashi: GA(days) ≈ MSD(mm) + 30, only if CRL is not measurable. MSD ≥25 mm without an embryo raises concern for early pregnancy failure.</li>
+          <li><strong>ART dating.</strong> ACOG 700: assign EDD from embryo age and transfer date. GA (days) = (scan minus transfer) + 14 + embryo age. EDD = transfer + 266 minus embryo age (day-5 blastocyst = transfer + 261 d; day-3 = transfer + 263 d). Do not replace an ART EDD with later biometry.</li>
+          <li><strong>CRL lock.</strong> A first-trimester CRL EDD is not revised by second- or third-trimester biometry. Later discordance is a growth problem.</li>
+          <li><strong>Parameter exclusion.</strong> Do not average a pathological AC or FL into the due date. FL/AC below 0.16 (Hadlock AJR 1983) screens skeletal dysplasia. Abnormal cephalic index (74-83 working band; Hadlock 1981 mean 78.3, 2 SD about 70-86) uses area-corrected BPD = sqrt((BPD x OFD)/1.265) (Doubilet and Greenes 1984), not sqrt(BPD x OFD).</li>
+          <li><strong>Hadlock 1984 combinations.</strong> Single-parameter and combination menstrual-age equations (Radiology 1984;152:497-501). Four-parameter: MA = 10.85 + 0.060(HC)(FL) + 0.670(BPD) + 0.168(AC), cm. Averaging individual GAs is statistically similar; this app prefers the combination equation after exclusions.</li>
           <li><strong>Redating.</strong> ACOG/AIUM/SMFM Committee Opinion 700 (2017): ≤8w6d >5 days; 9w0d–13w6d >7 days; 14–15w6d >7 days; 16–21w6d >10 days; 22–27w6d >14 days; ≥28 weeks >21 days.</li>
           <li><strong>Later dating rank.</strong> Chervenak et al., <em>AJR</em> 1991 — shape-corrected BPD and HC (plus FL in the third trimester) outperform AC for dating.</li>
           <li><strong>FHR.</strong> Doubilet & Benson, <em>AJR</em> 1995. Peak near 9–10 weeks; 110–160 bpm from about 14 weeks. Ibrahim et al., <em>J Perinat Med</em> 2022.</li>
@@ -1390,6 +1439,174 @@
     if (h != null) return { weeks: gaHC(h), label: "HC only" };
     if (b != null) return { weeks: gaBPD(b), label: "BPD only" };
     return null;
+  }
+
+
+  function accuracyBand(days, method) {
+    var w = days / 7;
+    if (method === "msd") return { days: 14, label: "Low accuracy (\u00b11\u20132 weeks). Confirm with CRL." };
+    if (method === "crl") {
+      if (w <= 8 + 6 / 7) return { days: 5, label: "CRL \u22648+6: ACOG 700 discrepancy window 5 days" };
+      return { days: 7, label: "CRL 9+0\u201313+6: ACOG 700 discrepancy window 7 days" };
+    }
+    if (method === "art") return { days: 1, label: "ART dating is preferred (ACOG 700). Ultrasound confirms viability, not the birthday." };
+    if (w < 14) return { days: 7, label: "First trimester without CRL: prefer a CRL scan" };
+    if (w < 16) return { days: 7, label: "14+0\u201315+6: \u00b17 days (ACOG 700)" };
+    if (w < 22) return { days: 10, label: "16+0\u201321+6: \u00b110 days" };
+    if (w < 28) return { days: 14, label: "22+0\u201327+6: \u00b114 days" };
+    return { days: 21, label: "\u226528 weeks, no earlier dating: \u00b121\u201330 days. EDD provisional." };
+  }
+
+  function assignGestationalAge() {
+    var scan = parseLocalDate(val("d-scandate")) || new Date();
+    var lmp = parseLocalDate(val("d-lmp"));
+    var crl = num(val("d-crl")), msd = num(val("d-msd"));
+    var cycle = num(val("d-cycle")); var luteal = num(val("d-luteal"));
+    if (cycle == null) cycle = 28;
+    if (luteal == null) luteal = 14;
+    if (cycle < 21) cycle = 21;
+    if (cycle > 45) cycle = 45;
+    if (luteal < 10) luteal = 10;
+    if (luteal > 16) luteal = 16;
+    var art = parseLocalDate(val("d-art"));
+    var embryo = num(val("d-embryo"));
+    var priorEdd = parseLocalDate(val("d-prior-edd"));
+    var priorSrc = val("d-prior-src") || "crl";
+    var lockBox = typeof checked === "function" && checked("d-lock");
+    var exclAC = checked("d-x-fgr") || checked("d-x-macro") || checked("d-x-acdist");
+    var exclFL = checked("d-x-skel");
+    var exclBPD = checked("d-x-cranial");
+    var exclHC = checked("d-x-hc");
+    var twins = checked("d-x-twins");
+    var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+    var ci = calcCI(bpd, ofd);
+    var hc = calcHC(bpd, ofd);
+    var cbpd = calcCorrectedBPD(bpd, ofd);
+    var ciAbn = ci != null && (ci < 74 || ci > 83);
+    var warnings = [], flags = [], used = [], excluded = [], reasons = [];
+    if (twins) warnings.push("Twins: date from the larger fetus. Discordance is a growth problem, not a new EDD.");
+    if (fl != null && ac != null && ac > 0 && (fl / ac) < 0.16) {
+      exclFL = true;
+      flags.push("FL/AC " + ((fl / ac) * 100).toFixed(1) + "% <16% \u2014 Hadlock AJR 1983 skeletal-dysplasia screen. FL excluded from dating.");
+    }
+    if (ciAbn && !exclBPD) {
+      reasons.push("Cephalic index " + ci.toFixed(1) + " outside 74\u201383 (Hadlock 1981 working band; mean 78.3, \u00b12 SD ~70\u201386). Raw BPD replaced with area-corrected BPD = sqrt((BPD*OFD)/1.265) for dating (Doubilet & Greenes 1984).");
+    }
+    var bUse = null, hUse = null, aUse = null, fUse = null;
+    if (bpd != null && !exclBPD) bUse = ciAbn ? cbpd : bpd;
+    else if (exclBPD) { excluded.push("BPD"); reasons.push("Raw BPD excluded (cranial anomaly). HC used if available."); }
+    if (hc != null && !exclHC) hUse = hc;
+    else if (exclHC) { excluded.push("HC"); reasons.push("HC excluded (severe microcephaly / macrocephaly)."); }
+    if (ac != null && !exclAC) aUse = ac;
+    else if (exclAC) {
+      excluded.push("AC");
+      reasons.push(checked("d-x-fgr") ? "AC excluded: suspected FGR \u2014 do not bake a small belly into the due date." : (checked("d-x-macro") ? "AC excluded: suspected macrosomia / diabetes." : "AC excluded: distorted measurement."));
+    }
+    if (fl != null && !exclFL) fUse = fl;
+    else if (exclFL) { excluded.push("FL"); reasons.push("FL excluded from dating (skeletal dysplasia risk or FL/AC <0.16)."); }
+    if (bUse != null) used.push(ciAbn ? "cBPD" : "BPD");
+    if (hUse != null) used.push("HC");
+    if (aUse != null) used.push("AC");
+    if (fUse != null) used.push("FL");
+    var individual = {};
+    if (bUse != null) individual.BPD = gaBPD(bUse);
+    if (hUse != null) individual.HC = gaHC(hUse);
+    if (aUse != null) individual.AC = gaAC(aUse);
+    if (fUse != null) individual.FL = gaFL(fUse);
+    var indVals = Object.keys(individual).map(function (k) { return individual[k]; });
+    var indMean = indVals.length ? indVals.reduce(function (s, v) { return s + v; }, 0) / indVals.length : null;
+    var comp = gaComposite(bUse, hUse, aUse, fUse);
+    if (comp && indVals.length >= 2) {
+      var spreadW = Math.max.apply(null, indVals) - Math.min.apply(null, indVals);
+      if (spreadW > 2) flags.push("Biometry discordant: parameter GAs spread " + spreadW.toFixed(1) + " weeks (>2). Consider asymmetric pathology. Dating confidence reduced.");
+    }
+    var lmpOffset = cycle - luteal + 266;
+    var lmpEDD = lmp ? addDays(lmp, lmpOffset) : null;
+    var lmpDays = null;
+    if (lmp) {
+      var ovDay = cycle - luteal;
+      lmpDays = Math.round((scan - addDays(lmp, ovDay)) / 86400000) + 14;
+    }
+    var artDays = null, artEDD = null;
+    if (art && embryo != null) {
+      artDays = Math.round((scan - art) / 86400000) + 14 + embryo;
+      artEDD = addDays(art, 266 - embryo);
+    } else if (art && embryo == null) {
+      warnings.push("ART date entered without embryo age. Select day 0 (retrieval), day 3, or day 5. Until then ART is not used to assign GA.");
+    }
+    var crlDays = crl != null ? gaFromCRLmm(crl) : null;
+    var crlEDD = crlDays != null ? addDays(scan, 280 - crlDays) : null;
+    if (crl != null && crl > 84) warnings.push("CRL " + crl + " mm is above the usual 45\u201384 mm (11+0\u201313+6) window. Prefer biometry if this is a second-trimester scan; do not treat it as an NT.");
+    if (crl != null && crl < 5) warnings.push("CRL <5 mm is very early; MSD or a short-interval repeat is often more informative.");
+    var msdDays = (crl == null && msd != null) ? gaFromMSDmm(msd) : null;
+    var msdEDD = msdDays != null ? addDays(scan, 280 - msdDays) : null;
+    var bioDays = comp ? comp.weeks * 7 : null;
+    var bioLabel = comp ? comp.label : null;
+    var priorDays = priorEdd ? Math.round((scan - priorEdd) / 86400000) + 280 : null;
+
+    var preferredDays = null, preferredEDD = null, method = null, locked = false, usIsCRL = false;
+    if (priorEdd && (priorSrc === "crl" || priorSrc === "art")) {
+      preferredDays = priorDays;
+      preferredEDD = priorEdd;
+      method = priorSrc === "art" ? "prior_art" : "prior_crl";
+      locked = true;
+      warnings.push("Using the previously assigned " + (priorSrc === "art" ? "ART" : "CRL") + " EDD. This scan is for growth and anatomy, not redating.");
+    } else if (artDays != null) {
+      preferredDays = artDays;
+      preferredEDD = artEDD;
+      method = "art";
+      locked = true;
+      warnings.push("ART dating locked (ACOG 700). Do not replace with later biometry.");
+    } else if (crlDays != null) {
+      preferredDays = crlDays;
+      preferredEDD = crlEDD;
+      method = "crl";
+      usIsCRL = true;
+      locked = !!lockBox;
+      if (lockBox) warnings.push("This CRL EDD is locked on this device.");
+      else warnings.push("First-trimester CRL is the preferred dating method. Lock it so later growth scans cannot overwrite it.");
+    } else if (msdDays != null) {
+      preferredDays = msdDays;
+      preferredEDD = msdEDD;
+      method = "msd";
+      warnings.push("MSD dating is low accuracy (\u00b11\u20132 weeks). Confirm with CRL.");
+    } else if (bioDays != null) {
+      preferredDays = bioDays;
+      preferredEDD = addDays(scan, 280 - bioDays);
+      method = "composite";
+      if (preferredDays / 7 >= 28) warnings.push("No prior dating; composite biometry at \u226528 weeks. Accuracy \u00b13 weeks. EDD provisional. Do not redate a possibly growth-restricted fetus.");
+      else if (preferredDays / 7 >= 22) warnings.push("No first-trimester CRL. Composite biometry at 22\u201327+6: \u00b110\u201314 days.");
+      else warnings.push("No first-trimester CRL. Composite biometry at 14\u201321+6: \u00b17\u201310 days.");
+      if (used.length === 1) warnings.push("Single-parameter dating. Hadlock 1984 allows it, but combination equations are tighter. Add the missing measurements.");
+    } else if (lmpDays != null) {
+      preferredDays = lmpDays;
+      preferredEDD = lmpEDD;
+      method = "lmp";
+      warnings.push("Ultrasound dating not yet available. LMP EDD is provisional, especially if cycles are irregular.");
+    }
+
+    if (lockBox && preferredEDD) locked = true;
+    if (priorEdd && priorSrc === "lmp" && (crlDays != null || bioDays != null)) {
+      warnings.push("A prior LMP-only EDD does not outrank a valid ultrasound date (ACOG 700).");
+    }
+    if (locked && bioDays != null && preferredDays != null && method !== "composite") {
+      var gap = Math.abs(bioDays - preferredDays);
+      if (preferredDays / 7 >= 28 && gap > 21) flags.push("This scan's biometry is " + Math.round(gap) + " days from the locked EDD. Growth restriction or macrosomia \u2014 do not change the EDD.");
+      else if (preferredDays / 7 >= 14 && gap > 14) flags.push("This scan's biometry is " + Math.round(gap) + " days from the locked EDD. Treat as growth, not a new due date.");
+    }
+    var band = preferredDays != null ? accuracyBand(preferredDays, method === "prior_crl" ? "crl" : (method === "prior_art" ? "art" : method)) : null;
+    return {
+      scan: scan, cycle: cycle, luteal: luteal,
+      preferredDays: preferredDays, preferredEDD: preferredEDD, method: method, locked: locked, usIsCRL: usIsCRL,
+      accuracy: band, used: used, excluded: excluded, reasons: reasons,
+      individual: individual, indMean: indMean, composite: comp,
+      warnings: warnings, flags: flags,
+      lmpDays: lmpDays, lmpEDD: lmpEDD,
+      artDays: artDays, artEDD: artEDD,
+      crlDays: crlDays, crlEDD: crlEDD, msdDays: msdDays, msdEDD: msdEDD,
+      bioDays: bioDays, bioLabel: bioLabel,
+      ci: ci, hc: hc, bpd: bpd, ofd: ofd, ac: ac, fl: fl, cbpd: cbpd
+    };
   }
 
   function gaFromCRLmm(crl) { return 8.052 * Math.sqrt(crl * 1.037) + 23.73; }
@@ -1770,13 +1987,19 @@
 
     // --- Dating from this scan (composite + per-parameter + discordance) ---
     var datingHtml = '<div class="card-title">Dating From This Scan</div>';
+    var Gbio = assignGestationalAge();
     var bForGA = (ci != null && (ci < 74 || ci > 83)) ? cbpd : bpd;
-    var comp = gaComposite(bForGA, hc, ac, fl);
+    var comp = Gbio.composite || gaComposite(bForGA, hc, ac, fl);
     var perParam = [];
-    if (bpd != null) perParam.push({ p: "BPD" + ((ci != null && (ci < 74 || ci > 83)) ? " (corrected)" : ""), w: gaBPD(bForGA) });
-    if (hc != null) perParam.push({ p: "HC", w: gaHC(hc) });
-    if (ac != null) perParam.push({ p: "AC", w: gaAC(ac) });
-    if (fl != null) perParam.push({ p: "FL", w: gaFL(fl) });
+    Object.keys(Gbio.individual).forEach(function (k) {
+      perParam.push({ p: k + (k === "BPD" && Gbio.ci != null && (Gbio.ci < 74 || Gbio.ci > 83) ? " (corrected)" : ""), w: Gbio.individual[k] });
+    });
+    if (!perParam.length) {
+      if (bpd != null) perParam.push({ p: "BPD" + ((ci != null && (ci < 74 || ci > 83)) ? " (corrected)" : ""), w: gaBPD(bForGA) });
+      if (hc != null) perParam.push({ p: "HC", w: gaHC(hc) });
+      if (ac != null) perParam.push({ p: "AC", w: gaAC(ac) });
+      if (fl != null) perParam.push({ p: "FL", w: gaFL(fl) });
+    }
 
     if (comp) {
       var compDays = comp.weeks * 7;
@@ -1892,10 +2115,11 @@
     if (fl != null && ac != null) {
       any = true;
       var flac = (fl / ac) * 100;
-      html += organRow("FL / AC", flac.toFixed(1) + "%", "20\u201324% (GA-independent past 21wk)");
-      if (flac > 24) html += '<div class="badge warn">&gt;24% \u2014 relatively small AC; consider asymmetric growth restriction</div>';
+      html += organRow("FL / AC", flac.toFixed(1) + "%", "20\u201324% (GA-independent past 21wk); <16% is a dysplasia screen");
+      if (flac < 16) html += '<div class="badge danger">FL/AC ratio &lt;0.16 \u2014 Hadlock AJR 1983 skeletal-dysplasia screen. Recheck FL; do not use FL to date.</div>';
+      else if (flac > 24) html += '<div class="badge warn">&gt;24% \u2014 relatively small AC; consider asymmetric growth restriction</div>';
       else if (flac < 20) html += '<div class="badge warn">&lt;20% \u2014 relatively large AC; consider macrosomia</div>';
-      else html += '<div class="badge ok">Normal proportion</div>';
+      else html += '<div class="badge ok">Normal proportion (20\u201324%)</div>';
       html += '<div class="hairline" style="margin:10px 0"></div>';
     }
     if (bpd != null && fl != null) {
@@ -1915,40 +2139,17 @@
      RENDER: DATING & EDD TAB
      ========================================================================= */
   function renderDating() {
+    var G = assignGestationalAge();
     var lmp = parseLocalDate(val("d-lmp"));
-    var scan = parseLocalDate(val("d-scandate")) || new Date();
+    var scan = G.scan;
     var crl = num(val("d-crl")), msd = num(val("d-msd"));
-
-    var lmpDays = lmp ? Math.round((scan - lmp) / 86400000) : null;
-    var cycle = num(val("d-cycle"));
-    var luteal = num(val("d-luteal"));
-    if (cycle == null) cycle = 28;
-    if (luteal == null) luteal = 14;
-    if (cycle < 21) cycle = 21;
-    if (cycle > 45) cycle = 45;
-    if (luteal < 10) luteal = 10;
-    if (luteal > 16) luteal = 16;
-    var lmpOffset = cycle - luteal + 266;
-    var lmpEDD = lmp ? addDays(lmp, lmpOffset) : null;
+    var lmpDays = G.lmpDays;
+    var cycle = G.cycle, luteal = G.luteal;
+    var lmpEDD = G.lmpEDD;
     var lmpEDDclassic = lmp ? addDays(lmp, 280) : null;
-    if (lmp && (cycle !== 28 || luteal !== 14)) {
-      var ovDay = cycle - luteal;
-      lmpDays = Math.round((scan - addDays(lmp, ovDay)) / 86400000) + 14;
-    }
-
-    var usDays = null, usLabel = null, usIsCRL = false;
-    if (crl != null) { usDays = gaFromCRLmm(crl); usLabel = "CRL"; usIsCRL = true; }
-    else if (msd != null) { usDays = gaFromMSDmm(msd); usLabel = "MSD"; }
-
-    // Pull biometry composite if available
-    var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
-    var ci = calcCI(bpd, ofd);
-    var bForGA = (ci != null && (ci < 74 || ci > 83)) ? calcCorrectedBPD(bpd, ofd) : bpd;
-    var hc = calcHC(bpd, ofd);
-    var comp = gaComposite(bForGA, hc, ac, fl);
-    if (usDays == null && comp) { usDays = comp.weeks * 7; usLabel = "Biometry composite"; }
-
-    var usEDD = usDays != null ? addDays(scan, 280 - usDays) : null;
+    var usDays = G.preferredDays, usLabel = G.method, usIsCRL = G.usIsCRL;
+    var usEDD = G.preferredEDD;
+    var bpd = G.bpd, ofd = G.ofd, ac = G.ac, fl = G.fl, ci = G.ci, hc = G.hc, comp = G.composite;
 
     var eddHtml = '<div class="card-title">Estimated Due Date</div>';
     if (!lmpEDD && !usEDD) {
@@ -1962,7 +2163,11 @@
         }
       }
       if (usEDD) {
-        eddHtml += '<div class="compare-row"><span class="compare-label">By ultrasound (' + usLabel + ')</span><span class="compare-value">' + formatDate(usEDD) + '</span></div>';
+        var usPretty = { crl: "CRL", msd: "MSD", art: "ART", prior_crl: "locked CRL EDD", prior_art: "locked ART EDD", composite: "biometry composite", lmp: "LMP" }[usLabel] || usLabel;
+        eddHtml += '<div class="compare-row"><span class="compare-label">Preferred (' + usPretty + (G.locked ? ", locked" : "") + ')</span><span class="compare-value">' + formatDate(usEDD) + '</span></div>';
+        if (G.crlEDD && G.method !== "crl") eddHtml += '<div class="compare-row"><span class="compare-label">This-visit CRL EDD (not preferred)</span><span class="compare-value">' + formatDate(G.crlEDD) + '</span></div>';
+        if (G.bioDays != null && G.method !== "composite") eddHtml += '<div class="compare-row"><span class="compare-label">This-visit biometry EDD (not preferred)</span><span class="compare-value">' + formatDate(addDays(scan, 280 - G.bioDays)) + '</span></div>';
+        if (G.artEDD && G.method !== "art" && G.method !== "prior_art") eddHtml += '<div class="compare-row"><span class="compare-label">ART EDD</span><span class="compare-value">' + formatDate(G.artEDD) + '</span></div>';
       }
       if (lmpDays != null) {
         var lwd = weeksDaysFromDays(lmpDays);
@@ -1970,7 +2175,7 @@
       }
       if (usDays != null) {
         var uwd = weeksDaysFromDays(usDays);
-        eddHtml += '<div class="compare-row"><span class="compare-label">GA by ' + usLabel + ', at scan</span><span class="compare-value">' + uwd.w + 'w' + uwd.d + 'd</span></div>';
+        eddHtml += '<div class="compare-row"><span class="compare-label">GA by ' + usPretty + ', at scan</span><span class="compare-value">' + uwd.w + 'w' + uwd.d + 'd</span></div>';
         eddHtml += '<div class="note">' + trimesterLabel(usDays) + '</div>';
       }
       var prefEDD = usEDD || lmpEDD;
@@ -1995,11 +2200,56 @@
     }
     set("edd-card", eddHtml);
 
+    var audit = '<div class="card-title">Assigned GA (hierarchy)</div>';
+    if (G.preferredDays == null) {
+      audit += '<p class="empty">Enter LMP, ART, CRL, MSD, or biometry. CRL and ART outrank later measurements.</p>';
+    } else {
+      var awd = weeksDaysFromDays(G.preferredDays);
+      audit += '<span class="result-num">' + awd.w + '</span><span class="result-unit">w</span><span class="result-num">' + awd.d + '</span><span class="result-unit">d</span>';
+      var methodLab = { crl: "CRL (Robinson-Fleming)", msd: "MSD (Hellman) \u2014 provisional", art: "ART / embryo transfer", prior_crl: "Locked prior CRL EDD", prior_art: "Locked prior ART EDD", composite: "Hadlock 1984 composite", lmp: "LMP (cycle-adjusted Naegele)" }[G.method] || G.method;
+      audit += '<div class="chip">' + methodLab + (G.locked ? " \u00b7 locked" : "") + "</div>";
+      if (G.preferredEDD) audit += '<div class="compare-row"><span class="compare-label">Preferred EDD</span><span class="compare-value">' + formatDate(G.preferredEDD) + "</span></div>";
+      if (G.accuracy) audit += '<div class="note">' + G.accuracy.label + "</div>";
+      if (G.artDays != null) {
+        var arwd = weeksDaysFromDays(G.artDays);
+        audit += '<div class="compare-row"><span class="compare-label">ART GA at scan</span><span class="compare-value">' + arwd.w + "w" + arwd.d + "d</span></div>";
+      }
+      if (G.crlDays != null && G.method !== "crl") {
+        var crwd = weeksDaysFromDays(G.crlDays);
+        audit += '<div class="compare-row"><span class="compare-label">This-visit CRL (not used \u2014 hierarchy)</span><span class="compare-value">' + crwd.w + "w" + crwd.d + "d</span></div>";
+      }
+      if (G.bioDays != null && G.method !== "composite") {
+        var brwd = weeksDaysFromDays(G.bioDays);
+        audit += '<div class="compare-row"><span class="compare-label">This-visit biometry (growth only)</span><span class="compare-value">' + brwd.w + "w" + brwd.d + "d \u00b7 " + (G.bioLabel || "") + "</span></div>";
+      }
+      if (G.used.length) audit += '<div class="compare-row"><span class="compare-label">Parameters used for composite</span><span class="compare-value">' + G.used.join(", ") + "</span></div>";
+      if (G.excluded.length) audit += '<div class="compare-row"><span class="compare-label">Excluded from dating</span><span class="compare-value">' + G.excluded.join(", ") + "</span></div>";
+      var ik = Object.keys(G.individual);
+      if (ik.length) {
+        audit += '<table class="ref"><tr><th>Parameter</th><th>Hadlock 1984 GA</th></tr>';
+        ik.forEach(function (k) {
+          var pwd = weeksDaysFromDays(G.individual[k] * 7);
+          audit += "<tr><td>" + k + '</td><td class="num">' + pwd.w + "w" + pwd.d + "d</td></tr>";
+        });
+        if (G.indMean != null) {
+          var mwd = weeksDaysFromDays(G.indMean * 7);
+          audit += "<tr><td>Mean of available</td><td class=\"num\">" + mwd.w + "w" + mwd.d + "d</td></tr>";
+        }
+        audit += "</table>";
+        audit += '<p class="note">Machines use the Hadlock combination equation (not the arithmetic mean). Both are shown because Hadlock 1984 found they agree. Combination is preferred when 2+ parameters remain after exclusions.</p>';
+      }
+      G.reasons.forEach(function (r) { audit += '<div class="note">' + r + "</div>"; });
+      G.flags.forEach(function (r) { audit += '<div class="badge danger">' + r + "</div>"; });
+      G.warnings.forEach(function (r) { audit += '<div class="badge warn">' + r + "</div>"; });
+    }
+    set("ga-audit-card", audit);
+
+
     var redateHtml = '<div class="card-title">LMP vs Ultrasound</div>';
     if (lmpEDD && usEDD) {
       var diffDays = Math.round(Math.abs(lmpEDD - usEDD) / 86400000);
       var refGAweeks = usDays / 7;
-      var threshold = acogThresholdDays(refGAweeks, usIsCRL);
+      var threshold = acogThresholdDays(refGAweeks, usIsCRL || G.method === "prior_crl" || G.method === "art" || G.method === "prior_art");
       redateHtml += '<span class="result-num small">' + diffDays + '</span><span class="result-unit">day' + (diffDays === 1 ? '' : 's') + ' apart</span>';
       if (threshold != null) {
         if (diffDays > threshold) {
@@ -3376,22 +3626,17 @@
     return x ? (x.w + "w" + x.d + "d") : "—";
   }
   function impBestGA() {
+    var G = assignGestationalAge();
+    var scan = G.scan;
     var crl = num(val("d-crl")), msd = num(val("d-msd"));
-    var scan = parseLocalDate(val("d-scandate")) || new Date();
-    var lmp = parseLocalDate(val("d-lmp"));
-    var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
-    if (crl != null) return { days: gaFromCRLmm(crl), source: "CRL", crl: crl, msd: msd, scan: scan };
-    if (msd != null) return { days: gaFromMSDmm(msd), source: "MSD", crl: crl, msd: msd, scan: scan };
+    if (G.preferredDays != null) {
+      var srcMap = { crl: "CRL", msd: "MSD", art: "ART", prior_crl: "locked CRL EDD", prior_art: "locked ART EDD", composite: "biometry composite", lmp: "LMP" };
+      return { days: G.preferredDays, source: srcMap[G.method] || G.method, crl: crl, msd: msd, scan: scan, locked: G.locked };
+    }
     var ivf = parseLocalDate(val("imp-ivf"));
     if (ivf) return { days: Math.round((scan - ivf) / 86400000) + 14, source: "IVF/conception (+14 d)", crl: crl, msd: msd, scan: scan };
+    var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
     if (estWk != null) return { days: (estWk + (estD || 0) / 7) * 7, source: "established GA", crl: crl, msd: msd, scan: scan };
-    var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
-    var ci = calcCI(bpd, ofd);
-    var bForGA = (ci != null && (ci < 74 || ci > 83)) ? calcCorrectedBPD(bpd, ofd) : bpd;
-    var hc = calcHC(bpd, ofd);
-    var comp = gaComposite(bForGA, hc, ac, fl);
-    if (comp) return { days: comp.weeks * 7, source: "biometry composite", crl: crl, msd: msd, scan: scan };
-    if (lmp) return { days: Math.round((scan - lmp) / 86400000), source: "LMP", crl: crl, msd: msd, scan: scan };
     var fhrWk = num(val("fhr-wk")), fhrD = num(val("fhr-d"));
     if (fhrWk != null) return { days: (fhrWk + (fhrD || 0) / 7) * 7, source: "FHR GA", crl: crl, msd: msd, scan: scan };
     var dpWk = num(val("dp-wk")), dpD = num(val("dp-d"));
@@ -5744,7 +5989,7 @@
   function initCases() { window.__casesReady = true; renderCases(); }
 
   var JUMP_INDEX = [
-    { name: "Dating & EDD", hint: "LMP, CRL, MSD, cycle-adjusted Naegele", tab: "dating", keys: "naegele due date conception fertile GBS GDM" },
+    { name: "Dating & EDD", hint: "LMP, CRL, MSD, ART, locked EDD, exclusions", tab: "dating", keys: "naegele due date conception fertile GBS GDM IVF embryo lock FGR" },
     { name: "Biometry & EFW", hint: "Hadlock, BPD, HC, AC, FL, centiles", tab: "biometry" },
     { name: "Doppler", hint: "UA-PI, AEDF/REDF, MCA, CPR, DV", tab: "doppler" },
     { name: "Anomaly", hint: "ventricle, NT, fluid, placenta", tab: "anomaly" },
@@ -5945,7 +6190,7 @@
 
     // Dating / biometry / Doppler share gestational age — recompute those three only
     var ids = ["b-bpd","b-ofd","b-ac","b-fl","b-estwk","b-estd",
-      "d-lmp","d-cycle","d-luteal","d-crl","d-msd","d-scandate","fhr-wk","fhr-d","fhr-bpm",
+      "d-lmp","d-cycle","d-luteal","d-crl","d-msd","d-scandate","d-art","d-embryo","d-prior-edd","d-prior-src","d-lock","d-x-fgr","d-x-macro","d-x-acdist","d-x-skel","d-x-cranial","d-x-hc","d-x-twins","fhr-wk","fhr-d","fhr-bpm",
       "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv",
       "dp-utpi","dp-notch","dp-dvpi","dp-dvaw"];
     ids.forEach(function (id) {
