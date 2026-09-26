@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Babsinogen — Obstetric &amp; Sonographic Biometry</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#C45C4A">
@@ -109,9 +109,12 @@
     border-bottom: 1px solid var(--line);
   }
   .tabs::-webkit-scrollbar { display: none; }
+  html[data-fs="md"] { font-size: 106.25%; }
+  html[data-fs="lg"] { font-size: 118.75%; }
+  html[data-fs="xl"] { font-size: 131.25%; }
   .tab {
     background: transparent; border: 0; color: var(--muted); font-size: 13.5px; font-weight: 600;
-    padding: 10px 14px; min-height: 44px; border-radius: 999px; white-space: nowrap;
+    padding: 10px 14px; min-height: 48px; border-radius: 999px; white-space: nowrap;
     transition: background var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
   }
   .tab.active { color: var(--on-accent); background: var(--accent); }
@@ -175,7 +178,7 @@
   }
   .segmented button.on { color: var(--on-accent); background: var(--accent); font-weight: 600; }
 
-  .check-row { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--paper); margin-bottom: 10px; cursor: pointer; min-height: 44px; }
+  .check-row { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--paper); margin-bottom: 10px; cursor: pointer; min-height: 48px; }
   .check-row input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
 
   .result-num { font-family: var(--display); font-size: 40px; font-weight: 600; color: var(--accent); line-height: 1; }
@@ -351,10 +354,13 @@
   }
   .jump-hit {
     display: block; width: 100%; text-align: left; background: none; border: 0;
-    color: var(--paper); padding: 12px 8px; min-height: 44px; border-radius: 10px; font-size: 14px;
+    color: var(--paper); padding: 12px 8px; min-height: 48px; border-radius: 10px; font-size: 14px;
   }
   .jump-hit:hover, .jump-hit.active { background: var(--panel2); }
   .jump-hit span { color: var(--muted); font-size: 12px; display: block; }
+  .jump-row { display: flex; gap: 6px; align-items: stretch; }
+  .jump-star { flex: 0 0 48px; min-height: 48px; border: 0; border-radius: 10px; background: var(--panel2); color: var(--accent); font-size: 16px; }
+  .jump-star.on { background: color-mix(in srgb, var(--accent) 18%, transparent); }
   .week-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
   .week-nav input { width: 72px; text-align: center; font-family: var(--mono); font-size: 18px; background: none; border: 0; border-bottom: 1px solid var(--line); color: var(--paper); }
   .week-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
@@ -408,6 +414,10 @@
   <div class="jump-box">
     <label class="card-title" for="err-text">Report an error (stays on this device)</label>
     <p class="note">Nothing is uploaded. Copy the text into an email or issue if you want the maintainers to see it. Do not paste patient identifiers.</p>
+    <div class="field"><label>Type</label><div class="row"><select id="err-kind">
+      <option value="error">Report an error</option>
+      <option value="suggest">Suggest an improvement</option>
+    </select></div></div>
     <div class="field"><label>Section</label><div class="row"><select id="err-sec">
       <option value="dating">Dating & EDD</option>
       <option value="biometry">Biometry</option>
@@ -435,7 +445,7 @@
     <label class="card-title" for="jump-q">Jump to a module or calculator</label>
     <input id="jump-q" type="search" placeholder="e.g. EFW, TI-RADS, oligohydramnios, RMI" autocomplete="off">
     <div id="jump-hits"></div>
-    <p class="note">Shortcut: press / when not typing in a field.</p>
+    <p class="note" id="jump-meta">Shortcut: press / when not typing in a field. Star a module to bookmark it on this device.</p>
   </div>
 </div>
 <div id="boot-splash" class="boot-splash" aria-hidden="true">
@@ -457,6 +467,8 @@
     <div class="hero-meta">
       <div class="offline-chip"><span class="dot"></span>Works fully offline once installed &mdash; no data leaves this device</div>
       <button type="button" class="icon-btn" id="theme-toggle" aria-pressed="false">Dark room</button>
+      <button type="button" class="icon-btn" id="fs-down" aria-label="Smaller text">A-</button>
+      <button type="button" class="icon-btn" id="fs-up" aria-label="Larger text">A+</button>
       <button type="button" class="icon-btn" id="jump-open">Jump / search</button>
     </div>
   </header>
@@ -676,6 +688,11 @@
           <div class="card-title">Ductus Venosus</div>
           <div class="field"><label>PI</label><div class="row"><input id="dp-dvpi" type="number" inputMode="decimal" step="0.01" placeholder="e.g. 0.50"></div></div>
           <label class="check-row"><input type="checkbox" id="dp-dvaw"> Absent or reversed a-wave</label>
+        </div>
+        <div class="card">
+          <div class="card-title">Technique</div>
+          <label class="check-row"><input type="checkbox" id="dp-angle"> Angle of insonation greater than 30 degrees (or MCA-PSV not near 0)</label>
+          <p class="note">ISUOG: keep the Doppler angle as small as possible. MCA-PSV should be as near 0 as practical. PI/RI are less angle-dependent than absolute velocity.</p>
         </div>
       </div>
       <div>
@@ -1260,6 +1277,8 @@
           <li><strong>Spleen.</strong> Rosenberg et al., <em>AJR</em> 1991. <strong>Kidney.</strong> Emamian et al., <em>AJR</em> 1993 (paediatric mean). <strong>Uterus.</strong> Kelsey et al., PLOS ONE 2016.</li>
           <li><strong>IPP.</strong> Grade I <5 mm, II 5–10 mm, III >10 mm (Lee, Korean J Urol 2013), bladder comfortably full.</li>
           <li><strong>Aorta.</strong> AAA ≥3 cm; elective-repair discussion commonly ≥5.5 cm. Portal vein ~13 mm.</li>
+          <li><strong>Carotid (SRU 2003).</strong> Grant EG et al., <em>Radiology</em> 2003;229:340–346. NASCET percent: ICA PSV <125 cm/s = <50%; 125–230 = 50–69%; >230 = ≥70% to near occlusion. EDV and ICA/CCA ratio are concordant checks, not a replacement for PSV. Near occlusion is a qualitative string-sign, not a percent. This is not a CEA indication.</li>
+          <li><strong>Carotid (SRU 2003).</strong> Grant EG et al., Radiology 2003;229:340-346. NASCET percent from ICA PSV: <125 cm/s = <50%; 125-230 = 50-69%; >230 = >=70% to near occlusion. EDV and ICA/CCA ratio check concordance. Near occlusion is qualitative. Not a CEA order.</li>
           <li>Textbook viscera: Rumack & Levine, <em>Diagnostic Ultrasound</em>.</li>
         </ul>
       </div>
@@ -1297,10 +1316,47 @@
   </section>
 
 
+    <div class="card ref-block" id="privacy-card">
+      <h3>Privacy (this device only)</h3>
+      <ul>
+        <li>No accounts, no cookies for tracking, no analytics, no cloud sync.</li>
+        <li>Calculators run in the browser. Folliculometry folders, quiz/case progress, bookmarks, theme, and text size use localStorage. The optional patient log uses IndexedDB and stays off until per-episode consent is ticked.</li>
+        <li>Report-an-error text is copied locally; nothing is uploaded from this app.</li>
+        <li>Clearing site data for this origin deletes those stores (GDPR erasure on this device). Do not type names, MRNs, or other identifiers into free-text fields.</li>
+        <li>This tool is not FDA-cleared or CE-marked as a medical device. It is decision support for qualified professionals.</li>
+      </ul>
+    </div>
+    <div class="card ref-block" id="changelog-card">
+      <h3>Changelog</h3>
+      <ul>
+        <li><strong>1.6.0</strong> (26 Sep 2026) — Privacy statement; bookmarks and recent jumps; ICD-10 lookup of conditions already in the app; SRU 2003 carotid helper; text size; 48 px targets; pinch-zoom restored. Doppler angle warning.</li>
+        <li><strong>1.5.0</strong> — ACOG 700 dating hierarchy (ART/CRL lock, parameter exclusion); 30 sourced cases.</li>
+        <li><strong>1.4.x</strong> — Topical quiz (320), BI-RADS lexicon helper, scan-week notes, protocols/pitfalls, PCOM, BPP/impression.</li>
+      </ul>
+      <p class="note">Last reviewed against the citations on this page: 26 Sep 2026. Quarterly re-check of ISUOG/ACR/ACOG statements is the governance plan — not a claim that a peer-review panel has sat.</p>
+    </div>
+    <div class="card ref-block">
+      <h3>ICD-10 lookup (not a coder)</h3>
+      <p class="note" style="margin-top:0;">These are high-use codes that map to findings this app already names. They are not a billable encounter. Verify laterality, trimester, and local ICD-10-CM/ICD-11 rules. Search them from Jump as well.</p>
+      <table class="ref"><tr><th>Code</th><th>Maps to</th></tr>
+        <tr><td>O00.9</td><td>Ectopic pregnancy, unspecified</td></tr>
+        <tr><td>O02.1</td><td>Missed miscarriage (do not use from a single suspicious scan)</td></tr>
+        <tr><td>O36.5</td><td>Maternal care for poor fetal growth</td></tr>
+        <tr><td>O40</td><td>Polyhydramnios</td></tr>
+        <tr><td>O41.0</td><td>Oligohydramnios</td></tr>
+        <tr><td>O43.2</td><td>Morbidly adherent placenta (PAS — clinical diagnosis)</td></tr>
+        <tr><td>O69.4</td><td>Labour and delivery complicated by vasa praevia</td></tr>
+        <tr><td>P95</td><td>Stillbirth / fetal death (labelling only; local definition of 20 weeks applies here)</td></tr>
+        <tr><td>N83.2</td><td>Other and unspecified ovarian cysts</td></tr>
+        <tr><td>E04.1</td><td>Nontoxic single thyroid nodule</td></tr>
+        <tr><td>N28.1</td><td>Cyst of kidney, acquired</td></tr>
+        <tr><td>I65.2</td><td>Occlusion and stenosis of carotid artery</td></tr>
+      </table>
+    </div>
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 1.5 · Cases module uses the same published rules as the calculators. Last reviewed with those sources.</p>
+    <p class="note">Babsinogen 1.6.0 · Last reviewed 26 Sep 2026 with the citations in References. Privacy, changelog, and ICD lookup live on that tab.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
   </footer>
 
@@ -2311,6 +2367,10 @@
       return;
     }
 
+    if (checked("dp-angle")) {
+      html += '<div class="badge warn">Angle of insonation >30° (or MCA-PSV not near 0°) — absolute velocities and PSV MoM are unreliable. Repeat with a smaller angle. PI/RI are more robust than PSV when the angle is imperfect.</div>';
+    }
+
     if (redf) {
       html += '<div class="badge danger">Reversed end-diastolic flow \u2014 critical finding, regardless of PI</div>';
     } else if (aedf) {
@@ -2413,7 +2473,7 @@
     { id: "spleen", label: "Spleen" }, { id: "liver", label: "Liver" }, { id: "kidney", label: "Kidney" },
     { id: "pancreas", label: "Pancreas" }, { id: "bowel", label: "Bowel & Appendix" }, { id: "bladder", label: "Bladder" },
     { id: "prostate", label: "Prostate" }, { id: "uterus", label: "Uterus & Endometrium" }, { id: "ovary", label: "Ovary" },
-    { id: "vessels", label: "Abdominal Vessels" }, { id: "tirads", label: "Thyroid (TI-RADS)" }, { id: "bosniak", label: "Renal cyst (Bosniak)" }, { id: "birads", label: "Breast (BI-RADS US)" }
+    { id: "vessels", label: "Abdominal Vessels" }, { id: "carotid", label: "Carotid (SRU)" }, { id: "tirads", label: "Thyroid (TI-RADS)" }, { id: "bosniak", label: "Renal cyst (Bosniak)" }, { id: "birads", label: "Breast (BI-RADS US)" }
   ];
 
   /* Ovary — mean volume reproductive age 6.11mL, prepubertal 1.67mL (SIGO/SIE consensus, Raffone et al. 2022).
@@ -2701,6 +2761,17 @@
         '<div class="field"><label>Maximum diameter (optional)</label><div class="row"><input id="bk-size" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>';
       set("organ-inputs", html);
       wireOrganInputs(["bk-class", "bk-size"]);
+    } else if (organSection === "carotid") {
+      html = '<div class="card-title">Carotid stenosis (SRU 2003 consensus)</div>' +
+        '<p class="subhead">Grant et al., Radiology 2003;229:340-346. NASCET-style percent. This is a waveform classifier, not a CEA or stent order. Confirm occlusion with colour and spectral, both sides, and the vertebral arteries as locally protocolled.</p>' +
+        '<div class="field"><label>ICA peak systolic velocity</label><div class="row"><input id="ca-psv" type="number" inputMode="decimal" step="1" placeholder="e.g. 140"><span class="suffix">cm/s</span></div></div>' +
+        '<div class="field"><label>ICA end-diastolic velocity (optional)</label><div class="row"><input id="ca-edv" type="number" inputMode="decimal" step="1" placeholder="e.g. 45"><span class="suffix">cm/s</span></div></div>' +
+        '<div class="field"><label>ICA/CCA PSV ratio (optional)</label><div class="row"><input id="ca-ratio" type="number" inputMode="decimal" step="0.1" placeholder="e.g. 2.4"></div></div>' +
+        '<label class="check-row"><input type="checkbox" id="ca-plaque"> Plaque visible in the ICA</label>' +
+        '<label class="check-row"><input type="checkbox" id="ca-near"> Near occlusion / string sign (residual lumen, variable velocity)</label>' +
+        '<label class="check-row"><input type="checkbox" id="ca-occl"> No detectable ICA lumen flow (suspected occlusion)</label>';
+      set("organ-inputs", html);
+      wireOrganInputs(["ca-psv","ca-edv","ca-ratio","ca-plaque","ca-near","ca-occl"]);
     } else if (organSection === "birads") {
       html = '<div class="card-title">BI-RADS ultrasound lexicon (ACR Atlas 5th ed.)</div>' +
         '<p class="subhead">This is a reporting helper, not a point score. You assign the assessment category. The engine only flags when descriptors and category are discordant.</p>' +
@@ -3102,6 +3173,35 @@
         }
       }
       html += '<div class="note">ACR BI-RADS Atlas 5th Edition (2013), ultrasound chapter. There is no TI-RADS-style point total. Do not use this helper as a biopsy order.</div>';
+    } else if (organSection === "carotid") {
+      var psv = num(val("ca-psv")), edv = num(val("ca-edv")), ratio = num(val("ca-ratio"));
+      var plaque = checked("ca-plaque"), near = checked("ca-near"), occl = checked("ca-occl");
+      if (occl) {
+        html += '<div class="impression danger"><h3>SRU 2003</h3><p>Total occlusion: undetectable ICA flow. Confirm with colour and spectral Doppler, and look at CCA/ECA waveforms. This app does not diagnose stroke or time carotid surgery.</p></div>';
+      } else if (near) {
+        html += '<div class="impression danger"><h3>SRU 2003</h3><p>Near occlusion (string sign): PSV may be high, low, or undetectable. Do not force a 50/70 percent from the number alone.</p></div>';
+      } else if (psv == null) {
+        html += '<p class="empty">Enter ICA PSV. EDV and ICA/CCA ratio refine concordance; they do not replace PSV in the SRU table.</p>';
+      } else {
+        var band, cls;
+        if (psv < 125) { band = plaque ? "<50% (plaque present, PSV <125)" : "Normal / <50% (PSV <125, no plaque recorded)"; cls = plaque ? "ok" : "ok"; }
+        else if (psv <= 230) { band = "50-69% (PSV 125-230 cm/s)"; cls = "warn"; }
+        else { band = ">=70% to near occlusion (PSV >230 cm/s)"; cls = "danger"; }
+        html += '<div class="impression ' + (cls === "ok" ? "" : cls) + '"><h3>Primary (ICA PSV)</h3><p>' + band + "</p></div>";
+        if (edv != null) {
+          var edExp = psv < 125 ? "<40" : (psv <= 230 ? "40-100" : ">100");
+          var edOk = (psv < 125 && edv < 40) || (psv >= 125 && psv <= 230 && edv >= 40 && edv <= 100) || (psv > 230 && edv > 100);
+          html += organRow("ICA EDV", edv.toFixed(0) + " cm/s", "SRU typical for this PSV band: " + edExp + " cm/s");
+          html += edOk ? '<div class="badge ok">EDV concordant with the PSV band</div>' : '<div class="badge warn">EDV discordant with the PSV band — repeat, check angle, or do not force a percent</div>';
+        }
+        if (ratio != null) {
+          var rExp = psv < 125 ? "<2.0" : (psv <= 230 ? "2.0-4.0" : ">4.0");
+          var rOk = (psv < 125 && ratio < 2) || (psv >= 125 && psv <= 230 && ratio >= 2 && ratio <= 4) || (psv > 230 && ratio > 4);
+          html += organRow("ICA/CCA PSV ratio", ratio.toFixed(2), "SRU typical: " + rExp);
+          html += rOk ? '<div class="badge ok">Ratio concordant with the PSV band</div>' : '<div class="badge warn">Ratio discordant with the PSV band</div>';
+        }
+        html += '<div class="note">Grant EG et al. Radiology 2003;229:340-346 (SRU consensus, NASCET). Gray-scale plaque and waveform quality outrank a single PSV. Not a stroke-risk score and not an operative indication.</div>';
+      }
     }
 
     set("organ-result", html);
@@ -6010,7 +6110,15 @@
     { name: "Reports & log", hint: "print, save locally", tab: "log" },
     { name: "Quiz", hint: "clinical scenarios", tab: "quiz" },
     { name: "Cases", hint: "decision cases, SRU, Doppler, IOTA", tab: "cases" },
-    { name: "References & limitations", hint: "sources, FDA, safety", tab: "refs" }
+    { name: "References & limitations", hint: "sources, FDA, safety", tab: "refs" },
+    { name: "Privacy", hint: "no accounts, local only, GDPR erasure", tab: "refs", keys: "privacy HIPAA GDPR" },
+    { name: "Changelog", hint: "versions, last reviewed", tab: "refs", keys: "changelog version" },
+    { name: "Carotid SRU", hint: "ICA PSV 125 / 230, NASCET percent", tab: "organ", organ: "carotid", keys: "carotid stenosis I65 PSV EDV" },
+    { name: "O00.9 Ectopic", hint: "ICD-10 lookup — verify locally", tab: "impress", keys: "O00 ectopic ICD" },
+    { name: "O36.5 Poor fetal growth", hint: "ICD-10 lookup — not a coder", tab: "biometry", keys: "O36 FGR SGA ICD" },
+    { name: "O40 Polyhydramnios", hint: "ICD-10 lookup", tab: "anomaly", keys: "O40 polyhydramnios ICD" },
+    { name: "O41.0 Oligohydramnios", hint: "ICD-10 lookup", tab: "anomaly", keys: "O41 oligohydramnios ICD AFI SDP" },
+    { name: "I65.2 Carotid stenosis", hint: "ICD-10 lookup", tab: "organ", organ: "carotid", keys: "I65 carotid ICD" }
   ];
   function applyTheme(dark) {
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
@@ -6044,27 +6152,68 @@
     bar.classList.add("show");
     bar.innerHTML = "<strong>Critical / red-flag findings</strong><ul>" + uniq.map(function (t) { return "<li>" + fEsc(t) + "</li>"; }).join("") + "</ul><p class='note' style='margin:8px 0 0'>Immediate specialist correlation. This banner is not an emergency dispatch and does not time delivery.</p>";
   }
+  function jumpKey(j) { return j.tab + "|" + (j.organ || ""); }
+  function loadMarks() {
+    try { return JSON.parse(localStorage.getItem("babsinogen.jump.v1") || "{}") || {}; } catch (e) { return {}; }
+  }
+  function saveMarks(o) { try { localStorage.setItem("babsinogen.jump.v1", JSON.stringify(o)); } catch (e) {} }
   function renderJump(q) {
     q = (q || "").toLowerCase();
+    var store = loadMarks();
+    var marks = store.stars || [];
+    var recents = store.recent || [];
     var hits = JUMP_INDEX.filter(function (j) {
       var blob = (j.name + " " + j.hint + " " + j.tab + " " + (j.keys || "")).toLowerCase();
       return !q || blob.indexOf(q) !== -1;
-    }).sort(function (a, b) {
+    });
+    if (!q) {
+      var starred = JUMP_INDEX.filter(function (j) { return marks.indexOf(jumpKey(j)) !== -1; });
+      var recentHits = recents.map(function (k) {
+        for (var i = 0; i < JUMP_INDEX.length; i++) if (jumpKey(JUMP_INDEX[i]) === k) return JUMP_INDEX[i];
+        return null;
+      }).filter(Boolean);
+      hits = starred.concat(recentHits).concat(hits);
+      var seen = {};
+      hits = hits.filter(function (j) { var k = jumpKey(j); if (seen[k]) return false; seen[k] = 1; return true; });
+    }
+    hits = hits.sort(function (a, b) {
       if (!q) return 0;
       var an = a.name.toLowerCase().indexOf(q) !== -1 ? 0 : 1;
       var bn = b.name.toLowerCase().indexOf(q) !== -1 ? 0 : 1;
       return an - bn;
-    }).slice(0, 8);
+    }).slice(0, 10);
     set("jump-hits", hits.map(function (j, i) {
-      return '<button type="button" class="jump-hit' + (i === 0 ? " active" : "") + '" data-tab="' + j.tab + '" data-organ="' + (j.organ || "") + '">' + fEsc(j.name) + "<span>" + fEsc(j.hint) + "</span></button>";
-    }).join("") || '<p class="empty">No matching module.</p>');
+      var k = jumpKey(j);
+      var on = marks.indexOf(k) !== -1;
+      return '<div class="jump-row"><button type="button" class="jump-hit' + (i === 0 ? " active" : "") + '" data-tab="' + j.tab + '" data-organ="' + (j.organ || "") + '">' + fEsc(j.name) + "<span>" + fEsc(j.hint) + '</span></button><button type="button" class="jump-star' + (on ? " on" : "") + '" data-k="' + k + '" aria-label="Bookmark">' + (on ? "★" : "☆") + "</button></div>";
+    }).join("") || '<p class="empty">No matching module or ICD code.</p>');
     document.querySelectorAll(".jump-hit").forEach(function (b) {
       b.addEventListener("click", function () { goJump(b.getAttribute("data-tab"), b.getAttribute("data-organ")); });
+    });
+    document.querySelectorAll(".jump-star").forEach(function (b) {
+      b.addEventListener("click", function (e) {
+        e.preventDefault();
+        var st = loadMarks();
+        st.stars = st.stars || [];
+        var k = b.getAttribute("data-k");
+        var ix = st.stars.indexOf(k);
+        if (ix === -1) st.stars.push(k); else st.stars.splice(ix, 1);
+        saveMarks(st);
+        renderJump(document.getElementById("jump-q") ? document.getElementById("jump-q").value : "");
+      });
     });
   }
   function goJump(tab, organ) {
     var ov = document.getElementById("jump-overlay");
     if (ov) { ov.classList.remove("open"); ov.hidden = true; }
+    try {
+      var st = loadMarks();
+      var k = tab + "|" + (organ || "");
+      st.recent = (st.recent || []).filter(function (x) { return x !== k; });
+      st.recent.unshift(k);
+      st.recent = st.recent.slice(0, 6);
+      saveMarks(st);
+    } catch (e) {}
     if (tab === "protocol") {
       if (organ === "flags" || (organ && RED_FLAGS.some(function (f) { return f.id === organ; }))) {
         protoMode = "flags";
@@ -6090,6 +6239,25 @@
     if (tbtn) tbtn.addEventListener("click", function () {
       applyTheme(document.documentElement.getAttribute("data-theme") !== "dark");
     });
+    function applyFs(step) {
+      var order = ["", "md", "lg", "xl"];
+      var cur = document.documentElement.getAttribute("data-fs") || "";
+      var i = order.indexOf(cur);
+      if (i < 0) i = 0;
+      i = Math.max(0, Math.min(order.length - 1, i + step));
+      var next = order[i];
+      if (next) document.documentElement.setAttribute("data-fs", next);
+      else document.documentElement.removeAttribute("data-fs");
+      try { localStorage.setItem("babsinogen.fs", next); } catch (e2) {}
+    }
+    try {
+      var savedFs = localStorage.getItem("babsinogen.fs");
+      if (savedFs) document.documentElement.setAttribute("data-fs", savedFs);
+    } catch (e3) {}
+    var fd = document.getElementById("fs-down");
+    var fu = document.getElementById("fs-up");
+    if (fd) fd.addEventListener("click", function () { applyFs(-1); });
+    if (fu) fu.addEventListener("click", function () { applyFs(1); });
     var open = document.getElementById("jump-open");
     var ov = document.getElementById("jump-overlay");
     var qel = document.getElementById("jump-q");
@@ -6108,8 +6276,9 @@
     var errCopy = document.getElementById("err-copy");
     if (errCopy) errCopy.addEventListener("click", function () {
       var sec = val("err-sec") || "other";
+      var kind = val("err-kind") || "error";
       var body = (document.getElementById("err-text") || {}).value || "";
-      var report = "Babsinogen error report (local only)\nSection: " + sec + "\n" + body.trim() + "\nDo not include patient identifiers.";
+      var report = "Babsinogen " + kind + " (local only)\nSection: " + sec + "\n" + body.trim() + "\nDo not include patient identifiers.";
       function done(ok) {
         var st = document.getElementById("err-status");
         if (st) st.textContent = ok ? "Copied. Paste into an email or GitHub issue if you wish. Nothing left this device." : "Copy failed — select the text manually.";
@@ -6191,7 +6360,7 @@
     // Dating / biometry / Doppler share gestational age — recompute those three only
     var ids = ["b-bpd","b-ofd","b-ac","b-fl","b-estwk","b-estd",
       "d-lmp","d-cycle","d-luteal","d-crl","d-msd","d-scandate","d-art","d-embryo","d-prior-edd","d-prior-src","d-lock","d-x-fgr","d-x-macro","d-x-acdist","d-x-skel","d-x-cranial","d-x-hc","d-x-twins","fhr-wk","fhr-d","fhr-bpm",
-      "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv",
+      "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv","dp-angle",
       "dp-utpi","dp-notch","dp-dvpi","dp-dvaw"];
     ids.forEach(function (id) {
       var el = document.getElementById(id);
