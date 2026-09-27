@@ -504,6 +504,11 @@
             <div class="field"><label>BPD</label><div class="row"><input id="b-bpd" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix" id="u1">cm</span></div></div>
             <div class="field"><label>OFD</label><div class="row"><input id="b-ofd" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix" id="u2">cm</span></div></div>
           </div>
+          <div class="field" id="hc-field">
+            <label>HC <span class="chip" id="hc-src">editable</span></label>
+            <div class="row"><input id="b-hc" type="number" inputMode="decimal" step="0.1" placeholder="type, or leave blank to auto-fill"><span class="suffix" id="u5">cm</span></div>
+          </div>
+          <p class="note" style="margin-top:0;">HC is always editable. If you leave it blank, it fills from 1.62 × (BPD + OFD) as soon as both diameters are entered. Type a traced or machine-ellipse HC to keep that value. Clear the box to return to auto-fill. Auto HC is used for EFW and dating unless you override it.</p>
           <div class="grid2">
             <div class="field"><label>AC *</label><div class="row"><input id="b-ac" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix" id="u3">cm</span></div></div>
             <div class="field"><label>FL *</label><div class="row"><input id="b-fl" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix" id="u4">cm</span></div></div>
@@ -1438,6 +1443,45 @@
      HEAD SHAPE: HC, cephalic index, shape-corrected BPD
      ========================================================================= */
   function calcHC(bpd, ofd) { if (bpd == null || ofd == null) return null; return 1.62 * (bpd + ofd); }
+  var hcManual = false;
+  function hcDisplayText(cm) {
+    if (cm == null) return "";
+    return bioUnit === "mm" ? (cm * 10).toFixed(1) : cm.toFixed(1);
+  }
+  function markHCSource(src) {
+    var chip = document.getElementById("hc-src");
+    if (!chip) return;
+    if (src === "measured") chip.textContent = "typed";
+    else if (src === "derived") chip.textContent = "auto from BPD + OFD";
+    else chip.textContent = "editable";
+  }
+  function resolveHC() {
+    var typed = toCmB("b-hc");
+    var derived = calcHC(toCmB("b-bpd"), toCmB("b-ofd"));
+    if (hcManual && typed != null) return { cm: typed, source: "measured", derived: derived };
+    if (derived != null) return { cm: derived, source: "derived", derived: derived };
+    if (typed != null) return { cm: typed, source: "measured", derived: null };
+    return { cm: null, source: null, derived: null };
+  }
+  function syncDerivedHC() {
+    var el = document.getElementById("b-hc");
+    if (!el) return;
+    var derived = calcHC(toCmB("b-bpd"), toCmB("b-ofd"));
+    if (hcManual) {
+      markHCSource(toCmB("b-hc") != null ? "measured" : "editable");
+      return;
+    }
+    if (derived == null) {
+      if (el.getAttribute("data-auto") === "1") el.value = "";
+      el.removeAttribute("data-auto");
+      markHCSource("editable");
+      return;
+    }
+    var text = hcDisplayText(derived);
+    if (el.value !== text) el.value = text;
+    el.setAttribute("data-auto", "1");
+    markHCSource("derived");
+  }
   function calcCI(bpd, ofd) { if (bpd == null || ofd == null || ofd === 0) return null; return (bpd / ofd) * 100; }
   function calcCorrectedBPD(bpd, ofd) { if (bpd == null || ofd == null) return null; return Math.sqrt((bpd * ofd) / 1.265); }
   function classifyCI(ci) {
@@ -1536,7 +1580,9 @@
     var twins = checked("d-x-twins");
     var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
     var ci = calcCI(bpd, ofd);
-    var hc = calcHC(bpd, ofd);
+    syncDerivedHC();
+    var H = resolveHC();
+    var hc = H.cm;
     var cbpd = calcCorrectedBPD(bpd, ofd);
     var ciAbn = ci != null && (ci < 74 || ci > 83);
     var warnings = [], flags = [], used = [], excluded = [], reasons = [];
@@ -2009,22 +2055,33 @@
      ========================================================================= */
   function renderBiometry() {
     var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+    syncDerivedHC();
+    var H = resolveHC();
+    var hc = H.cm;
 
     // --- Head shape ---
     var headHtml = '<div class="card-title">Head Shape</div>';
-    var hc = calcHC(bpd, ofd), ci = calcCI(bpd, ofd), cbpd = calcCorrectedBPD(bpd, ofd);
+    var ci = calcCI(bpd, ofd), cbpd = calcCorrectedBPD(bpd, ofd);
     if (hc != null) {
-      var ciInfo = classifyCI(ci);
+      var ciInfo = ci != null ? classifyCI(ci) : null;
       headHtml += '<span class="result-num small">' + hc.toFixed(1) + '</span><span class="result-unit">cm HC</span>';
-      headHtml += '<div class="result-sub">Cephalic index ' + ci.toFixed(1) + '% \u2014 <strong>' + ciInfo.label + '</strong> (' + ciInfo.detail + ')</div>';
-      headHtml += '<div class="badge ' + ciInfo.cls + '">CI ' + ci.toFixed(1) + '% \u00b7 normal 74\u201383</div>';
-      if (ci < 74 || ci > 83) {
+      headHtml += '<div class="chip">' + (H.source === "measured" ? "Measured / typed HC" : "Derived 1.62 \u00d7 (BPD + OFD)") + "</div>";
+      if (ciInfo) {
+        headHtml += '<div class="result-sub">Cephalic index ' + ci.toFixed(1) + '% \u2014 <strong>' + ciInfo.label + '</strong> (' + ciInfo.detail + ')</div>';
+        headHtml += '<div class="badge ' + ciInfo.cls + '">CI ' + ci.toFixed(1) + '% \u00b7 normal 74\u201383</div>';
+      }
+      if (H.source === "measured" && H.derived != null) {
+        var delta = Math.abs(H.cm - H.derived) / H.derived;
+        headHtml += '<div class="note">Ellipse estimate from BPD+OFD is ' + H.derived.toFixed(1) + ' cm.</div>';
+        if (delta > 0.05) headHtml += '<div class="badge warn">Typed HC differs from 1.62 \u00d7 (BPD+OFD) by ' + (delta * 100).toFixed(0) + '% \u2014 recheck plane, calipers, or whether the machine used a different ellipse factor.</div>';
+      }
+      if (ci != null && (ci < 74 || ci > 83)) {
         headHtml += '<div class="note flag">Shape-corrected BPD: ' + cbpd.toFixed(2) + ' cm. Head shape is outside the normal range, so raw BPD will bias BPD-based dating \u2014 the composite dating below automatically uses the corrected value in place of raw BPD.</div>';
-      } else {
+      } else if (cbpd != null) {
         headHtml += '<div class="note">Shape-corrected BPD: ' + cbpd.toFixed(2) + ' cm (nearly identical to raw BPD here, as expected for a normal head shape).</div>';
       }
     } else {
-      headHtml += '<p class="empty">Enter BPD and OFD to get HC, cephalic index, and shape-corrected BPD.</p>';
+      headHtml += '<p class="empty">Enter BPD and OFD to auto-fill HC, or type a measured HC. CI still needs both diameters.</p>';
     }
     set("head-card", headHtml);
 
@@ -3629,7 +3686,7 @@
   function measurementDiagnoses() {
     var dx = anomalyDiagnoses().slice();
     var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
-    var hc = calcHC(bpd, ofd);
+    var hc = resolveHC().cm;
     var ci = calcCI(bpd, ofd);
     if (ci != null) {
       var ciInfo = classifyCI(ci);
@@ -4043,7 +4100,7 @@
     }
 
     var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
-    var hc = calcHC(bpd, ofd);
+    var hc = resolveHC().cm;
     var efw = hadlockEFW(bpd, hc, ac, fl);
     var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
     var gaForPct = estWk != null ? (estWk + (estD || 0) / 7) : (weeks != null ? weeks : null);
@@ -6348,7 +6405,7 @@
       b.addEventListener("click", function () {
         bioUnit = b.getAttribute("data-unit");
         bioToggle.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); });
-        ["u1", "u2", "u3", "u4"].forEach(function (id) { document.getElementById(id).textContent = bioUnit; });
+        ["u1", "u2", "u3", "u4", "u5"].forEach(function (id) { var n = document.getElementById(id); if (n) n.textContent = bioUnit; });
         renderClinical();
       });
     });
@@ -6358,7 +6415,19 @@
     scanDateEl.value = new Date().toISOString().slice(0, 10);
 
     // Dating / biometry / Doppler share gestational age — recompute those three only
-    var ids = ["b-bpd","b-ofd","b-ac","b-fl","b-estwk","b-estd",
+    var hcEl = document.getElementById("b-hc");
+    if (hcEl) {
+      hcEl.addEventListener("input", function () {
+        if (!this.value.trim()) {
+          hcManual = false;
+          this.removeAttribute("data-auto");
+        } else {
+          hcManual = true;
+          this.removeAttribute("data-auto");
+        }
+      });
+    }
+    var ids = ["b-bpd","b-ofd","b-hc","b-ac","b-fl","b-estwk","b-estd",
       "d-lmp","d-cycle","d-luteal","d-crl","d-msd","d-scandate","d-art","d-embryo","d-prior-edd","d-prior-src","d-lock","d-x-fgr","d-x-macro","d-x-acdist","d-x-skel","d-x-cranial","d-x-hc","d-x-twins","fhr-wk","fhr-d","fhr-bpm",
       "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv","dp-angle",
       "dp-utpi","dp-notch","dp-dvpi","dp-dvaw"];
