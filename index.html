@@ -101,13 +101,19 @@
   .offline-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
 
   .tabs {
-    display: flex; gap: 4px; margin: 0 -16px 22px; padding: 8px 16px 10px;
+    display: none; gap: 4px; margin: 0 -16px 22px; padding: 8px 16px 10px;
     overflow-x: auto; scrollbar-width: none;
     position: sticky; top: 0; z-index: 20;
     background: color-mix(in srgb, var(--ink-page) 88%, white);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
   }
+  .tabs.show-modules { display: flex; }
+  body[data-family="gyn"] .ob-only, body[data-family="gen"] .ob-only { display: none !important; }
+  .exam-step.on { background: var(--accent); color: var(--on-accent); }
+  .home-group summary { cursor: pointer; font-family: var(--display); font-size: 18px; padding: 4px 0 10px; list-style: none; }
+  .home-group summary::-webkit-details-marker { display: none; }
+  .home-flow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
   .tabs::-webkit-scrollbar { display: none; }
   html[data-fs="md"] { font-size: 106.25%; }
   html[data-fs="lg"] { font-size: 118.75%; }
@@ -386,6 +392,55 @@
   .boot-sub { font-size: 13px; color: var(--muted); letter-spacing: 0.03em; }
   @media (prefers-reduced-motion: reduce) { .boot-splash { display: none; } }
 
+
+  .home-title { font-family: var(--display); font-size: 28px; font-weight: 600; color: var(--paper); margin: 4px 0 8px; }
+  .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .exam-card {
+    text-align: left; background: var(--panel2); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 12px; min-height: 88px; color: var(--paper);
+  }
+  .exam-card strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .exam-card span { display: block; font-size: 12px; color: var(--muted); line-height: 1.35; }
+  .exam-card:hover { border-color: var(--accent); }
+  #exam-bar {
+    position: sticky; top: 52px; z-index: 19; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 8px 10px; margin: -8px 0 16px;
+    box-shadow: var(--shadow);
+  }
+  #exam-bar[hidden] { display: none !important; }
+  .exam-bar-name { font-family: var(--display); font-size: 15px; color: var(--accent); margin-right: 6px; }
+  .exam-steps { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .exam-step {
+    background: var(--panel2); border: 0; color: var(--paper); font-size: 12.5px; padding: 8px 12px;
+    border-radius: 999px; min-height: 40px;
+  }
+  .bottom-nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: flex; justify-content: space-around; gap: 4px;
+    background: color-mix(in srgb, var(--panel) 92%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line); padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  }
+  .bottom-nav button {
+    flex: 1; background: none; border: 0; color: var(--muted); font-size: 11px; font-weight: 600;
+    min-height: 48px; border-radius: 12px;
+  }
+  .bottom-nav button.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  body[data-exam] .tagline { display: none; }
+  @media (max-width: 720px) {
+    body[data-exam] .hero-meta .offline-chip { display: none; }
+    body { padding-bottom: 96px; }
+  }
+  .home-group { margin-bottom: 12px; }
+  .home-group > summary { cursor: pointer; list-style: none; font-family: var(--display); font-size: 18px; padding: 12px 4px; }
+  .home-group > summary::-webkit-details-marker { display: none; }
+  .home-group > summary::after { content: " ▾"; color: var(--accent); font-size: 14px; }
+  .timeline { list-style: none; padding: 0; margin: 8px 0; }
+  .timeline li { border-left: 2px solid var(--line); padding: 0 0 12px 14px; margin-left: 6px; }
+  .timeline .tl-day { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+  .q-miss { color: var(--signal); }
+
+
   #report-view { display: none; }
   @media print {
     body { background: #fff; padding: 0; }
@@ -405,7 +460,7 @@
     .cert-wrap { text-align: center; padding: 28px 12px; border: 3px double #C45C4A; }
     .cert-wrap h1 { font-size: 28px; margin: 8px 0; color: #C45C4A; }
     .cert-wrap .cert-name { font-size: 22px; margin: 18px 0 8px; }
-    .jump-overlay, .boot-splash, .crit-bar { display: none !important; }
+    .jump-overlay, .boot-splash, .crit-bar, .bottom-nav, #exam-bar { display: none !important; }
   }
 </style>
 </head>
@@ -443,7 +498,7 @@
 <div id="jump-overlay" class="jump-overlay" hidden>
   <div class="jump-box">
     <label class="card-title" for="jump-q">Jump to a module or calculator</label>
-    <input id="jump-q" type="search" placeholder="e.g. EFW, TI-RADS, oligohydramnios, RMI" autocomplete="off">
+    <input id="jump-q" type="search" placeholder="e.g. CRL 6 mm no heartbeat, MCA 1.6 MoM, TI-RADS 4" autocomplete="off">
     <div id="jump-hits"></div>
     <p class="note" id="jump-meta">Shortcut: press / when not typing in a field. Star a module to bookmark it on this device.</p>
   </div>
@@ -451,29 +506,32 @@
 <div id="boot-splash" class="boot-splash" aria-hidden="true">
   <img src="logo-mark.png?v=10" width="96" height="96" alt="">
   <p class="boot-name">Babsinogen</p>
-  <p class="boot-sub">Obstetric biometry & folliculometry</p>
+  <p class="boot-sub">Clinical Sonography Companion</p>
 </div>
 <div class="app" id="app">
 
   <header class="header">
-    <div class="eyebrow">BABSINOGEN &middot; CLINICAL TOOLS</div>
+    <div class="eyebrow">BABSINOGEN &middot; CLINICAL SONOGRAPHY COMPANION</div>
     <div class="title-row">
       <div class="logo-wrap" aria-hidden="true">
         <img src="logo-mark.png?v=10" width="60" height="60" alt="Babsinogen" class="logo-mark">
       </div>
       <h1>Babsinogen</h1>
     </div>
-    <p class="tagline">Structured obstetric biometry, Doppler, anomaly markers, and serial folliculometry &mdash; from the measurements you enter. Decision support only.</p>
+    <p class="tagline">Scan → measure → check → interpret → report → learn. Pick the examination you are performing. Decision support only — not a substitute for clinical judgement.</p>
     <div class="hero-meta">
       <div class="offline-chip"><span class="dot"></span>Works fully offline once installed &mdash; no data leaves this device</div>
       <button type="button" class="icon-btn" id="theme-toggle" aria-pressed="false">Dark room</button>
       <button type="button" class="icon-btn" id="fs-down" aria-label="Smaller text">A-</button>
       <button type="button" class="icon-btn" id="fs-up" aria-label="Larger text">A+</button>
-      <button type="button" class="icon-btn" id="jump-open">Jump / search</button>
+      <button type="button" class="icon-btn" id="jump-open">Search</button>
+      <button type="button" class="icon-btn" id="modules-toggle" aria-pressed="false">All modules</button>
     </div>
   </header>
 
   <nav class="tabs" aria-label="Clinical modules">
+    <button class="tab" data-tab="home">Home</button>
+    <button class="tab" data-tab="exam">Exam wrap-up</button>
     <button class="tab" data-tab="dating">Dating &amp; EDD</button>
     <button class="tab" data-tab="weeks">Scan weeks</button>
     <button class="tab" data-tab="protocol">Protocols</button>
@@ -489,6 +547,83 @@
     <button class="tab" data-tab="refs">References</button>
   </nav>
   <div id="crit-bar" class="crit-bar" role="status" aria-live="polite"></div>
+
+  <div id="exam-bar" hidden></div>
+
+  <section class="panel-view" id="view-home">
+    <div id="home-body"></div>
+  </section>
+
+  <section class="panel-view" id="view-exam">
+    <div class="layout">
+      <div>
+        <div class="card ob-only">
+          <div class="card-title">Clinical information</div>
+          <p class="subhead">Folder ID is optional and stays on this device. Do not use a hospital MRN unless local policy allows on-device storage.</p>
+          <div class="grid2">
+            <div class="field"><label>Folder ID</label><div class="row"><input id="ex-pid" maxlength="20" placeholder="-"></div></div>
+            <div class="field"><label>Initials</label><div class="row"><input id="ex-initials" maxlength="10" placeholder="-"></div></div>
+          </div>
+          <div class="field"><label>Indication</label><div class="row"><input id="ex-indication" placeholder="e.g. growth, reduced movements"></div></div>
+          <div class="grid2">
+            <div class="field"><label>Fetuses</label><div class="row"><select id="ex-fetuses"><option value="Singleton">Singleton</option><option value="Twins">Twins</option><option value="Higher-order">Higher-order</option></select></div></div>
+            <div class="field"><label>Cardiac activity</label><div class="row"><select id="ex-cardiac"><option value="">-</option><option value="present">Present</option><option value="absent">Absent</option></select></div></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Presentation</label><div class="row"><select id="ex-presentation"><option value="">-</option><option value="cephalic">Cephalic</option><option value="breech">Breech</option><option value="transverse">Transverse</option><option value="oblique">Oblique</option></select></div></div>
+            <div class="field"><label>Lie</label><div class="row"><select id="ex-lie"><option value="">-</option><option value="longitudinal">Longitudinal</option><option value="transverse">Transverse</option><option value="oblique">Oblique</option></select></div></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Movements</label><div class="row"><select id="ex-move"><option value="">-</option><option value="seen">Seen</option><option value="reduced">Reduced</option><option value="not seen">Not seen</option></select></div></div>
+            <div class="field"><label>Placenta vs internal os</label><div class="row"><select id="ex-plac-os"><option value="">-</option><option value="clear of the os">Clear of the os</option><option value="low-lying">Low-lying</option><option value="previa">Placenta previa</option><option value="vasa previa suspected">Vasa previa suspected</option></select></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Suggested impression (editable)</div>
+          <p class="subhead">Never locked. Regenerating overwrites only if you have not typed.</p>
+          <div class="field"><label>Template</label><div class="row"><select id="ex-template">
+            <option value="">keep current wording</option>
+            <option value="growth">Normal growth scan skeleton</option>
+            <option value="first">Normal first-trimester skeleton</option>
+            <option value="anatomy">Normal anatomy skeleton</option>
+            <option value="pelvic">Normal pelvic skeleton</option>
+            <option value="abdomen">Normal abdomen skeleton</option>
+            <option value="anatomy-n">Normal anatomy (longer)</option>
+            <option value="thyroid">Thyroid / TI-RADS skeleton</option>
+            <option value="breast">Breast / BI-RADS skeleton</option>
+            <option value="renal">Renal tract skeleton</option>
+          </select></div></div>
+          <textarea id="ex-impression" rows="8" style="width:100%;min-height:160px;background:var(--panel2);color:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px;font-family:var(--sans);font-size:14px;"></textarea>
+          <div class="btn-row" style="margin-top:10px;flex-wrap:wrap;">
+            <button type="button" class="btn-ghost" id="ex-regen" style="width:auto;">Regenerate</button>
+            <button type="button" class="btn-ghost" id="ex-copy-imp" style="width:auto;">Copy impression</button>
+            <button type="button" class="btn-ghost" id="ex-copy-find" style="width:auto;">Copy findings</button>
+            <button type="button" class="btn-ghost" id="ex-copy-full" style="width:auto;">Copy full</button>
+            <button type="button" class="btn-ghost" id="ex-save-tpl" style="width:auto;">Save as my template</button>
+            <button type="button" class="btn-primary" id="ex-print" style="width:auto;">Print report</button>
+          </div>
+          <p class="note" id="exam-preview"></p>
+        </div>
+        <div class="card">
+          <label class="check-row"><input type="checkbox" id="ex-consent"> Patient consented to save this examination on this device</label>
+          <button type="button" class="btn-primary" id="ex-save">Save examination</button>
+          <p class="note" id="ex-save-msg">Browser storage is not a hospital record. Export a backup from Reports if these data matter.</p>
+        </div>
+      </div>
+      <div>
+        <div class="card" id="exam-meaning"></div>
+        <div class="card" id="exam-miss"></div>
+        <div class="card" id="exam-audit"></div>
+        <div class="card" id="exam-serial"></div>
+        <div class="card">
+          <div class="card-title">Learning point (optional)</div>
+          <details><summary>Why is CPR calculated?</summary>
+            <p class="note">CPR = MCA PI / UA PI. A value below 1.0 is a qualitative brain-sparing flag, not a delivery order. Weigh it with EFW/AC trend, fluid, and DV.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ===================== TAB 1: BIOMETRY ===================== -->
   <section class="panel-view" id="view-biometry">
@@ -698,6 +833,13 @@
           <div class="card-title">Technique</div>
           <label class="check-row"><input type="checkbox" id="dp-angle"> Angle of insonation greater than 30 degrees (or MCA-PSV not near 0)</label>
           <p class="note">ISUOG: keep the Doppler angle as small as possible. MCA-PSV should be as near 0 as practical. PI/RI are less angle-dependent than absolute velocity.</p>
+          <div class="hairline"></div>
+          <div class="card-title">Technical quality (self-attested)</div>
+          <p class="subhead">Software cannot see your waveform. Tick what you actually did. Unticked items are completeness reminders, not proof of a bad study.</p>
+          <label class="check-row"><input type="checkbox" id="dp-q-ua"> UA sampled from a free loop (not at the fetal abdomen or placenta)</label>
+          <label class="check-row"><input type="checkbox" id="dp-q-mca"> MCA sampled near the origin, angle as near 0° as practical</label>
+          <label class="check-row"><input type="checkbox" id="dp-q-wave"> Adequate waveform without fetal breathing artefact</label>
+          <label class="check-row"><input type="checkbox" id="dp-q-alara"> ALARA: Doppler duration kept short, especially in the first trimester</label>
         </div>
       </div>
       <div>
@@ -744,6 +886,22 @@
         <div class="card-title">Saved Episodes <span id="log-count" class="chip" style="margin:0"></span></div>
         <div id="log-list"><p class="empty">None saved yet.</p></div>
         <button class="btn-danger" id="log-delete-all-btn" style="margin-top:14px;">Delete All Saved Episodes</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Backup this device</div>
+        <p class="subhead">Export a JSON copy of local folders, bookmarks, and saved examinations. Store it yourself. This is not encryption and not an EMR.</p>
+        <div class="btn-row">
+          <button type="button" class="btn-primary" id="bk-export" style="width:auto;">Export backup</button>
+          <label class="btn-ghost" style="width:auto;display:inline-flex;align-items:center;justify-content:center;">Import backup<input type="file" id="bk-import" accept="application/json" hidden></label>
+        </div>
+        <p class="note" id="bk-msg"></p>
+        <div class="hairline"></div>
+        <div class="card-title">Facility letterhead (this device)</div>
+        <p class="subhead">Used on printed reports. Stays in localStorage. Not a hospital EMR identity.</p>
+        <div class="field"><label>Facility name</label><div class="row"><input id="fac-name" maxlength="80" placeholder="e.g. departmental heading"></div></div>
+        <div class="field"><label>Operator / clinician</label><div class="row"><input id="fac-clinician" maxlength="60" placeholder="-"></div></div>
+        <div class="field"><label>Backup passphrase (optional)</label><div class="row"><input id="bk-pass" type="password" maxlength="64" placeholder="leave blank for plain JSON"></div></div>
+        <p class="note">A passphrase encrypts the file with AES-GCM on this device before download. There is no password recovery. Plain JSON is not encryption.</p>
       </div>
     </div>
   </section>
@@ -1284,6 +1442,7 @@
           <li><strong>Aorta.</strong> AAA ≥3 cm; elective-repair discussion commonly ≥5.5 cm. Portal vein ~13 mm.</li>
           <li><strong>Carotid (SRU 2003).</strong> Grant EG et al., <em>Radiology</em> 2003;229:340–346. NASCET percent: ICA PSV <125 cm/s = <50%; 125–230 = 50–69%; >230 = ≥70% to near occlusion. EDV and ICA/CCA ratio are concordant checks, not a replacement for PSV. Near occlusion is a qualitative string-sign, not a percent. This is not a CEA indication.</li>
           <li><strong>Carotid (SRU 2003).</strong> Grant EG et al., Radiology 2003;229:340-346. NASCET percent from ICA PSV: <125 cm/s = <50%; 125-230 = 50-69%; >230 = >=70% to near occlusion. EDV and ICA/CCA ratio check concordance. Near occlusion is qualitative. Not a CEA order.</li>
+          <li><strong>Testicular volume.</strong> Lambert B, <em>J Urol</em> 1982 — ellipsoid L×W×H×0.71. Compare sides. Not a torsion or tumour diagnosis.</li>
           <li>Textbook viscera: Rumack & Levine, <em>Diagnostic Ultrasound</em>.</li>
         </ul>
       </div>
@@ -1334,11 +1493,15 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>2.1.0</strong> (29 Sep 2026) — Exam workflows (dating, viability, anatomy, Doppler, pelvic, adnexal); scrotal volume (Lambert 0.71); smart search phrases; letterhead; optional AES backup; custom templates. Formulas unchanged.</li>
+        <li><strong>2.0.0</strong> (27 Sep 2026) — Exam-first home, growth-scan workflow, completeness check, editable impression, serial EFW graph, device backup. Clinical formulas unchanged.</li>
         <li><strong>1.6.0</strong> (26 Sep 2026) — Privacy statement; bookmarks and recent jumps; ICD-10 lookup of conditions already in the app; SRU 2003 carotid helper; text size; 48 px targets; pinch-zoom restored. Doppler angle warning.</li>
         <li><strong>1.5.0</strong> — ACOG 700 dating hierarchy (ART/CRL lock, parameter exclusion); 30 sourced cases.</li>
         <li><strong>1.4.x</strong> — Topical quiz (320), BI-RADS lexicon helper, scan-week notes, protocols/pitfalls, PCOM, BPP/impression.</li>
       </ul>
       <p class="note">Last reviewed against the citations on this page: 26 Sep 2026. Quarterly re-check of ISUOG/ACR/ACOG statements is the governance plan — not a claim that a peer-review panel has sat.</p>
+      <button type="button" class="btn-ghost" id="self-test" style="width:auto;margin-top:8px;">Run formula self-test</button>
+      <p class="note" id="self-test-out"></p>
     </div>
     <div class="card ref-block">
       <h3>ICD-10 lookup (not a coder)</h3>
@@ -1361,11 +1524,19 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 1.6.0 · Last reviewed 26 Sep 2026 with the citations in References. Privacy, changelog, and ICD lookup live on that tab.</p>
+    <p class="note">Babsinogen 2.1.0 · Clinical Sonography Companion. Last reviewed 26 Sep 2026 with the citations in References. Formulas unchanged in this workflow release.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
   </footer>
 
 </div>
+
+<nav class="bottom-nav" aria-label="Primary">
+    <button type="button" data-go="home">Home</button>
+    <button type="button" data-go="exam">Exam</button>
+    <button type="button" id="nav-search">Search</button>
+    <button type="button" data-go="log">Reports</button>
+    <button type="button" data-go="cases">Learn</button>
+  </nav>
 
 <div id="report-view">
   <div class="report-header">
@@ -2083,6 +2254,10 @@
     } else {
       headHtml += '<p class="empty">Enter BPD and OFD to auto-fill HC, or type a measured HC. CI still needs both diameters.</p>';
     }
+    var plaus = typeof plausibilityNotes === "function" ? plausibilityNotes() : [];
+    if (plaus && plaus.length) {
+      plaus.forEach(function (n) { headHtml += '<div class="badge warn">' + n + "</div>"; });
+    }
     set("head-card", headHtml);
 
     // --- EFW ---
@@ -2530,7 +2705,7 @@
     { id: "spleen", label: "Spleen" }, { id: "liver", label: "Liver" }, { id: "kidney", label: "Kidney" },
     { id: "pancreas", label: "Pancreas" }, { id: "bowel", label: "Bowel & Appendix" }, { id: "bladder", label: "Bladder" },
     { id: "prostate", label: "Prostate" }, { id: "uterus", label: "Uterus & Endometrium" }, { id: "ovary", label: "Ovary" },
-    { id: "vessels", label: "Abdominal Vessels" }, { id: "carotid", label: "Carotid (SRU)" }, { id: "tirads", label: "Thyroid (TI-RADS)" }, { id: "bosniak", label: "Renal cyst (Bosniak)" }, { id: "birads", label: "Breast (BI-RADS US)" }
+    { id: "vessels", label: "Abdominal Vessels" }, { id: "scrotal", label: "Scrotal" }, { id: "carotid", label: "Carotid (SRU)" }, { id: "tirads", label: "Thyroid (TI-RADS)" }, { id: "bosniak", label: "Renal cyst (Bosniak)" }, { id: "birads", label: "Breast (BI-RADS US)" }
   ];
 
   /* Ovary — mean volume reproductive age 6.11mL, prepubertal 1.67mL (SIGO/SIE consensus, Raffone et al. 2022).
@@ -2818,6 +2993,22 @@
         '<div class="field"><label>Maximum diameter (optional)</label><div class="row"><input id="bk-size" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>';
       set("organ-inputs", html);
       wireOrganInputs(["bk-class", "bk-size"]);
+    } else if (organSection === "scrotal") {
+      html = '<div class="card-title">Scrotal (volume helper)</div>' +
+        '<p class="subhead">Lambert 1982 ellipsoid: L \u00d7 W \u00d7 H \u00d7 0.71. Compare sides. This does not diagnose torsion, tumour, or infection — those are clinical plus greyscale/Doppler pattern, not a volume number.</p>' +
+        '<div class="grid2">' +
+        '<div class="field"><label>Right L</label><div class="row"><input id="sc-rl" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
+        '<div class="field"><label>Right W</label><div class="row"><input id="sc-rw" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
+        '</div><div class="grid2">' +
+        '<div class="field"><label>Right H</label><div class="row"><input id="sc-rh" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
+        '<div class="field"><label>Left L</label><div class="row"><input id="sc-ll" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
+        '</div><div class="grid2">' +
+        '<div class="field"><label>Left W</label><div class="row"><input id="sc-lw" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
+        '<div class="field"><label>Left H</label><div class="row"><input id="sc-lh" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
+        '</div>' +
+        '<label class="check-row"><input type="checkbox" id="sc-pain"> Acute pain / suspected torsion pathway (clinical)</label>';
+      set("organ-inputs", html);
+      wireOrganInputs(["sc-rl","sc-rw","sc-rh","sc-ll","sc-lw","sc-lh","sc-pain"]);
     } else if (organSection === "carotid") {
       html = '<div class="card-title">Carotid stenosis (SRU 2003 consensus)</div>' +
         '<p class="subhead">Grant et al., Radiology 2003;229:340-346. NASCET-style percent. This is a waveform classifier, not a CEA or stent order. Confirm occlusion with colour and spectral, both sides, and the vertebral arteries as locally protocolled.</p>' +
@@ -3230,6 +3421,20 @@
         }
       }
       html += '<div class="note">ACR BI-RADS Atlas 5th Edition (2013), ultrasound chapter. There is no TI-RADS-style point total. Do not use this helper as a biopsy order.</div>';
+    } else if (organSection === "scrotal") {
+      function scVol(l, w, h) { return (l != null && w != null && h != null) ? l * w * h * 0.71 : null; }
+      var r = scVol(num(val("sc-rl")), num(val("sc-rw")), num(val("sc-rh")));
+      var lft = scVol(num(val("sc-ll")), num(val("sc-lw")), num(val("sc-lh")));
+      if (r == null && lft == null) html += '<p class="empty">Enter three axes per testis. Volume = L \u00d7 W \u00d7 H \u00d7 0.71 (Lambert 1982).</p>';
+      if (r != null) html += organRow("Right volume", r.toFixed(1) + " mL", "ellipsoid 0.71");
+      if (lft != null) html += organRow("Left volume", lft.toFixed(1) + " mL", "ellipsoid 0.71");
+      if (r != null && lft != null) {
+        var mx = Math.max(r, lft), mn = Math.min(r, lft);
+        var asym = mx ? ((mx - mn) / mx) * 100 : 0;
+        html += organRow("Side difference", asym.toFixed(0) + "% of the larger", "describe; do not treat a percent as torsion");
+      }
+      if (checked("sc-pain")) html += '<div class="badge danger">Acute scrotal pain is a clinical emergency pathway. Colour Doppler of the spermatic cord / testis is interpreted at the bedside — this volume helper does not rule torsion in or out.</div>';
+      html += '<div class="note">Lambert B, J Urol 1982 (0.71 ellipsoid). Adult volumes vary widely; compare with the contralateral testis and clinical findings. Not a tumour or fertility diagnosis.</div>';
     } else if (organSection === "carotid") {
       var psv = num(val("ca-psv")), edv = num(val("ca-edv")), ratio = num(val("ca-ratio"));
       var plaque = checked("ca-plaque"), near = checked("ca-near"), occl = checked("ca-occl");
@@ -5855,7 +6060,7 @@
     return out;
   }
 
-  function renderClinical() { renderBiometry(); renderDating(); renderDoppler(); if (window.__impReady) { renderImpression(); renderBppLive(); } if (window.__anomReady) renderAnomalyResult(); refreshRedFlags(); }
+  function renderClinical() { renderBiometry(); renderDating(); renderDoppler(); if (window.__impReady) { renderImpression(); renderBppLive(); } if (window.__anomReady) renderAnomalyResult(); refreshRedFlags(); if (window.__examReady) renderExamWrap(); }
   function renderAll() {
     renderClinical();
     if (window.__follReady) renderFolliculometry();
@@ -6171,6 +6376,7 @@
     { name: "Privacy", hint: "no accounts, local only, GDPR erasure", tab: "refs", keys: "privacy HIPAA GDPR" },
     { name: "Changelog", hint: "versions, last reviewed", tab: "refs", keys: "changelog version" },
     { name: "Carotid SRU", hint: "ICA PSV 125 / 230, NASCET percent", tab: "organ", organ: "carotid", keys: "carotid stenosis I65 PSV EDV" },
+    { name: "Scrotal volume", hint: "Lambert 0.71 ellipsoid", tab: "organ", organ: "scrotal", keys: "testis scrotal torsion volume" },
     { name: "O00.9 Ectopic", hint: "ICD-10 lookup — verify locally", tab: "impress", keys: "O00 ectopic ICD" },
     { name: "O36.5 Poor fetal growth", hint: "ICD-10 lookup — not a coder", tab: "biometry", keys: "O36 FGR SGA ICD" },
     { name: "O40 Polyhydramnios", hint: "ICD-10 lookup", tab: "anomaly", keys: "O40 polyhydramnios ICD" },
@@ -6214,6 +6420,28 @@
     try { return JSON.parse(localStorage.getItem("babsinogen.jump.v1") || "{}") || {}; } catch (e) { return {}; }
   }
   function saveMarks(o) { try { localStorage.setItem("babsinogen.jump.v1", JSON.stringify(o)); } catch (e) {} }
+  function smartJumpHits(q) {
+    q = (q || "").toLowerCase();
+    var hits = [];
+    var crl = q.match(/crl\s*(\d+(?:\.\d+)?)/);
+    if (crl && /absent|no (fca|heartbeat|cardiac|hb)/.test(q)) {
+      var mm = parseFloat(crl[1]);
+      hits.push({ name: "SRU viability", hint: "CRL " + mm + " mm without heartbeat — Impression tab. Diagnostic demise is CRL ≥7 mm TV, not a single smaller measurement.", tab: "impress", keys: "sru" });
+    }
+    if (/mca/.test(q) && /1\.5|1\.6|mom/.test(q)) {
+      hits.push({ name: "MCA-PSV anaemia pathway", hint: "Mari ≥1.5 MoM is a risk threshold, not a transfusion order. Doppler tab.", tab: "doppler" });
+    }
+    if (/simple (ovarian )?cyst|iota|adnexal/.test(q)) {
+      hits.push({ name: "Adnexal / IOTA", hint: "Simple Rules and RMI on Organ → Ovary. Inconclusive is a valid result.", tab: "organ", organ: "ovary" });
+    }
+    if (/ti-?rads|tr4|tr5/.test(q)) {
+      hits.push({ name: "Thyroid TI-RADS", hint: "ACR 2017 points and FNA size — not a biopsy order.", tab: "organ", organ: "tirads" });
+    }
+    if (/growth scan|efw|sga|fgr/.test(q)) {
+      hits.push({ name: "Growth scan workflow", hint: "Start the examination rather than a lone calculator.", tab: "home" });
+    }
+    return hits;
+  }
   function renderJump(q) {
     q = (q || "").toLowerCase();
     var store = loadMarks();
@@ -6223,6 +6451,7 @@
       var blob = (j.name + " " + j.hint + " " + j.tab + " " + (j.keys || "")).toLowerCase();
       return !q || blob.indexOf(q) !== -1;
     });
+    if (q) hits = smartJumpHits(q).concat(hits);
     if (!q) {
       var starred = JUMP_INDEX.filter(function (j) { return marks.indexOf(jumpKey(j)) !== -1; });
       var recentHits = recents.map(function (k) {
@@ -6315,6 +6544,14 @@
     var fu = document.getElementById("fs-up");
     if (fd) fd.addEventListener("click", function () { applyFs(-1); });
     if (fu) fu.addEventListener("click", function () { applyFs(1); });
+    var mt = document.getElementById("modules-toggle");
+    if (mt) mt.addEventListener("click", function () {
+      var nav = document.querySelector(".tabs");
+      if (!nav) return;
+      nav.classList.toggle("show-modules");
+      var on = nav.classList.contains("show-modules");
+      mt.setAttribute("aria-pressed", on ? "true" : "false");
+    });
     var open = document.getElementById("jump-open");
     var ov = document.getElementById("jump-overlay");
     var qel = document.getElementById("jump-q");
@@ -6360,10 +6597,633 @@
     });
   }
 
+  /* =========================================================================
+     COMPANION — exam-first workflow. Reuses existing engines. No new formulas.
+     ========================================================================= */
+  var activeExam = null;
+  var EXAM_KEY = "babsinogen.exams.v1";
+
+  var EXAM_CATALOG = [
+    { id: "growth", group: "Obstetrics", name: "Growth scan", hint: "Third-trimester biometry, fluid, Doppler", kind: "workflow",
+      steps: [
+        { id: "clinical", label: "Clinical", tab: "exam" },
+        { id: "dating", label: "Dating", tab: "dating" },
+        { id: "biometry", label: "Biometry", tab: "biometry" },
+        { id: "fluid", label: "Fluid & placenta", tab: "anomaly", organ: "fluid" },
+        { id: "doppler", label: "Doppler", tab: "doppler" },
+        { id: "wrap", label: "Check & report", tab: "exam" }
+      ] },
+    { id: "dating", group: "Obstetrics", name: "Dating scan", hint: "CRL / MSD, lock EDD", kind: "workflow", steps: [{id:"dates",label:"Dating",tab:"dating"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "viability", group: "Obstetrics", name: "Viability", hint: "Early pregnancy, SRU criteria", kind: "workflow", steps: [{id:"dates",label:"Dating",tab:"dating"},{id:"sru",label:"SRU / location",tab:"impress"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "nt", group: "Obstetrics", name: "11–14 week / NT", hint: "NT window, CRL 45–84 mm", kind: "guide", tab: "weeks" },
+    { id: "anatomy", group: "Obstetrics", name: "Anatomy / midtrimester", hint: "ISUOG checklist", kind: "workflow", steps: [{id:"proto",label:"Checklist",tab:"protocol"},{id:"anom",label:"Markers",tab:"anomaly"},{id:"bio",label:"Biometry",tab:"biometry"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "fgr", group: "Obstetrics", name: "FGR assessment", hint: "Size + Doppler, not a single centile", kind: "workflow", alias: "growth" },
+    { id: "third", group: "Obstetrics", name: "Third-trimester assessment", hint: "Growth, fluid, presentation", kind: "workflow", alias: "growth" },
+    { id: "doppler", group: "Obstetrics", name: "Doppler assessment", hint: "UA, MCA, CPR, DV", kind: "workflow", steps: [{id:"ga",label:"GA / dating",tab:"dating"},{id:"dop",label:"Doppler",tab:"doppler"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "bpp", group: "Obstetrics", name: "Biophysical profile", hint: "Manning 8/8 or 10/10", kind: "guide", tab: "impress" },
+    { id: "cervix", group: "Obstetrics", name: "Cervical assessment", hint: "Length before 24 weeks", kind: "guide", tab: "impress" },
+    { id: "twins", group: "Obstetrics", name: "Multiple pregnancy", hint: "Chorionicity not scored here — document locally", kind: "guide", tab: "dating" },
+    { id: "first", group: "Obstetrics", name: "First trimester", hint: "Sac, yolk sac, CRL, cardiac activity", kind: "workflow", steps: [{id:"dates",label:"Dating",tab:"dating"},{id:"sru",label:"Viability",tab:"impress"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "pelvic", group: "Gynaecology", name: "Pelvic ultrasound", hint: "Uterus, endometrium, ovaries", kind: "workflow", steps: [{id:"ut",label:"Uterus",tab:"organ",organ:"uterus"},{id:"ov",label:"Ovary / IOTA",tab:"organ",organ:"ovary"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "follicle", group: "Gynaecology", name: "Folliculometry", hint: "Serial follicle tracking", kind: "guide", tab: "follicle" },
+    { id: "infertility", group: "Gynaecology", name: "Infertility assessment", hint: "Follicles + endometrium", kind: "guide", tab: "follicle" },
+    { id: "earlypreg", group: "Gynaecology", name: "Early pregnancy", hint: "PUL, ectopic, EPL", kind: "guide", tab: "impress" },
+    { id: "adnexal", group: "Gynaecology", name: "Adnexal mass", hint: "IOTA Simple Rules, RMI", kind: "workflow", steps: [{id:"ov",label:"IOTA / RMI",tab:"organ",organ:"ovary"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "endometrium", group: "Gynaecology", name: "Endometrial assessment", hint: "Thickness by cycle / PMB", kind: "guide", tab: "organ", organ: "uterus" },
+    { id: "abdomen", group: "General", name: "Abdomen", hint: "Liver, spleen, pancreas, vessels", kind: "guide", tab: "organ", organ: "liver" },
+    { id: "hb", group: "General", name: "Hepatobiliary", hint: "Liver, portal vein", kind: "guide", tab: "organ", organ: "liver" },
+    { id: "renal", group: "General", name: "Renal / urinary", hint: "Kidneys, bladder, Bosniak", kind: "guide", tab: "organ", organ: "kidney" },
+    { id: "thyroid", group: "General", name: "Thyroid", hint: "ACR TI-RADS 2017", kind: "guide", tab: "organ", organ: "tirads" },
+    { id: "breast", group: "General", name: "Breast", hint: "BI-RADS US lexicon", kind: "guide", tab: "organ", organ: "birads" },
+    { id: "scrotal", group: "General", name: "Scrotal", hint: "Testicular volume (Lambert 0.71)", kind: "guide", tab: "organ", organ: "scrotal" },
+    { id: "prostate", group: "General", name: "Prostate", hint: "Volume, IPP", kind: "guide", tab: "organ", organ: "prostate" },
+    { id: "paeds", group: "General", name: "Paediatric", hint: "Kidney means, not pass/fail", kind: "guide", tab: "organ", organ: "kidney" },
+    { id: "vascular", group: "General", name: "Vascular", hint: "Carotid SRU, abdominal vessels", kind: "guide", tab: "organ", organ: "carotid" },
+    { id: "emergency", group: "General", name: "Emergency / focused", hint: "Red flags atlas", kind: "guide", tab: "protocol" }
+  ];
+
+  function examById(id) {
+    for (var i = 0; i < EXAM_CATALOG.length; i++) if (EXAM_CATALOG[i].id === id) return EXAM_CATALOG[i];
+    return null;
+  }
+  function examResolved(id) {
+    var e = examById(id);
+    if (!e) return null;
+    if (e.alias) {
+      var a = examById(e.alias);
+      return a ? Object.assign({}, a, { name: e.name, id: e.id, hint: e.hint }) : e;
+    }
+    return e;
+  }
+
+  function loadExamStore() {
+    try { return JSON.parse(localStorage.getItem(EXAM_KEY) || "[]") || []; } catch (e) { return []; }
+  }
+  function saveExamStore(rows) {
+    try { localStorage.setItem(EXAM_KEY, JSON.stringify(rows.slice(-80))); } catch (e) {}
+  }
+
+  function currentSnapshot() {
+    var G = {};
+    try { G = assignGestationalAge() || {}; } catch (e) {}
+    var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+    var hc = resolveHC().cm;
+    var efw = hadlockEFW(bpd, hc, ac, fl);
+    var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
+    var gaDays = G.preferredDays;
+    var gaW = gaDays != null ? gaDays / 7 : (estWk != null ? estWk + (estD || 0) / 7 : null);
+    var pct = (efw && gaW != null) ? lookupPercentile(gaW, efw.grams) : null;
+    var uapi = num(val("dp-uapi")), mcapi = num(val("dp-mcapi")), mcapsv = num(val("dp-mcapsv"));
+    var cpr = (mcapi != null && uapi) ? mcapi / uapi : null;
+    var dpGa = num(val("dp-wk"));
+    dpGa = dpGa != null ? dpGa + (num(val("dp-d")) || 0) / 7 : gaW;
+    var mom = (mcapsv != null && dpGa != null) ? mcapsv / mcaPsvMedian(dpGa) : null;
+    return {
+      date: new Date().toISOString(),
+      exam: activeExam ? activeExam.id : "ad-hoc",
+      pid: val("ex-pid") || val("log-pid") || "",
+      initials: val("ex-initials") || val("log-initials") || "",
+      indication: val("ex-indication"),
+      fetuses: val("ex-fetuses"),
+      cardiac: val("ex-cardiac"),
+      presentation: val("ex-presentation"),
+      lie: val("ex-lie"),
+      move: val("ex-move"),
+      placOs: val("ex-plac-os"),
+      gaDays: gaDays, gaLabel: (function () { if (gaDays == null) return ""; var wd = weeksDaysFromDays(gaDays); return wd.w + "w" + wd.d + "d"; })(),
+      method: G.method || "",
+      bpd: bpd, ofd: ofd, hc: hc, ac: ac, fl: fl,
+      efw: efw ? Math.round(efw.grams) : null,
+      efwPct: pct && !pct.outOfRange ? pct.percentile : null,
+      afMethod: anomVal("an-afmethod") || "",
+      afVal: anomNum("an-afval"),
+      uapi: uapi, mcapi: mcapi, cpr: cpr, mcapsvMom: mom,
+      aedf: checked("dp-aedf"), redf: checked("dp-redf"),
+      fhr: num(val("fhr-bpm")),
+      impression: val("ex-impression")
+    };
+  }
+
+  function completenessFor(exam) {
+    var items = [];
+    function add(level, text, ok) { items.push({ level: level, text: text, ok: !!ok }); }
+    var e = exam || activeExam;
+    var id = e ? e.id : "growth";
+    if (id === "growth" || id === "fgr" || id === "third") {
+      add("required", "Established GA or locked EDD", assignGestationalAge().preferredDays != null);
+      add("required", "Cardiac activity / FHR documented", !!(val("ex-cardiac") || num(val("fhr-bpm"))));
+      add("required", "AC entered", toCmB("b-ac") != null);
+      add("required", "FL entered", toCmB("b-fl") != null);
+      add("recommended", "HC (typed or from BPD+OFD)", resolveHC().cm != null);
+      add("recommended", "Presentation", !!val("ex-presentation"));
+      add("recommended", "Placenta vs internal os", !!val("ex-plac-os"));
+      add("recommended", "Amniotic fluid (AFI or SDP)", anomNum("an-afval") != null);
+      add("recommended", "UA Doppler if growth concern", num(val("dp-uapi")) != null || checked("dp-aedf") || checked("dp-redf"));
+    } else if (id === "dating" || id === "first" || id === "viability") {
+      add("required", "CRL or MSD", num(val("d-crl")) != null || num(val("d-msd")) != null);
+      add("recommended", "Cardiac activity on Impression", val("imp-fca") !== "" && val("imp-fca") != null);
+      add("recommended", "Scan date", !!val("d-scandate"));
+    } else if (id === "doppler") {
+      add("required", "GA at Doppler", num(val("dp-wk")) != null);
+      add("required", "UA-PI or AEDF/REDF", num(val("dp-uapi")) != null || checked("dp-aedf") || checked("dp-redf"));
+      add("recommended", "Free-loop UA sampling attested", checked("dp-q-ua"));
+      add("recommended", "Adequate waveform attested", checked("dp-q-wave"));
+    } else if (id === "anatomy") {
+      add("recommended", "Biometry entered", toCmB("b-ac") != null);
+      add("recommended", "Open the ISUOG-style checklist on Protocols", true);
+    } else if (id === "follicle" || id === "infertility") {
+      add("recommended", "Open a patient folder on Folliculometry", true);
+    } else {
+      add("recommended", "Enter the measurements for this examination", true);
+    }
+    try {
+      measurementDiagnoses().forEach(function (d) {
+        if (d.cls === "danger") add("abnormal", d.text, false);
+        else if (d.cls === "warn") add("concern", d.text, false);
+      });
+    } catch (err) {}
+    return items;
+  }
+
+  function suggestedImpression(snap) {
+    snap = snap || currentSnapshot();
+    var bits = [];
+    var nFet = snap.fetuses || "Singleton";
+    var live = snap.cardiac === "absent" ? "no cardiac activity documented" : "live";
+    var ga = snap.gaLabel ? " corresponding to " + snap.gaLabel + " by the dating method in use (" + (snap.method || "see Dating") + ")" : "";
+    bits.push(nFet + " " + live + " intrauterine pregnancy" + ga + ".");
+    if (snap.presentation) bits.push("Presentation: " + snap.presentation + (snap.lie ? "; lie " + snap.lie : "") + ".");
+    if (snap.efw != null) {
+      var line = "Estimated fetal weight is approximately " + snap.efw.toLocaleString() + " g";
+      if (snap.efwPct != null) line += " (" + ordinal(snap.efwPct) + " centile for the GA used)";
+      line += ". EFW error is typically ±10–15%. This is a size descriptor, not a disease label.";
+      bits.push(line);
+    }
+    if (snap.afVal != null) {
+      try {
+        var fl = fluidClassify();
+        if (fl) bits.push("Amniotic fluid: " + fl.text + " Interpret with leakage history, kidneys, and growth.");
+      } catch (e) {}
+    }
+    if (snap.redf) bits.push("Umbilical artery reversed end-diastolic flow is recorded. This is a critical finding — correlate urgently; this app does not time delivery.");
+    else if (snap.aedf) bits.push("Umbilical artery absent end-diastolic flow is recorded. Correlate urgently.");
+    else if (snap.uapi != null) bits.push("Umbilical artery PI " + snap.uapi.toFixed(2) + ".");
+    if (snap.cpr != null) bits.push("CPR " + snap.cpr.toFixed(2) + (snap.cpr < 1 ? " (<1.0, qualitative brain-sparing flag)." : "."));
+    if (snap.mcapsvMom != null && snap.mcapsvMom >= 1.5) bits.push("MCA-PSV " + snap.mcapsvMom.toFixed(2) + " MoM meets Mari’s anaemia-risk threshold. Correlate, do not treat from this number alone.");
+    if (snap.placOs) bits.push("Placenta: " + snap.placOs + ".");
+    bits.push("Decision support only. Edit this wording. Local protocol outranks this text.");
+    return bits.join(" ");
+  }
+
+  function meaningBlock(snap) {
+    snap = snap || currentSnapshot();
+    var html = '<div class="card-title">What does this result mean?</div>';
+    if (snap.efw == null) {
+      html += '<p class="empty">Enter AC and FL on Biometry for EFW (Hadlock). Centiles need an established GA.</p>';
+      return html;
+    }
+    html += '<div class="result-num">' + snap.efw.toLocaleString() + '</div><span class="result-unit">g EFW</span>';
+    if (snap.efwPct != null) {
+      html += '<div class="result-sub">' + ordinal(snap.efwPct) + " centile · Hadlock 1991 band used in this app</div>";
+      var g = classifyGrowth(snap.efwPct, snap.efw);
+      html += '<div class="badge ' + g.sizeCls + '">' + g.sizeClass + "</div>";
+      html += '<div class="impression"><h3>Interpretation</h3><p>';
+      if (snap.efwPct < 10) html += "Estimated fetal weight is below the 10th percentile for the gestational age used. This is consistent with SGA as a size label. FGR is a clinical diagnosis that also uses AC trajectory, Doppler, fluid, and history — not a single EFW.";
+      else if (snap.efwPct >= 90) html += "Estimated fetal weight is at or above the 90th percentile (LGA as a size label). Macrosomia in this app is absolute grams (≥4000 / 4500 / 5000), not a centile.";
+      else html += "Estimated fetal weight is within the 10th–90th percentile band (AGA as a size label).";
+      html += "</p></div>";
+    } else {
+      html += '<p class="note">Centile chart here covers 24–41 weeks. Outside that window the grams are shown without a percentile.</p>';
+    }
+    html += '<p class="note"><strong>Consider in context:</strong> AC trend, interval from the last scan, UA/MCA/CPR, amniotic fluid, and maternal/fetal factors. Do not diagnose from this card alone.</p>';
+    html += '<p class="note">Evidence: Hadlock EFW AJOG 1985; centiles Hadlock 1991. Last reviewed with the References tab, Sep 2026.</p>';
+    return html;
+  }
+
+  function serialHtml(pid) {
+    var rows = loadExamStore().filter(function (r) { return pid ? r.pid === pid : true; }).slice().sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
+    if (!rows.length) return '<p class="empty">Save consented examinations with a folder ID to build a timeline. Browser storage is not a hospital record.</p>';
+    var list = '<ul class="timeline">';
+    rows.forEach(function (r) {
+      list += "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><strong>" + fEsc(r.exam || "exam") + "</strong> · " + fEsc(r.gaLabel || "") + (r.efw ? " · EFW " + r.efw + " g" : "") + (r.efwPct != null ? " (" + ordinal(r.efwPct) + ")" : "") + "</li>";
+    });
+    list += "</ul>";
+    var graphRows = rows.filter(function (r) { return r.efwPct != null && r.gaDays != null; }).sort(function (a, b) { return a.gaDays - b.gaDays; });
+    if (graphRows.length < 2) return list + '<p class="empty">Serial EFW graph needs centiles on two scans (24–41 weeks).</p>';
+    var w = 620, h = 180, mL = 36, mR = 10, mT = 10, mB = 22;
+    function x(ga) { return mL + ((ga - graphRows[0].gaDays) / Math.max(1, graphRows[graphRows.length - 1].gaDays - graphRows[0].gaDays)) * (w - mL - mR); }
+    function y(p) { return mT + (1 - Math.max(0, Math.min(100, p)) / 100) * (h - mT - mB); }
+    var pts = graphRows.map(function (r) { return x(r.gaDays) + "," + y(r.efwPct); }).join(" ");
+    var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" role="img" aria-label="Serial EFW centile">';
+    svg += '<polyline points="' + pts + '" fill="none" stroke="#C45C4A" stroke-width="2"/>';
+    graphRows.forEach(function (r) {
+      svg += '<circle cx="' + x(r.gaDays) + '" cy="' + y(r.efwPct) + '" r="4" fill="#C45C4A"/>';
+    });
+    svg += "</svg>";
+    var first = graphRows[0], last = graphRows[graphRows.length - 1];
+    var delta = last.efwPct - first.efwPct;
+    var note = "EFW percentile changed from " + ordinal(first.efwPct) + " to " + ordinal(last.efwPct) + " across saved examinations.";
+    if (delta <= -20) note += " A downward change is observed. Interpret alongside interval, dating accuracy, AC trajectory, Doppler, and clinical context. This is not an FGR diagnosis.";
+    return list + svg + '<p class="note">' + fEsc(note) + "</p>";
+  }
+
+  function dontMissHtml() {
+    var items = completenessFor(activeExam);
+    var miss = items.filter(function (i) { return (i.level === "required" || i.level === "recommended") && !i.ok; });
+    var abn = items.filter(function (i) { return i.level === "abnormal" || i.level === "concern"; });
+    var html = '<div class="card-title">Before finalizing</div>';
+    if (!miss.length && !abn.length) html += '<div class="badge ok">No missing required/recommended fields flagged on this examination type.</div>';
+    if (miss.length) {
+      html += "<ul class='imp-list'>";
+      miss.forEach(function (i) {
+        html += "<li>" + (i.level === "required" ? "Required: " : "Recommended: ") + fEsc(i.text) + "</li>";
+      });
+      html += "</ul>";
+    }
+    if (abn.length) {
+      html += '<p class="note">Findings requiring attention (decision support):</p><ul class="imp-list">';
+      abn.forEach(function (i) { html += "<li>" + fEsc(i.text) + "</li>"; });
+      html += "</ul>";
+    }
+    html += '<p class="note">You may finalize anyway. Missing recommended fields are not a legal hold. Do not delay emergency care for this checklist.</p>';
+    return html;
+  }
+
+  function formulaAuditHtml() {
+    var snap = currentSnapshot();
+    var html = '<div class="card-title">Calculation audit</div>';
+    html += '<p class="note">Clinical mathematics already computed on other tabs. This is a transparency card, not a second engine.</p>';
+    if (snap.hc != null && snap.bpd != null && snap.ofd != null) {
+      html += organRow("HC", snap.hc.toFixed(1) + " cm", "typed or 1.62 × (BPD + OFD)");
+    }
+    if (snap.efw != null) html += organRow("EFW", snap.efw + " g", "Hadlock IV when BPD+HC+AC+FL; else III/II");
+    if (snap.cpr != null) html += organRow("CPR", snap.cpr.toFixed(2), "MCA PI ÷ UA PI");
+    if (snap.mcapsvMom != null) html += organRow("MCA-PSV MoM", snap.mcapsvMom.toFixed(2), "Mari 2000; 1.5 MoM anaemia-risk");
+    html += '<p class="note">Sources and limitations: References tab. Status: current as of last review Sep 2026 unless a replacement guideline is cited there.</p>';
+    return html;
+  }
+
+  function renderHome() {
+    var groups = ["Obstetrics", "Gynaecology", "General"];
+    var html = '<p class="home-flow">Scan → measure → check → interpret → report → learn</p>';
+    html += '<h2 class="home-title">Start an examination</h2>';
+    html += '<p class="tagline" style="margin-bottom:18px">Choose the examination you are performing. Calculators stay available underneath. Decision support only.</p>';
+    var recents = loadExamStore().slice(-4).reverse();
+    if (recents.length) {
+      html += '<div class="card"><div class="card-title">Recent on this device</div><ul class="timeline">';
+      recents.forEach(function (r) {
+        html += "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div>" + fEsc(r.exam || "exam") + " · " + fEsc(r.gaLabel || "") + (r.efw ? " · " + r.efw + " g" : "") + "</li>";
+      });
+      html += "</ul></div>";
+    }
+    groups.forEach(function (g, gi) {
+      html += '<details class="home-group card" ' + (gi === 0 ? "open" : "") + '><summary>' + g + "</summary><div class='exam-grid'>";
+      EXAM_CATALOG.filter(function (e) { return e.group === g; }).forEach(function (e) {
+        html += '<button type="button" class="exam-card" data-exam="' + e.id + '"><strong>' + fEsc(e.name) + "</strong><span>" + fEsc(e.hint) + "</span></button>";
+      });
+      html += "</div></details>";
+    });
+    html += '<div class="card"><div class="card-title">Tools</div><div class="exam-grid">';
+    [["dating","Dating & EDD"],["biometry","Biometry / EFW"],["quiz","Quiz"],["cases","Cases"],["log","Reports & backup"],["refs","Evidence library"]].forEach(function (t) {
+      html += '<button type="button" class="exam-card" data-tab="' + t[0] + '"><strong>' + t[1] + "</strong><span>Open module</span></button>";
+    });
+    html += "</div></div>";
+    html += caseOfDayHtml();
+    set("home-body", html);
+    document.querySelectorAll("#home-body [data-exam]").forEach(function (b) {
+      b.addEventListener("click", function () { startExam(b.getAttribute("data-exam")); });
+    });
+    document.querySelectorAll("#home-body [data-tab]").forEach(function (b) {
+      b.addEventListener("click", function () { if (window.__showTab) window.__showTab(b.getAttribute("data-tab")); });
+    });
+    var cod = document.getElementById("cod-open");
+    if (cod) cod.addEventListener("click", function () { if (window.__showTab) window.__showTab("cases"); });
+  }
+
+  function caseOfDayHtml() {
+    if (typeof CASE_BANK === "undefined" || !CASE_BANK.length) return "";
+    var day = Math.floor(Date.now() / 86400000);
+    var c = CASE_BANK[day % CASE_BANK.length];
+    return '<div class="card"><div class="card-title">Case of the day</div><p><strong>' + fEsc(c.title) + "</strong></p><p class='note'>" + fEsc(c.hx) + '</p><button type="button" class="btn-primary" id="cod-open" style="width:auto">Open in Cases</button></div>';
+  }
+
+  function startExam(id) {
+    var e = examResolved(id);
+    if (!e) return;
+    activeExam = e;
+    document.body.setAttribute("data-exam", e.id);
+    document.body.setAttribute("data-family", e.group === "Obstetrics" ? "ob" : (e.group === "Gynaecology" ? "gyn" : "gen"));
+    renderExamBar();
+    if (e.kind === "guide") {
+      if (window.__showTab) window.__showTab(e.tab);
+      if (e.organ && e.tab === "organ" && typeof selectOrganSection === "function") {
+        setTimeout(function () { selectOrganSection(e.organ); }, 0);
+      }
+      if (e.organ && e.tab === "anomaly" && typeof selectAnomalySection === "function") {
+        setTimeout(function () { selectAnomalySection(e.organ); }, 50);
+      }
+    } else {
+      if (window.__showTab) window.__showTab("exam");
+      renderExamWrap();
+    }
+  }
+
+  function renderExamBar() {
+    var bar = document.getElementById("exam-bar");
+    if (!bar) return;
+    if (!activeExam) { bar.hidden = true; bar.innerHTML = ""; return; }
+    bar.hidden = false;
+    var steps = activeExam.steps || [{ id: "open", label: activeExam.name, tab: activeExam.tab }];
+    var html = '<div class="exam-bar-name">' + fEsc(activeExam.name) + '</div><div class="exam-steps">';
+    steps.forEach(function (s) {
+      html += '<button type="button" class="exam-step" data-tab="' + s.tab + '" data-organ="' + (s.organ || "") + '">' + fEsc(s.label) + "</button>";
+    });
+    html += '</div><button type="button" class="btn-ghost" id="exam-end" style="width:auto">End exam</button>';
+    bar.innerHTML = html;
+    bar.querySelectorAll(".exam-step").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var tab = b.getAttribute("data-tab");
+        var organ = b.getAttribute("data-organ");
+        if (window.__showTab) window.__showTab(tab);
+        if (organ && tab === "anomaly") {
+          window.__anomReady = false;
+          if (typeof selectAnomalySection === "function") setTimeout(function () { selectAnomalySection(organ); }, 80);
+          else setTimeout(function () {
+            if (window.__showTab) window.__showTab("anomaly");
+            setTimeout(function () { if (typeof selectAnomalySection === "function") selectAnomalySection(organ); }, 50);
+          }, 80);
+        }
+        if (organ && tab === "organ") {
+          window.__organReady = false;
+          if (typeof selectOrganSection === "function") setTimeout(function () { selectOrganSection(organ); }, 80);
+        }
+      });
+    });
+    var end = document.getElementById("exam-end");
+    if (end) end.addEventListener("click", function () {
+      activeExam = null;
+      document.body.removeAttribute("data-exam");
+      document.body.removeAttribute("data-family");
+      renderExamBar();
+      if (window.__showTab) window.__showTab("home");
+    });
+  }
+
+  function renderExamWrap() {
+    var snap = currentSnapshot();
+    set("exam-meaning", meaningBlock(snap));
+    set("exam-miss", dontMissHtml());
+    set("exam-audit", formulaAuditHtml());
+    set("exam-serial", '<div class="card-title">Serial examinations</div>' + serialHtml(snap.pid));
+    var plaus = typeof plausibilityNotes === "function" ? plausibilityNotes() : [];
+    if (plaus && plaus.length) {
+      var missEl = document.getElementById("exam-miss");
+      if (missEl) missEl.innerHTML += "<p class='note'>Plausibility (value not changed):</p>" + plaus.map(function (n) { return '<div class="badge warn">' + fEsc(n) + "</div>"; }).join("");
+    }
+    var sug = suggestedImpression(snap);
+    var ta = document.getElementById("ex-impression");
+    if (ta && !ta.dataset.touched) ta.value = sug;
+    var prev = document.getElementById("exam-preview");
+    if (prev) prev.textContent = ta && ta.value ? ta.value : sug;
+  }
+
+  function wireExam() {
+    ["ex-indication","ex-pid","ex-initials","ex-fetuses","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("change", renderExamWrap);
+      el.addEventListener("input", renderExamWrap);
+    });
+    var ta = document.getElementById("ex-impression");
+    if (ta) ta.addEventListener("input", function () { ta.dataset.touched = "1"; var p = document.getElementById("exam-preview"); if (p) p.textContent = ta.value; });
+    var regen = document.getElementById("ex-regen");
+    if (regen) regen.addEventListener("click", function () {
+      if (ta) { ta.dataset.touched = ""; ta.value = suggestedImpression(); }
+      renderExamWrap();
+    });
+    function copyText(s) {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(s);
+    }
+    var ci = document.getElementById("ex-copy-imp");
+    if (ci) ci.addEventListener("click", function () { copyText((document.getElementById("ex-impression") || {}).value || ""); });
+    var cf = document.getElementById("ex-copy-find");
+    if (cf) cf.addEventListener("click", function () {
+      var snap = currentSnapshot();
+      copyText(["GA " + (snap.gaLabel || "—"), "EFW " + (snap.efw || "—") + " g", "AC " + (snap.ac || "—") + " cm", "Fluid " + (snap.afVal || "—"), "UA-PI " + (snap.uapi || "—")].join("\n"));
+    });
+    var cr = document.getElementById("ex-copy-full");
+    if (cr) cr.addEventListener("click", function () {
+      var snap = currentSnapshot();
+      copyText((val("ex-impression") || suggestedImpression(snap)) + "\n\n" + JSON.stringify({ ga: snap.gaLabel, efw: snap.efw, pct: snap.efwPct, ac: snap.ac, fluid: snap.afVal, uapi: snap.uapi }, null, 2));
+    });
+    var saveTpl = document.getElementById("ex-save-tpl");
+    if (saveTpl) saveTpl.addEventListener("click", function () {
+      var name = (window.prompt("Name this template (stays on this device):") || "").trim();
+      if (!name) return;
+      try {
+        var all = JSON.parse(localStorage.getItem("babsinogen.templates.v1") || "{}") || {};
+        all[name] = val("ex-impression") || "";
+        localStorage.setItem("babsinogen.templates.v1", JSON.stringify(all));
+        var sel = document.getElementById("ex-template");
+        if (sel && !sel.querySelector('option[value="' + name.replace(/"/g, "") + '"]')) {
+          var o = document.createElement("option");
+          o.value = name; o.textContent = "My: " + name;
+          sel.appendChild(o);
+        }
+      } catch (e) {}
+    });
+    var printB = document.getElementById("ex-print");
+    if (printB) printB.addEventListener("click", function () {
+      var snap = currentSnapshot();
+      var fac = {};
+      try { fac = JSON.parse(localStorage.getItem("babsinogen.facility.v1") || "{}") || {}; } catch (e) {}
+      var title = (fac.name || "Babsinogen") + " — examination report";
+      var body = "<h3>Examination</h3><p>" + fEsc(activeExam ? activeExam.name : "Ad-hoc") + "</p>";
+      body += "<h3>Indication</h3><p>" + fEsc(snap.indication || "—") + "</p>";
+      body += "<h3>Findings</h3><div class='rline'><span>GA</span><span>" + fEsc(snap.gaLabel || "—") + "</span></div>";
+      body += "<div class='rline'><span>EFW</span><span>" + (snap.efw || "—") + " g" + (snap.efwPct != null ? " (" + ordinal(snap.efwPct) + ")" : "") + "</span></div>";
+      body += "<div class='rline'><span>Presentation</span><span>" + fEsc(snap.presentation || "—") + "</span></div>";
+      body += "<div class='rline'><span>Placenta / os</span><span>" + fEsc(snap.placOs || "—") + "</span></div>";
+      body += "<h3>Impression</h3><p>" + fEsc(val("ex-impression") || suggestedImpression(snap)) + "</p>";
+      body += "<p class='note'>Decision support only. Local protocol outranks this text.</p>";
+      set("report-body", body);
+      var meta = (fac.name ? fac.name + " · " : "") + (fac.clinician ? fac.clinician + " · " : "") + (snap.pid || "No folder ID") + " · " + new Date().toLocaleString("en-GB");
+      set("report-meta", meta);
+      var rt = document.querySelector(".report-title");
+      if (rt) rt.textContent = title;
+      window.print();
+    });
+    var saveB = document.getElementById("ex-save");
+    if (saveB) saveB.addEventListener("click", function () {
+      if (!checked("ex-consent")) { set("ex-save-msg", "Tick consent before saving an examination on this device."); return; }
+      var snap = currentSnapshot();
+      snap.impression = val("ex-impression") || suggestedImpression(snap);
+      var rows = loadExamStore();
+      rows.push(snap);
+      saveExamStore(rows);
+      set("ex-save-msg", "Saved on this device only. Clearing site data will remove it unless you export a backup.");
+      renderExamWrap();
+    });
+    var tpl = document.getElementById("ex-template");
+    if (tpl) {
+      try {
+        var custom = JSON.parse(localStorage.getItem("babsinogen.templates.v1") || "{}") || {};
+        Object.keys(custom).forEach(function (name) {
+          if (!tpl.querySelector('option[value="' + name.replace(/"/g, "") + '"]')) {
+            var o = document.createElement("option");
+            o.value = name; o.textContent = "My: " + name;
+            tpl.appendChild(o);
+          }
+        });
+      } catch (eC) {}
+      tpl.addEventListener("change", function () {
+      var t = tpl.value;
+      if (!t) return;
+      var snap = currentSnapshot();
+      var map = {
+        growth: "Normal third-trimester growth scan. " + (snap.gaLabel ? "GA " + snap.gaLabel + ". " : "") + "Fetal cardiac activity present. Biometry is within the expected range for the dating standard in use. Amniotic fluid is within normal limits where measured. Placenta documented relative to the internal os. Decision support wording — edit before issue.",
+        first: "Intrauterine pregnancy. Cardiac activity documented where applicable. Dating as per the method on the Dating tab. Correlate with clinical findings.",
+        anatomy: "Midtrimester anatomy survey performed as locally protocolled. Biometry as entered. Structures reviewed against the ISUOG-style checklist on Protocols. This is not a guarantee of absence of anomaly.",
+        "anatomy-n": "Routine midtrimester fetal ultrasound. Situs, four-chamber heart and outflows, intracranial anatomy, spine, stomach, kidneys, bladder, three-vessel cord, and limbs reviewed as locally protocolled. Incomplete views must be stated. This is not a guarantee of absence of anomaly.",
+        pelvic: "Pelvic ultrasound. Uterus and adnexa as documented on the Organ tab. Correlate with cycle phase and symptoms.",
+        abdomen: "Abdominal ultrasound. Organ measurements as entered. Correlate with LFTs and clinical findings.",
+        thyroid: "Thyroid ultrasound. Nodules classified with ACR TI-RADS 2017 on the Organ tab. This is not a biopsy order.",
+        breast: "Breast ultrasound. Lexicon descriptors as entered. Assessment category is assigned by the reader (BI-RADS US is not a point score).",
+        renal: "Renal tract ultrasound. Kidneys, collecting systems, and bladder as documented. Bosniak class is morphological, not a size score."
+      };
+      try {
+        var custom = JSON.parse(localStorage.getItem("babsinogen.templates.v1") || "{}") || {};
+        if (custom[t]) { map[t] = custom[t]; }
+      } catch (eT) {}
+      var ta2 = document.getElementById("ex-impression");
+      if (ta2 && map[t]) { ta2.value = map[t]; ta2.dataset.touched = "1"; }
+    });
+    }
+  }
+
+  function plausibilityNotes() {
+    if (bioUnit !== "cm") return "";
+    var notes = [];
+    function chk(id, lo, hi, name) {
+      var n = num(val(id));
+      if (n == null) return;
+      if (n > hi) notes.push(name + " " + n + " cm is unusually large for centimetres — verify the unit (possible millimetres typed in cm). Value was not changed.");
+      else if (n < lo) notes.push(name + " " + n + " cm is unusually small for a second/third-trimester measurement — verify the unit or the plane. Value was not changed.");
+    }
+    chk("b-bpd", 2, 12, "BPD");
+    chk("b-ofd", 2, 16, "OFD");
+    chk("b-ac", 8, 42, "AC");
+    chk("b-fl", 1.2, 9, "FL");
+    var hc = num(val("b-hc"));
+    if (hc != null && bioUnit === "cm" && hc > 45) notes.push("HC " + hc + " cm is unusually large — verify centimetres vs millimetres. Value was not changed.");
+    return notes;
+  }
+
+  function backupExport() {
+    var payload = { v: 1, when: new Date().toISOString(), store: {}, exams: loadExamStore() };
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf("babsinogen.") === 0) payload.store[k] = localStorage.getItem(k);
+      }
+    } catch (e) {}
+    var text = JSON.stringify(payload);
+    var pass = val("bk-pass");
+    function download(name, blob) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+    }
+    if (!pass) {
+      download("babsinogen-backup.json", new Blob([text], { type: "application/json" }));
+      set("bk-msg", "Plain JSON downloaded. Store it yourself. Not an EMR.");
+      return;
+    }
+    if (!window.crypto || !crypto.subtle) { set("bk-msg", "This browser cannot encrypt. Exported nothing."); return; }
+    var enc = new TextEncoder();
+    var salt = crypto.getRandomValues(new Uint8Array(16));
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    crypto.subtle.importKey("raw", enc.encode(pass), "PBKDF2", false, ["deriveKey"]).then(function (km) {
+      return crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" }, km, { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+    }).then(function (key) {
+      return crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, enc.encode(text));
+    }).then(function (ct) {
+      function b64(buf) {
+        var bytes = new Uint8Array(buf);
+        var s = "";
+        for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+        return btoa(s);
+      }
+      var wrapped = { v: 2, enc: "AES-GCM", salt: b64(salt), iv: b64(iv), data: b64(ct) };
+      download("babsinogen-backup.enc.json", new Blob([JSON.stringify(wrapped)], { type: "application/json" }));
+      set("bk-msg", "Encrypted backup downloaded. There is no password recovery.");
+    }).catch(function () { set("bk-msg", "Encryption failed."); });
+  }
+  function backupImport(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      function apply(data) {
+        if (!data || (data.v !== 1 && data.v !== 2)) throw new Error("bad");
+        Object.keys(data.store || {}).forEach(function (k) {
+          if (k.indexOf("babsinogen.") === 0) localStorage.setItem(k, data.store[k]);
+        });
+        if (data.exams) saveExamStore(data.exams);
+        set("bk-msg", "Backup restored on this device.");
+      }
+      try {
+        var data = JSON.parse(reader.result);
+        if (data.enc === "AES-GCM") {
+          var pass = val("bk-pass");
+          if (!pass) { set("bk-msg", "Enter the passphrase used when this file was exported."); return; }
+          function unb64(s) {
+            var bin = atob(s);
+            var out = new Uint8Array(bin.length);
+            for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+            return out;
+          }
+          var enc = new TextEncoder();
+          crypto.subtle.importKey("raw", enc.encode(pass), "PBKDF2", false, ["deriveKey"]).then(function (km) {
+            return crypto.subtle.deriveKey({ name: "PBKDF2", salt: unb64(data.salt), iterations: 100000, hash: "SHA-256" }, km, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+          }).then(function (key) {
+            return crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(data.iv) }, key, unb64(data.data));
+          }).then(function (pt) {
+            apply(JSON.parse(new TextDecoder().decode(pt)));
+          }).catch(function () { set("bk-msg", "Decrypt failed — wrong passphrase or damaged file."); });
+          return;
+        }
+        apply(data);
+      } catch (e) { set("bk-msg", "Could not read that backup file."); }
+    };
+    reader.readAsText(file);
+  }
+
+  function clinicalSelfTest() {
+    var lines = [];
+    function ok(name, cond, detail) { lines.push((cond ? "PASS " : "FAIL ") + name + (detail ? " — " + detail : "")); }
+    var hc = calcHC(9.2, 11.6);
+    ok("HC ellipse", hc != null && Math.abs(hc - 33.696) < 0.01, hc && hc.toFixed(3) + " cm");
+    var cbpd = calcCorrectedBPD(9.2, 11.6);
+    ok("cBPD Doubilet", cbpd != null && Math.abs(cbpd - Math.sqrt((9.2 * 11.6) / 1.265)) < 0.0001, cbpd && cbpd.toFixed(3) + " cm");
+    var efw = hadlockEFW(9.2, 33, 32, 7.2);
+    var expectLog = 1.3596 + 0.0064 * 33 + 0.0424 * 32 + 0.174 * 7.2 + 0.00061 * 9.2 * 32 - 0.00386 * 32 * 7.2;
+    var expectG = Math.pow(10, expectLog);
+    ok("Hadlock IV", efw && Math.abs(efw.grams - expectG) < 0.5, efw ? Math.round(efw.grams) + " g" : "missing");
+    var artDays = 266 - 5;
+    ok("ART day-5 remainder", artDays === 261, "transfer + 261 d");
+    ok("CPR", Math.abs((1.10 / 1.25) - 0.88) < 0.005, "1.10/1.25");
+    set("self-test-out", lines.join("\n"));
+  }
+
+  JUMP_INDEX.unshift(
+    { name: "Start an examination", hint: "Home — pick the scan you are doing", tab: "home", keys: "home exam workflow growth" },
+    { name: "Check and report", hint: "Completeness, impression, serial growth", tab: "exam", keys: "report impression serial backup" }
+  );
+
   function onReady() {
     // Tabs
     var tabs = document.querySelectorAll(".tab");
-    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol"), cases: document.getElementById("view-cases") };
+    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), home: document.getElementById("view-home"), exam: document.getElementById("view-exam"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol"), cases: document.getElementById("view-cases") };
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
@@ -6392,12 +7252,43 @@
         initProtocols();
       } else if (name === "cases" && !window.__casesReady) {
         initCases();
+      } else if (name === "home") {
+        renderHome();
+      } else if (name === "exam") {
+        if (!window.__examReady) { window.__examReady = true; wireExam(); }
+        renderExamWrap();
       }
+      document.querySelectorAll(".bottom-nav [data-go]").forEach(function (b) {
+        b.classList.toggle("on", b.getAttribute("data-go") === name);
+      });
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
     window.__showTab = showTab;
     initChrome();
-    showTab("dating");
+    showTab("home");
+    document.querySelectorAll(".bottom-nav [data-go]").forEach(function (b) {
+      b.addEventListener("click", function () { showTab(b.getAttribute("data-go")); });
+    });
+    var ns = document.getElementById("nav-search");
+    if (ns) ns.addEventListener("click", function () { var o = document.getElementById("jump-open"); if (o) o.click(); });
+    var bke = document.getElementById("bk-export");
+    if (bke) bke.addEventListener("click", backupExport);
+    var bki = document.getElementById("bk-import");
+    if (bki) bki.addEventListener("change", function () { if (bki.files && bki.files[0]) backupImport(bki.files[0]); });
+    try {
+      var fac = JSON.parse(localStorage.getItem("babsinogen.facility.v1") || "{}") || {};
+      var fn = document.getElementById("fac-name");
+      var fc = document.getElementById("fac-clinician");
+      if (fn && fac.name) fn.value = fac.name;
+      if (fc && fac.clinician) fc.value = fac.clinician;
+      function saveFac() {
+        try { localStorage.setItem("babsinogen.facility.v1", JSON.stringify({ name: val("fac-name"), clinician: val("fac-clinician") })); } catch (e) {}
+      }
+      if (fn) fn.addEventListener("input", saveFac);
+      if (fc) fc.addEventListener("input", saveFac);
+    } catch (eFac) {}
+    var stBtn = document.getElementById("self-test");
+    if (stBtn) stBtn.addEventListener("click", clinicalSelfTest);
 
     // Biometry unit toggle
     var bioToggle = document.getElementById("bio-unit-toggle");
@@ -6429,7 +7320,7 @@
     }
     var ids = ["b-bpd","b-ofd","b-hc","b-ac","b-fl","b-estwk","b-estd",
       "d-lmp","d-cycle","d-luteal","d-crl","d-msd","d-scandate","d-art","d-embryo","d-prior-edd","d-prior-src","d-lock","d-x-fgr","d-x-macro","d-x-acdist","d-x-skel","d-x-cranial","d-x-hc","d-x-twins","fhr-wk","fhr-d","fhr-bpm",
-      "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv","dp-angle",
+      "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv","dp-angle","dp-q-ua","dp-q-mca","dp-q-wave","dp-q-alara",
       "dp-utpi","dp-notch","dp-dvpi","dp-dvaw"];
     ids.forEach(function (id) {
       var el = document.getElementById(id);
