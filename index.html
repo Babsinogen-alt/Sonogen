@@ -66,7 +66,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--ink-page); }
   body {
-    font-family: var(--sans); color: var(--paper); padding: 22px 16px 80px;
+    font-family: var(--sans); color: var(--paper); padding: 22px 16px 112px;
     -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     background:
@@ -409,7 +409,7 @@
   }
   #exam-bar[hidden] { display: none !important; }
   .exam-bar-name { font-family: var(--display); font-size: 15px; color: var(--accent); margin-right: 6px; }
-  .exam-steps { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .exam-steps { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; flex: 1; scrollbar-width: none; }
   .exam-step {
     background: var(--panel2); border: 0; color: var(--paper); font-size: 12.5px; padding: 8px 12px;
     border-radius: 999px; min-height: 40px;
@@ -577,6 +577,11 @@
             <div class="field"><label>Movements</label><div class="row"><select id="ex-move"><option value="">-</option><option value="seen">Seen</option><option value="reduced">Reduced</option><option value="not seen">Not seen</option></select></div></div>
             <div class="field"><label>Placenta vs internal os</label><div class="row"><select id="ex-plac-os"><option value="">-</option><option value="clear of the os">Clear of the os</option><option value="low-lying">Low-lying</option><option value="previa">Placenta previa</option><option value="vasa previa suspected">Vasa previa suspected</option></select></div></div>
           </div>
+          <div class="grid2">
+            <div class="field"><label>Cervical length (TV)</label><div class="row"><input id="ex-cx" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">mm</span></div></div>
+            <div class="field"><label>FHR (if not on Dating)</label><div class="row"><input id="ex-fhr" type="number" inputMode="numeric" placeholder="-"><span class="suffix">bpm</span></div></div>
+          </div>
+          <p class="note">Transvaginal cervical length <25 mm before 24 weeks is a short-cervix finding used in preterm-birth pathways. It is not a labour diagnosis. Empty-bladder TV technique.</p>
         </div>
         <div class="card">
           <div class="card-title">Suggested impression (editable)</div>
@@ -615,12 +620,7 @@
         <div class="card" id="exam-miss"></div>
         <div class="card" id="exam-audit"></div>
         <div class="card" id="exam-serial"></div>
-        <div class="card">
-          <div class="card-title">Learning point (optional)</div>
-          <details><summary>Why is CPR calculated?</summary>
-            <p class="note">CPR = MCA PI / UA PI. A value below 1.0 is a qualitative brain-sparing flag, not a delivery order. Weigh it with EFW/AC trend, fluid, and DV.</p>
-          </details>
-        </div>
+        <div class="card" id="exam-learn"></div>
       </div>
     </div>
   </section>
@@ -1493,6 +1493,7 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>2.2.0</strong> (30 Sep 2026) — Every listed examination is a workflow (not a calculator jump). Cervical length, reopen saved scans, richer “what this means”, exam-specific learning points. Clinical formulas unchanged.</li>
         <li><strong>2.1.0</strong> (29 Sep 2026) — Exam workflows (dating, viability, anatomy, Doppler, pelvic, adnexal); scrotal volume (Lambert 0.71); smart search phrases; letterhead; optional AES backup; custom templates. Formulas unchanged.</li>
         <li><strong>2.0.0</strong> (27 Sep 2026) — Exam-first home, growth-scan workflow, completeness check, editable impression, serial EFW graph, device backup. Clinical formulas unchanged.</li>
         <li><strong>1.6.0</strong> (26 Sep 2026) — Privacy statement; bookmarks and recent jumps; ICD-10 lookup of conditions already in the app; SRU 2003 carotid helper; text size; 48 px targets; pinch-zoom restored. Doppler angle warning.</li>
@@ -1524,7 +1525,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 2.1.0 · Clinical Sonography Companion. Last reviewed 26 Sep 2026 with the citations in References. Formulas unchanged in this workflow release.</p>
+    <p class="note">Babsinogen 2.2.0 · Clinical Sonography Companion. Last reviewed 26 Sep 2026 with the citations in References. Formulas unchanged in this workflow release.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
   </footer>
 
@@ -6440,6 +6441,15 @@
     if (/growth scan|efw|sga|fgr/.test(q)) {
       hits.push({ name: "Growth scan workflow", hint: "Start the examination rather than a lone calculator.", tab: "home" });
     }
+    if (/cervi|short cervix|25 mm/.test(q)) {
+      hits.push({ name: "Cervical assessment", hint: "TV length; <25 mm before 24 weeks is a short-cervix finding, not labour.", tab: "exam" });
+    }
+    if (/bpp|biophysical|manning/.test(q)) {
+      hits.push({ name: "Biophysical profile", hint: "Manning components on Impression — not a delivery clock.", tab: "impress" });
+    }
+    if (/bi-?rads|spiculated|taller-than-wide breast/.test(q)) {
+      hits.push({ name: "Breast BI-RADS US", hint: "Lexicon helper. You assign the category.", tab: "organ", organ: "birads" });
+    }
     return hits;
   }
   function renderJump(q) {
@@ -6615,31 +6625,49 @@
       ] },
     { id: "dating", group: "Obstetrics", name: "Dating scan", hint: "CRL / MSD, lock EDD", kind: "workflow", steps: [{id:"dates",label:"Dating",tab:"dating"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "viability", group: "Obstetrics", name: "Viability", hint: "Early pregnancy, SRU criteria", kind: "workflow", steps: [{id:"dates",label:"Dating",tab:"dating"},{id:"sru",label:"SRU / location",tab:"impress"},{id:"wrap",label:"Check & report",tab:"exam"}] },
-    { id: "nt", group: "Obstetrics", name: "11–14 week / NT", hint: "NT window, CRL 45–84 mm", kind: "guide", tab: "weeks" },
+    { id: "nt", group: "Obstetrics", name: "11-14 week / NT", hint: "NT window, CRL 45-84 mm", kind: "workflow",
+      steps: [{id:"weeks",label:"Window",tab:"weeks"},{id:"dates",label:"Dating / CRL",tab:"dating"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "anatomy", group: "Obstetrics", name: "Anatomy / midtrimester", hint: "ISUOG checklist", kind: "workflow", steps: [{id:"proto",label:"Checklist",tab:"protocol"},{id:"anom",label:"Markers",tab:"anomaly"},{id:"bio",label:"Biometry",tab:"biometry"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "fgr", group: "Obstetrics", name: "FGR assessment", hint: "Size + Doppler, not a single centile", kind: "workflow", alias: "growth" },
     { id: "third", group: "Obstetrics", name: "Third-trimester assessment", hint: "Growth, fluid, presentation", kind: "workflow", alias: "growth" },
     { id: "doppler", group: "Obstetrics", name: "Doppler assessment", hint: "UA, MCA, CPR, DV", kind: "workflow", steps: [{id:"ga",label:"GA / dating",tab:"dating"},{id:"dop",label:"Doppler",tab:"doppler"},{id:"wrap",label:"Check & report",tab:"exam"}] },
-    { id: "bpp", group: "Obstetrics", name: "Biophysical profile", hint: "Manning 8/8 or 10/10", kind: "guide", tab: "impress" },
-    { id: "cervix", group: "Obstetrics", name: "Cervical assessment", hint: "Length before 24 weeks", kind: "guide", tab: "impress" },
-    { id: "twins", group: "Obstetrics", name: "Multiple pregnancy", hint: "Chorionicity not scored here — document locally", kind: "guide", tab: "dating" },
+    { id: "bpp", group: "Obstetrics", name: "Biophysical profile", hint: "Manning 8/8 or 10/10", kind: "workflow",
+      steps: [{id:"bpp",label:"BPP",tab:"impress"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "cervix", group: "Obstetrics", name: "Cervical assessment", hint: "TV length before 24 weeks", kind: "workflow",
+      steps: [{id:"cx",label:"Length",tab:"exam"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "twins", group: "Obstetrics", name: "Multiple pregnancy", hint: "Chorionicity not scored here — document locally", kind: "workflow",
+      steps: [{id:"clin",label:"Clinical",tab:"exam"},{id:"dates",label:"Dating",tab:"dating"},{id:"bio",label:"Biometry",tab:"biometry"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "first", group: "Obstetrics", name: "First trimester", hint: "Sac, yolk sac, CRL, cardiac activity", kind: "workflow", steps: [{id:"dates",label:"Dating",tab:"dating"},{id:"sru",label:"Viability",tab:"impress"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "pelvic", group: "Gynaecology", name: "Pelvic ultrasound", hint: "Uterus, endometrium, ovaries", kind: "workflow", steps: [{id:"ut",label:"Uterus",tab:"organ",organ:"uterus"},{id:"ov",label:"Ovary / IOTA",tab:"organ",organ:"ovary"},{id:"wrap",label:"Check & report",tab:"exam"}] },
-    { id: "follicle", group: "Gynaecology", name: "Folliculometry", hint: "Serial follicle tracking", kind: "guide", tab: "follicle" },
-    { id: "infertility", group: "Gynaecology", name: "Infertility assessment", hint: "Follicles + endometrium", kind: "guide", tab: "follicle" },
-    { id: "earlypreg", group: "Gynaecology", name: "Early pregnancy", hint: "PUL, ectopic, EPL", kind: "guide", tab: "impress" },
+    { id: "follicle", group: "Gynaecology", name: "Folliculometry", hint: "Serial follicle tracking", kind: "workflow",
+      steps: [{id:"foll",label:"Follicles",tab:"follicle"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "infertility", group: "Gynaecology", name: "Infertility assessment", hint: "Follicles + endometrium", kind: "workflow",
+      steps: [{id:"foll",label:"Follicles",tab:"follicle"},{id:"ut",label:"Endometrium",tab:"organ",organ:"uterus"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "earlypreg", group: "Gynaecology", name: "Early pregnancy", hint: "PUL, ectopic, EPL", kind: "workflow",
+      steps: [{id:"dates",label:"Dating",tab:"dating"},{id:"sru",label:"SRU / location",tab:"impress"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "adnexal", group: "Gynaecology", name: "Adnexal mass", hint: "IOTA Simple Rules, RMI", kind: "workflow", steps: [{id:"ov",label:"IOTA / RMI",tab:"organ",organ:"ovary"},{id:"wrap",label:"Check & report",tab:"exam"}] },
-    { id: "endometrium", group: "Gynaecology", name: "Endometrial assessment", hint: "Thickness by cycle / PMB", kind: "guide", tab: "organ", organ: "uterus" },
-    { id: "abdomen", group: "General", name: "Abdomen", hint: "Liver, spleen, pancreas, vessels", kind: "guide", tab: "organ", organ: "liver" },
-    { id: "hb", group: "General", name: "Hepatobiliary", hint: "Liver, portal vein", kind: "guide", tab: "organ", organ: "liver" },
-    { id: "renal", group: "General", name: "Renal / urinary", hint: "Kidneys, bladder, Bosniak", kind: "guide", tab: "organ", organ: "kidney" },
-    { id: "thyroid", group: "General", name: "Thyroid", hint: "ACR TI-RADS 2017", kind: "guide", tab: "organ", organ: "tirads" },
-    { id: "breast", group: "General", name: "Breast", hint: "BI-RADS US lexicon", kind: "guide", tab: "organ", organ: "birads" },
-    { id: "scrotal", group: "General", name: "Scrotal", hint: "Testicular volume (Lambert 0.71)", kind: "guide", tab: "organ", organ: "scrotal" },
-    { id: "prostate", group: "General", name: "Prostate", hint: "Volume, IPP", kind: "guide", tab: "organ", organ: "prostate" },
-    { id: "paeds", group: "General", name: "Paediatric", hint: "Kidney means, not pass/fail", kind: "guide", tab: "organ", organ: "kidney" },
-    { id: "vascular", group: "General", name: "Vascular", hint: "Carotid SRU, abdominal vessels", kind: "guide", tab: "organ", organ: "carotid" },
-    { id: "emergency", group: "General", name: "Emergency / focused", hint: "Red flags atlas", kind: "guide", tab: "protocol" }
+    { id: "endometrium", group: "Gynaecology", name: "Endometrial assessment", hint: "Thickness by cycle / PMB", kind: "workflow",
+      steps: [{id:"ut",label:"Uterus",tab:"organ",organ:"uterus"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "abdomen", group: "General", name: "Abdomen", hint: "Liver, spleen, pancreas, vessels", kind: "workflow",
+      steps: [{id:"liv",label:"Liver",tab:"organ",organ:"liver"},{id:"spl",label:"Spleen",tab:"organ",organ:"spleen"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "hb", group: "General", name: "Hepatobiliary", hint: "Liver, portal vein", kind: "workflow",
+      steps: [{id:"liv",label:"Liver",tab:"organ",organ:"liver"},{id:"vs",label:"Vessels",tab:"organ",organ:"vessels"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "renal", group: "General", name: "Renal / urinary", hint: "Kidneys, bladder, Bosniak", kind: "workflow",
+      steps: [{id:"kid",label:"Kidney",tab:"organ",organ:"kidney"},{id:"blad",label:"Bladder",tab:"organ",organ:"bladder"},{id:"bos",label:"Bosniak",tab:"organ",organ:"bosniak"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "thyroid", group: "General", name: "Thyroid", hint: "ACR TI-RADS 2017", kind: "workflow",
+      steps: [{id:"tr",label:"TI-RADS",tab:"organ",organ:"tirads"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "breast", group: "General", name: "Breast", hint: "BI-RADS US lexicon", kind: "workflow",
+      steps: [{id:"br",label:"BI-RADS",tab:"organ",organ:"birads"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "scrotal", group: "General", name: "Scrotal", hint: "Testicular volume (Lambert 0.71)", kind: "workflow",
+      steps: [{id:"sc",label:"Scrotal",tab:"organ",organ:"scrotal"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "prostate", group: "General", name: "Prostate", hint: "Volume, IPP", kind: "workflow",
+      steps: [{id:"pr",label:"Prostate",tab:"organ",organ:"prostate"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "paeds", group: "General", name: "Paediatric", hint: "Kidney means, not pass/fail", kind: "workflow",
+      steps: [{id:"kid",label:"Kidney",tab:"organ",organ:"kidney"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "vascular", group: "General", name: "Vascular", hint: "Carotid SRU, abdominal vessels", kind: "workflow",
+      steps: [{id:"ca",label:"Carotid",tab:"organ",organ:"carotid"},{id:"vs",label:"Abdominal vessels",tab:"organ",organ:"vessels"},{id:"wrap",label:"Check & report",tab:"exam"}] },
+    { id: "emergency", group: "General", name: "Emergency / focused", hint: "Red flags atlas", kind: "workflow",
+      steps: [{id:"flags",label:"Red flags",tab:"protocol",organ:"flags"},{id:"wrap",label:"Check & report",tab:"exam"}] }
   ];
 
   function examById(id) {
@@ -6690,6 +6718,8 @@
       lie: val("ex-lie"),
       move: val("ex-move"),
       placOs: val("ex-plac-os"),
+      cx: num(val("ex-cx")),
+      fhrEx: num(val("ex-fhr")),
       gaDays: gaDays, gaLabel: (function () { if (gaDays == null) return ""; var wd = weeksDaysFromDays(gaDays); return wd.w + "w" + wd.d + "d"; })(),
       method: G.method || "",
       bpd: bpd, ofd: ofd, hc: hc, ac: ac, fl: fl,
@@ -6733,6 +6763,24 @@
       add("recommended", "Open the ISUOG-style checklist on Protocols", true);
     } else if (id === "follicle" || id === "infertility") {
       add("recommended", "Open a patient folder on Folliculometry", true);
+    } else if (id === "nt") {
+      add("required", "CRL entered", num(val("d-crl")) != null);
+      add("recommended", "CRL in the NT window 45-84 mm", (function () { var c = num(val("d-crl")); return c != null && c >= 45 && c <= 84; })());
+    } else if (id === "bpp") {
+      add("recommended", "Complete the BPP components on Impression", true);
+    } else if (id === "cervix") {
+      add("required", "Transvaginal cervical length", num(val("ex-cx")) != null);
+    } else if (id === "twins") {
+      add("required", "Fetal number documented", val("ex-fetuses") !== "Singleton");
+      add("recommended", "Chorionicity documented in free text / local report — this app does not score chorionicity", true);
+    } else if (id === "thyroid") {
+      add("recommended", "TI-RADS descriptors entered on Organ", true);
+    } else if (id === "breast") {
+      add("recommended", "BI-RADS lexicon and a reader-assigned category", true);
+    } else if (id === "adnexal" || id === "pelvic") {
+      add("recommended", "Adnexa described with IOTA Simple Rules or a stated reason they do not apply", true);
+    } else if (id === "emergency") {
+      add("recommended", "Review red-flag cards before discharge wording", true);
     } else {
       add("recommended", "Enter the measurements for this examination", true);
     }
@@ -6771,6 +6819,9 @@
     if (snap.cpr != null) bits.push("CPR " + snap.cpr.toFixed(2) + (snap.cpr < 1 ? " (<1.0, qualitative brain-sparing flag)." : "."));
     if (snap.mcapsvMom != null && snap.mcapsvMom >= 1.5) bits.push("MCA-PSV " + snap.mcapsvMom.toFixed(2) + " MoM meets Mari’s anaemia-risk threshold. Correlate, do not treat from this number alone.");
     if (snap.placOs) bits.push("Placenta: " + snap.placOs + ".");
+    if (snap.cx != null) {
+      bits.push("Transvaginal cervical length " + snap.cx.toFixed(1) + " mm" + (snap.cx < 25 ? " (below the 25 mm short-cervix band used before 24 weeks — not a labour diagnosis)." : ".") );
+    }
     bits.push("Decision support only. Edit this wording. Local protocol outranks this text.");
     return bits.join(" ");
   }
@@ -6797,6 +6848,26 @@
     }
     html += '<p class="note"><strong>Consider in context:</strong> AC trend, interval from the last scan, UA/MCA/CPR, amniotic fluid, and maternal/fetal factors. Do not diagnose from this card alone.</p>';
     html += '<p class="note">Evidence: Hadlock EFW AJOG 1985; centiles Hadlock 1991. Last reviewed with the References tab, Sep 2026.</p>';
+    if (snap.cx != null) {
+      html += '<div class="hairline"></div><div class="card-title">Cervical length</div>';
+      html += organRow("TV cervix", snap.cx.toFixed(1) + " mm", "empty-bladder transvaginal");
+      if (snap.cx < 25) html += '<div class="badge warn">Below 25 mm. This is a short-cervix finding used in preterm-birth risk pathways before 24 weeks. It is not a labour diagnosis and does not time delivery.</div>';
+      else html += '<div class="badge ok">Not in the <25 mm short-cervix band. Interpret with GA, symptoms, and local protocol.</div>';
+    }
+    if (snap.redf || snap.aedf || snap.uapi != null || snap.cpr != null || snap.mcapsvMom != null) {
+      html += '<div class="hairline"></div><div class="card-title">Doppler (what this means)</div>';
+      if (snap.redf) html += '<div class="badge danger">REDF is a critical qualitative finding. PI is secondary. This app does not time delivery.</div>';
+      else if (snap.aedf) html += '<div class="badge danger">AEDF is a significant qualitative finding. Correlate urgently.</div>';
+      if (snap.cpr != null) html += '<p class="note">CPR ' + snap.cpr.toFixed(2) + (snap.cpr < 1 ? " is below 1.0 (qualitative brain-sparing flag)." : ".") + " CPR = MCA PI / UA PI. Not a delivery order.</p>";
+      if (snap.mcapsvMom != null) html += '<p class="note">MCA-PSV ' + snap.mcapsvMom.toFixed(2) + " MoM (Mari 2000). ≥1.5 MoM is an anaemia-risk threshold, not a transfusion order. False positives rise after ~35 weeks.</p>";
+    }
+    try {
+      var fl = fluidClassify();
+      if (fl) {
+        html += '<div class="hairline"></div><div class="card-title">Amniotic fluid</div><p class="note">' + fEsc(fl.text) + " Correlate with leakage, kidneys, and growth. Not a standalone diagnosis.</p>";
+      }
+    } catch (eF) {}
+    if (snap.presentation) html += '<p class="note">Presentation recorded as ' + fEsc(snap.presentation) + (snap.lie ? " with " + fEsc(snap.lie) + " lie" : "") + ".</p>";
     return html;
   }
 
@@ -6804,8 +6875,8 @@
     var rows = loadExamStore().filter(function (r) { return pid ? r.pid === pid : true; }).slice().sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
     if (!rows.length) return '<p class="empty">Save consented examinations with a folder ID to build a timeline. Browser storage is not a hospital record.</p>';
     var list = '<ul class="timeline">';
-    rows.forEach(function (r) {
-      list += "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><strong>" + fEsc(r.exam || "exam") + "</strong> · " + fEsc(r.gaLabel || "") + (r.efw ? " · EFW " + r.efw + " g" : "") + (r.efwPct != null ? " (" + ordinal(r.efwPct) + ")" : "") + "</li>";
+    rows.forEach(function (r, ix) {
+      list += "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><button type='button' class='exam-card' data-load='" + ix + "' style='min-height:auto;width:100%'><strong>" + fEsc(r.exam || "exam") + "</strong><span>" + fEsc(r.gaLabel || "") + (r.efw ? " · EFW " + r.efw + " g" : "") + (r.efwPct != null ? " (" + ordinal(r.efwPct) + ")" : "") + (r.ac != null ? " · AC " + Number(r.ac).toFixed(1) + " cm" : "") + " — tap to reopen</span></button></li>";
     });
     list += "</ul>";
     var graphRows = rows.filter(function (r) { return r.efwPct != null && r.gaDays != null; }).sort(function (a, b) { return a.gaDays - b.gaDays; });
@@ -6825,6 +6896,63 @@
     var note = "EFW percentile changed from " + ordinal(first.efwPct) + " to " + ordinal(last.efwPct) + " across saved examinations.";
     if (delta <= -20) note += " A downward change is observed. Interpret alongside interval, dating accuracy, AC trajectory, Doppler, and clinical context. This is not an FGR diagnosis.";
     return list + svg + '<p class="note">' + fEsc(note) + "</p>";
+  }
+
+  function applySnapshot(s) {
+    if (!s) return;
+    function put(id, v) {
+      var el = document.getElementById(id);
+      if (!el || v == null || v === "") return;
+      el.value = String(v);
+    }
+    put("ex-pid", s.pid); put("ex-initials", s.initials); put("ex-indication", s.indication);
+    put("ex-fetuses", s.fetuses); put("ex-cardiac", s.cardiac); put("ex-presentation", s.presentation);
+    put("ex-lie", s.lie); put("ex-move", s.move); put("ex-plac-os", s.placOs);
+    if (s.cx != null) put("ex-cx", s.cx);
+    if (s.fhrEx != null) put("ex-fhr", s.fhrEx);
+    if (s.bpd != null) put("b-bpd", s.bpd);
+    if (s.ofd != null) put("b-ofd", s.ofd);
+    if (s.ac != null) put("b-ac", s.ac);
+    if (s.fl != null) put("b-fl", s.fl);
+    if (s.hc != null) { hcManual = true; put("b-hc", s.hc); }
+    if (s.uapi != null) put("dp-uapi", s.uapi);
+    if (s.mcapi != null) put("dp-mcapi", s.mcapi);
+    if (s.impression) {
+      var ta = document.getElementById("ex-impression");
+      if (ta) { ta.value = s.impression; ta.dataset.touched = "1"; }
+    }
+    if (s.exam) {
+      var e = examResolved(s.exam);
+      if (e) {
+        activeExam = e;
+        document.body.setAttribute("data-exam", e.id);
+        document.body.setAttribute("data-family", e.group === "Obstetrics" ? "ob" : (e.group === "Gynaecology" ? "gyn" : "gen"));
+        renderExamBar();
+      }
+    }
+    if (typeof renderClinical === "function") renderClinical();
+    renderExamWrap();
+    if (window.__showTab) window.__showTab("exam");
+  }
+
+  function learningPointHtml() {
+    var id = activeExam ? activeExam.id : "growth";
+    var map = {
+      growth: ["Why is EFW not an FGR diagnosis?", "EFW below the 10th centile is SGA as a size label. FGR also uses AC trajectory, Doppler, fluid, and history (ISUOG/SMFM). A single small EFW is not a disease."],
+      fgr: ["Why AEDF/REDF outrank PI", "Absent or reversed UA end-diastolic flow is a qualitative finding. A 'normal' PI numeral does not cancel it. This app does not time delivery."],
+      doppler: ["Why is CPR calculated?", "CPR = MCA PI / UA PI. Below 1.0 is a qualitative brain-sparing flag, not a delivery order."],
+      dating: ["Why lock a first-trimester CRL EDD?", "ACOG 700: a CRL EDD is not revised by later biometry. Later discordance is a growth problem, not a new due date."],
+      nt: ["Why 45-84 mm for NT?", "FMF/ISUOG NT programme uses CRL 45-84 mm (11+0 to 13+6). Outside that window NT is not the same screening test."],
+      cervix: ["Why 25 mm?", "TV cervical length <25 mm before 24 weeks is the usual short-cervix band in preterm-birth pathways. Symptoms and local protocol still decide action."],
+      adnexal: ["Why can IOTA be inconclusive?", "Simple Rules are inconclusive when B and M features coexist or neither applies (~1 in 4 masses). That is a valid result — expert ultrasound, not tumour markers alone."],
+      thyroid: ["Why is TI-RADS not a biopsy order?", "ACR 2017 points plus size thresholds recommend FNA or follow-up. Extra-thyroidal extension, nodes, and local protocol still apply."],
+      breast: ["Why is BI-RADS not a point score?", "The ultrasound lexicon is descriptive. The reader assigns 0-6. There is no TI-RADS-style total."],
+      follicle: ["Why is size not ovulation?", "A follicle ≥18 mm is pre-ovulatory range, not proof. Collapse, crenation, internal echoes, free fluid, and a corpus luteum complete the picture."],
+      bpp: ["Why is BPP not a delivery clock?", "Manning scores describe acute fetal status. A low score prompts correlation and local protocol, not an automatic caesarean from this app."],
+      emergency: ["ALARA in the first trimester", "Keep TI low and Doppler brief. Spectral Doppler is not a first-trimester toy."]
+    };
+    var row = map[id] || map.growth;
+    return '<div class="card-title">Learning point (optional)</div><details><summary>' + fEsc(row[0]) + "</summary><p class='note'>" + fEsc(row[1]) + "</p></details><p class='note'>Optional. Never delays emergency care.</p>";
   }
 
   function dontMissHtml() {
@@ -6914,18 +7042,19 @@
     document.body.setAttribute("data-exam", e.id);
     document.body.setAttribute("data-family", e.group === "Obstetrics" ? "ob" : (e.group === "Gynaecology" ? "gyn" : "gen"));
     renderExamBar();
-    if (e.kind === "guide") {
-      if (window.__showTab) window.__showTab(e.tab);
-      if (e.organ && e.tab === "organ" && typeof selectOrganSection === "function") {
-        setTimeout(function () { selectOrganSection(e.organ); }, 0);
-      }
-      if (e.organ && e.tab === "anomaly" && typeof selectAnomalySection === "function") {
-        setTimeout(function () { selectAnomalySection(e.organ); }, 50);
-      }
-    } else {
-      if (window.__showTab) window.__showTab("exam");
-      renderExamWrap();
+    var first = (e.steps && e.steps[0]) ? e.steps[0] : { tab: "exam" };
+    if (window.__showTab) window.__showTab(first.tab);
+    if (first.organ && first.tab === "organ" && typeof selectOrganSection === "function") {
+      setTimeout(function () { selectOrganSection(first.organ); }, 40);
     }
+    if (first.organ && first.tab === "anomaly" && typeof selectAnomalySection === "function") {
+      setTimeout(function () { selectAnomalySection(first.organ); }, 40);
+    }
+    if (first.organ && first.tab === "protocol") {
+      protoMode = "flags";
+      window.__protoReady = false;
+    }
+    if (first.tab === "exam") renderExamWrap();
   }
 
   function renderExamBar() {
@@ -6975,6 +7104,15 @@
     set("exam-miss", dontMissHtml());
     set("exam-audit", formulaAuditHtml());
     set("exam-serial", '<div class="card-title">Serial examinations</div>' + serialHtml(snap.pid));
+    set("exam-learn", learningPointHtml());
+    document.querySelectorAll("#exam-serial [data-load]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var pid = snap.pid;
+        var rows = loadExamStore().filter(function (r) { return pid ? r.pid === pid : true; }).slice().sort(function (a, c) { return (a.date || "").localeCompare(c.date || ""); });
+        var ix = parseInt(b.getAttribute("data-load"), 10);
+        if (rows[ix]) applySnapshot(rows[ix]);
+      });
+    });
     var plaus = typeof plausibilityNotes === "function" ? plausibilityNotes() : [];
     if (plaus && plaus.length) {
       var missEl = document.getElementById("exam-miss");
@@ -6988,7 +7126,7 @@
   }
 
   function wireExam() {
-    ["ex-indication","ex-pid","ex-initials","ex-fetuses","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os"].forEach(function (id) {
+    ["ex-indication","ex-pid","ex-initials","ex-fetuses","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-cx","ex-fhr"].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
       el.addEventListener("change", renderExamWrap);
@@ -7089,7 +7227,9 @@
         abdomen: "Abdominal ultrasound. Organ measurements as entered. Correlate with LFTs and clinical findings.",
         thyroid: "Thyroid ultrasound. Nodules classified with ACR TI-RADS 2017 on the Organ tab. This is not a biopsy order.",
         breast: "Breast ultrasound. Lexicon descriptors as entered. Assessment category is assigned by the reader (BI-RADS US is not a point score).",
-        renal: "Renal tract ultrasound. Kidneys, collecting systems, and bladder as documented. Bosniak class is morphological, not a size score."
+        renal: "Renal tract ultrasound. Kidneys, collecting systems, and bladder as documented. Bosniak class is morphological, not a size score.",
+        scrotal: "Scrotal ultrasound. Testicular volume uses the Lambert 0.71 ellipsoid where three axes are entered. Acute pain is a clinical emergency — this app does not exclude torsion.",
+        hb: "Hepatobiliary ultrasound. Liver and portal vein as entered. Correlate with LFTs. Diameter alone does not grade portal pressure."
       };
       try {
         var custom = JSON.parse(localStorage.getItem("babsinogen.templates.v1") || "{}") || {};
