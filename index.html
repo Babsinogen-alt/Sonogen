@@ -741,7 +741,10 @@
               <div class="field"><div class="row"><input id="b-estwk" type="number" inputMode="numeric" placeholder="wk"></div></div>
               <div class="field"><div class="row"><input id="b-estd" type="number" inputMode="numeric" min="0" max="6" placeholder="d"></div></div>
             </div>
-            <p class="note">Left blank, the centile uses this scan's own composite dating instead — fine for a single dating scan, but for true growth surveillance use the GA from an earlier, more reliable scan.</p>
+            <p class="note">Left blank, the centile uses this scan's own composite dating instead — fine for a single dating scan, but for true growth surveillance use the GA from an earlier, more reliable scan. This box is an obstetric age, not a biometric age.</p>
+            <div class="field"><label>Biometric-age model</label><div class="row"><select id="b-biomodel"><option value="nichd">NICHD 2017 (default)</option><option value="hadlock">Hadlock 1984 four-parameter</option><option value="both">Both — not averaged</option></select></div></div>
+            <label class="check-row"><input type="checkbox" id="b-showmean"> Show the arithmetic mean of the four Hadlock parameter ages</label>
+            <p class="note">Biometric age describes fetal size. It does not replace an established due date. NICHD needs BPD, HC, AC, and FL. A missing value is not guessed.</p>
           </div>
         </div>
       </div>
@@ -751,6 +754,7 @@
         <div class="card" id="efw-card"></div>
         <div class="card" id="ratio-card"></div>
         <div class="card" id="dating-card"></div>
+        <div class="card" id="bioage-card"></div>
         <div class="card" id="growth-card"></div>
       </div>
     </div>
@@ -1476,7 +1480,8 @@
           <li><strong>ART dating.</strong> ACOG 700: assign EDD from embryo age and transfer date. GA (days) = (scan minus transfer) + 14 + embryo age. EDD = transfer + 266 minus embryo age (day-5 blastocyst = transfer + 261 d; day-3 = transfer + 263 d). Do not replace an ART EDD with later biometry.</li>
           <li><strong>CRL lock.</strong> A first-trimester CRL EDD is not revised by second- or third-trimester biometry. Later discordance is a growth problem.</li>
           <li><strong>Parameter exclusion.</strong> Do not average a pathological AC or FL into the due date. FL/AC below 0.16 (Hadlock AJR 1983) screens skeletal dysplasia. Abnormal cephalic index (74-83 working band; Hadlock 1981 mean 78.3, 2 SD about 70-86) uses area-corrected BPD = sqrt((BPD x OFD)/1.265) (Doubilet and Greenes 1984), not sqrt(BPD x OFD).</li>
-          <li><strong>Hadlock 1984 combinations.</strong> Single-parameter and combination menstrual-age equations (Radiology 1984;152:497-501). Four-parameter: MA = 10.85 + 0.060(HC)(FL) + 0.670(BPD) + 0.168(AC), cm. Averaging individual GAs is statistically similar; this app prefers the combination equation after exclusions.</li>
+          <li><strong>Hadlock 1984 combinations.</strong> Single-parameter and combination menstrual-age equations (Radiology 1984;152:497-501). Four-parameter: MA = 10.85 + 0.060(HC)(FL) + 0.670(BPD) + 0.168(AC), cm. Averaging individual GAs is statistically similar; this app prefers the combination equation after exclusions. That average is not the NICHD model.</li>
+          <li><strong>NICHD 2017 biometric age.</strong> Skupski et al., <em>Obstet Gynecol</em> 2017;130:433–441, Table 2 unrounded coefficients, measurements in millimetres. Four parameters are required. Accuracy reported by the authors is about ±7 days at 14–20 weeks, ±10 days at 21–27 weeks, and ±17 days at 28–40 weeks. This is a size estimate. It does not replace CRL or ART dating, and it is not a claim of local validation.</li>
           <li><strong>Redating.</strong> ACOG/AIUM/SMFM Committee Opinion 700 (2017): ≤8w6d >5 days; 9w0d–13w6d >7 days; 14–15w6d >7 days; 16–21w6d >10 days; 22–27w6d >14 days; ≥28 weeks >21 days.</li>
           <li><strong>Later dating rank.</strong> Chervenak et al., <em>AJR</em> 1991 — shape-corrected BPD and HC (plus FL in the third trimester) outperform AC for dating.</li>
           <li><strong>FHR.</strong> Doubilet & Benson, <em>AJR</em> 1995. Peak near 9–10 weeks; 110–160 bpm from about 14 weeks. Ibrahim et al., <em>J Perinat Med</em> 2022.</li>
@@ -1605,6 +1610,7 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.3.0</strong> (10 Oct 2026) — NICHD 2017 four-parameter biometric age (Skupski Table 2, millimetres) beside Hadlock 1984. The two are not averaged. Neither replaces an established CRL, ART, or typed obstetric age. Formulas already in the dating engine are unchanged.</li>
         <li><strong>3.2.0</strong> (9 Oct 2026) — Interval comparison now includes CPR, MCA-PSV MoM, breast size, liver, spleen, vessels, atrium, and IPP when those values were saved, and prints the change since the last visit (including UA-PI). Doppler and twin wrap-up name the DV a-wave, uterine-artery PI, and that one biometry set is not discordance or TTTS. Formula audit shows cephalic index, FL/AC, and each parameter’s gestational age. Formulas unchanged.</li>
         <li><strong>3.1.0</strong> (8 Oct 2026) — Both kidneys; fasting gallbladder wall and CBD (ranges, not a stone diagnosis); chorionicity as documentation, not a score; scrotal flow and breast laterality; obstetric measurement labels inside the editable impression; Reports timeline columns for endometrium, thyroid, kidney, prostate, cervix, and carotid. Formulas unchanged.</li>
         <li><strong>3.0.0</strong> (7 Oct 2026) — Dedicated how-to/pitfall protocols for thyroid, breast, renal, scrotal, carotid, prostate, and abdomen. Wrap-up calendar from the preferred EDD. Formula audit names the Hadlock equation and shows the arithmetic. ACR TI-RADS 2017 follow-up intervals when FNA is not performed. Search synonyms (IUGR, stillbirth, accreta, hydramnios). Fifteen further sourced cases. Optional emergency contacts on the seek-care card. Thresholds CSV from References. Formulas unchanged.</li>
@@ -1647,7 +1653,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 3.2.0 · Clinical Sonography Companion. Last reviewed 26 Sep 2026 with the citations in References. Formulas unchanged in this workflow release.</p>
+    <p class="note">Babsinogen 3.3.0 · Clinical Sonography Companion. Last reviewed 26 Sep 2026 with the citations in References. Formulas unchanged in this workflow release.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -1837,6 +1843,219 @@
     return null;
   }
 
+
+
+  /* NICHD 2017 biometric age — Skupski et al. Obstet Gynecol 2017;130:433-441, Table 2.
+     Coefficients are applied to millimetres. Centimetres make a third-trimester
+     fetus look about 11 weeks, so this function converts cm -> mm and refuses
+     to invent a missing parameter. It never writes the established EDD. */
+  function nichd2017Weeks(bpdCm, hcCm, acCm, flCm) {
+    if (bpdCm == null || hcCm == null || acCm == null || flCm == null) return null;
+    var b = bpdCm * 10, h = hcCm * 10, a = acCm * 10, f = flCm * 10;
+    if (![b, h, a, f].every(function (x) { return isFinite(x) && x > 0; })) return null;
+    var weeks = 10.5992
+      - 0.1683 * b + 0.0452 * h + 0.0302 * a + 0.0576 * f
+      + 0.0025 * b * b + 0.0017 * f * f
+      + 0.0005 * b * a - 0.0052 * b * f
+      - 0.0003 * h * a + 0.0008 * h * f + 0.0006 * a * f;
+    if (!isFinite(weeks)) return null;
+    return { weeks: weeks, implausible: weeks < 10 || weeks > 45 };
+  }
+  function hadlock4Weeks(bpdCm, hcCm, acCm, flCm) {
+    if (bpdCm == null || hcCm == null || acCm == null || flCm == null) return null;
+    var weeks = 10.85 + 0.06 * hcCm * flCm + 0.67 * bpdCm + 0.168 * acCm;
+    if (!isFinite(weeks)) return null;
+    return { weeks: weeks, implausible: weeks < 10 || weeks > 45 };
+  }
+  function wdWords(weeks) {
+    if (weeks == null || !isFinite(weeks)) return "";
+    var wd = weeksDaysFromDays(Math.round(weeks * 7));
+    if (!wd) return "";
+    return wd.w + " weeks " + wd.d + " days";
+  }
+  function nichdWindowDays(estDays) {
+    var w = estDays / 7;
+    if (w < 21) return 7;
+    if (w < 28) return 10;
+    return 17;
+  }
+  function biometricBand(diffDays, windowDays) {
+    var a = Math.abs(diffDays);
+    if (a <= windowDays) return "concordant";
+    if (a <= windowDays + 7) return "mild";
+    return "marked";
+  }
+  function bandWords(band) {
+    if (band === "concordant") return "broadly concordant";
+    if (band === "mild") return "mildly discordant";
+    return "markedly discordant";
+  }
+  function establishedDatingAnchor() {
+    var G = {};
+    try { G = assignGestationalAge() || {}; } catch (e) { G = {}; }
+    var independent = { art: 1, prior_art: 1, crl: 1, prior_crl: 1, lmp: 1, msd: 1 };
+    var names = {
+      art: "Assisted reproduction",
+      prior_art: "Locked prior ART estimated date of delivery",
+      crl: "First-trimester crown-rump length",
+      prior_crl: "Locked prior CRL estimated date of delivery",
+      lmp: "Last menstrual period (cycle-adjusted)",
+      msd: "Mean sac diameter only"
+    };
+    var manualW = num(val("b-estwk"));
+    var manualDays = manualW != null ? manualW * 7 + (num(val("b-estd")) || 0) : null;
+    if (G.method && independent[G.method] && G.preferredDays != null) {
+      return {
+        days: G.preferredDays,
+        name: names[G.method] || G.method,
+        edd: G.preferredEDD || null,
+        method: G.method,
+        provisional: G.method === "lmp" || G.method === "msd",
+        manualDays: manualDays
+      };
+    }
+    if (manualDays != null) {
+      return { days: manualDays, name: "Gestational age typed as the established age", edd: null, method: "typed", provisional: false, manualDays: manualDays };
+    }
+    return { days: null, name: "", edd: null, method: "none", provisional: false, manualDays: manualDays };
+  }
+  function biometricAgePack(bpd, hc, ac, fl) {
+    var model = val("b-biomodel") || "nichd";
+    if (model !== "hadlock" && model !== "both") model = "nichd";
+    var wantN = model === "nichd" || model === "both";
+    var wantH = model === "hadlock" || model === "both";
+    var anchor = establishedDatingAnchor();
+    var complete = bpd != null && hc != null && ac != null && fl != null;
+    var nichd = wantN && complete ? nichd2017Weeks(bpd, hc, ac, fl) : null;
+    var had = wantH && complete ? hadlock4Weeks(bpd, hc, ac, fl) : null;
+    var mean = null;
+    if (checked("b-showmean") && complete) {
+      var parts = [gaBPD(bpd), gaHC(hc), gaAC(ac), gaFL(fl)];
+      if (parts.every(function (x) { return x != null && isFinite(x); })) {
+        mean = parts.reduce(function (s, v) { return s + v; }, 0) / 4;
+      }
+    }
+    function signed(n) { return (n > 0 ? "+" : "") + n; }
+    var sentence = "";
+    if (complete && (nichd || had) && !(nichd && nichd.implausible) && !(had && had.implausible)) {
+      var bits = [];
+      if (anchor.days != null) bits.push("Established gestational age is " + wdWords(anchor.days / 7) + " (" + anchor.name + ").");
+      else bits.push("No earlier dating anchor is documented. Biometric age is not an established due date.");
+      if (nichd) bits.push("NICHD 2017 four-parameter biometric age is " + wdWords(nichd.weeks) + ".");
+      if (had) bits.push("Hadlock 1984 four-parameter biometric age is " + wdWords(had.weeks) + ".");
+      if (nichd && had) {
+        var gap = Math.round(nichd.weeks * 7) - Math.round(had.weeks * 7);
+        var gapWord = Math.abs(gap) <= 7 ? "clinically small" : (Math.abs(gap) <= 14 ? "modest" : "substantial");
+        bits.push("The models differ by " + signed(gap) + " days (" + gapWord + "). They are not averaged.");
+      }
+      if (anchor.days != null) {
+        var primary = nichd || had;
+        var diff = Math.round(primary.weeks * 7) - Math.round(anchor.days);
+        var win = nichdWindowDays(anchor.days);
+        bits.push("Compared with the established age, the difference is " + signed(diff) + " days (" + bandWords(biometricBand(diff, win)) + ").");
+      }
+      bits.push("The current biometric age is a size-derived estimate and should not replace the established gestational age or estimated date of delivery.");
+      sentence = bits.join(" ");
+    }
+    return { model: model, anchor: anchor, complete: complete, nichd: nichd, had: had, mean: mean, sentence: sentence };
+  }
+  function biometricAgeHtml(bpd, hc, ac, fl) {
+    var pack = biometricAgePack(bpd, hc, ac, fl);
+    var html = '<div class="card-title">Biometric age</div>';
+    html += '<p class="note">Established obstetric age is the dating anchor. Biometric age is a statistical estimate of size. Growth is whether that size fits the established age. A late biometric age does not automatically replace an earlier reliable date.</p>';
+    if (!pack.complete) {
+      html += '<p class="empty">Insufficient biometric inputs for the four-parameter composite model. BPD, HC, AC, and FL are all required. A missing value was not estimated.</p>';
+      return html;
+    }
+    function unitLine(label, cm) {
+      if (bioUnit === "mm") return "<div class='rline'><span>" + label + "</span><span>" + (cm * 10).toFixed(1) + " mm</span></div>";
+      return "<div class='rline'><span>" + label + "</span><span>" + cm.toFixed(1) + " cm</span></div>";
+    }
+    html += "<h3 style='font-size:14px;margin:12px 0 6px'>Dating basis</h3>";
+    if (pack.anchor.days != null) {
+      html += "<div class='rline'><span>Established gestational age</span><span>" + fEsc(wdWords(pack.anchor.days / 7)) + "</span></div>";
+      html += "<div class='rline'><span>Dating basis</span><span>" + fEsc(pack.anchor.name) + "</span></div>";
+      if (pack.anchor.edd) html += "<div class='rline'><span>Established EDD</span><span>" + fEsc(formatDate(pack.anchor.edd)) + "</span></div>";
+      if (pack.anchor.provisional) html += '<div class="badge warn">This anchor is provisional. A crown-rump length, when it exists, outranks menstrual dates and sac size.</div>';
+      if (pack.anchor.manualDays != null && pack.anchor.method !== "typed" && Math.abs(pack.anchor.manualDays - pack.anchor.days) >= 2) {
+        html += '<p class="note">The gestational age typed on this tab differs from the dating hierarchy. The hierarchy is used for the comparison.</p>';
+      }
+    } else {
+      html += '<p class="note">Established gestational age: not documented. Do not treat this scan’s biometric age as a locked due date.</p>';
+    }
+    html += "<h3 style='font-size:14px;margin:12px 0 6px'>Measurements</h3>";
+    html += unitLine("BPD", bpd) + unitLine("HC", hc) + unitLine("AC", ac) + unitLine("FL", fl);
+    html += '<p class="note">NICHD Table 2 is calculated in millimetres. Centimetres are converted first. The rounded equation printed in the article text is not used.</p>';
+    html += "<h3 style='font-size:14px;margin:12px 0 6px'>Biometric calculations</h3>";
+    function showAge(title, res) {
+      if (!res) return;
+      if (res.implausible) {
+        html += '<div class="badge danger">' + fEsc(title) + " is " + res.weeks.toFixed(1) + " weeks, which is not a plausible menstrual age. Check millimetres versus centimetres, decimal placement, and calipers. The value was not corrected.</div>";
+        return;
+      }
+      html += "<div class='rline'><span>" + fEsc(title) + "</span><span>" + fEsc(wdWords(res.weeks)) + "</span></div>";
+    }
+    if (pack.nichd) showAge("NICHD 2017 four-parameter", pack.nichd);
+    if (pack.had) showAge("Hadlock 1984 four-parameter", pack.had);
+    if (pack.nichd && pack.had && !pack.nichd.implausible && !pack.had.implausible) {
+      var gap = Math.round(pack.nichd.weeks * 7) - Math.round(pack.had.weeks * 7);
+      var gapWord = Math.abs(gap) <= 7 ? "clinically small" : (Math.abs(gap) <= 14 ? "modest" : "substantial");
+      html += "<div class='rline'><span>Model difference (NICHD minus Hadlock)</span><span>" + (gap > 0 ? "+" : "") + gap + " days — " + gapWord + "</span></div>";
+      html += '<p class="note">The models were not averaged.</p>';
+    }
+    if (pack.mean != null) {
+      html += "<div class='rline'><span>Arithmetic mean of individual Hadlock ages</span><span>" + fEsc(wdWords(pack.mean)) + "</span></div>";
+      html += '<p class="note">Equal-weighted average of the four single-parameter Hadlock ages. This is not the NICHD model and not the Hadlock combination equation.</p>';
+    }
+    var primary = (pack.nichd && !pack.nichd.implausible) ? pack.nichd : ((pack.had && !pack.had.implausible) ? pack.had : null);
+    html += "<h3 style='font-size:14px;margin:12px 0 6px'>Comparison</h3>";
+    if (!primary) {
+      html += '<p class="empty">No usable biometric age to compare.</p>';
+    } else if (pack.anchor.days == null) {
+      html += '<p class="note">There is no established age to subtract from. The dating tab still uses its own hierarchy, including Hadlock only when no better anchor exists. This card does not write that due date.</p>';
+    } else {
+      var diff = Math.round(primary.weeks * 7) - Math.round(pack.anchor.days);
+      var win = nichdWindowDays(pack.anchor.days);
+      var band = biometricBand(diff, win);
+      html += "<div class='rline'><span>Established gestational age</span><span>" + fEsc(wdWords(pack.anchor.days / 7)) + "</span></div>";
+      html += "<div class='rline'><span>Biometric difference</span><span>" + (diff > 0 ? "+" : "") + diff + " days</span></div>";
+      var cls = band === "concordant" ? "ok" : (band === "mild" ? "warn" : "danger");
+      html += '<div class="badge ' + cls + '">' + fEsc(bandWords(band).charAt(0).toUpperCase() + bandWords(band).slice(1)) + ". Practical flag only: within " + win + " days follows the Skupski 2017 accuracy band for this age (±7 days at 14–20 weeks, ±10 at 21–27, ±17 at 28–40). Not a diagnosis.</div>";
+    }
+    html += "<h3 style='font-size:14px;margin:12px 0 6px'>Interpretation</h3>";
+    html += "<p class='note'>Biometric age is a statistical estimate based on fetal size. It does not independently establish the pregnancy’s chronological gestational age.</p>";
+    if (pack.anchor.days != null && primary) {
+      var diff2 = Math.round(primary.weeks * 7) - Math.round(pack.anchor.days);
+      var band2 = biometricBand(diff2, nichdWindowDays(pack.anchor.days));
+      if (band2 === "marked") {
+        html += "<p class='note'>The discrepancy may reflect dating uncertainty, measurement variation, or altered fetal growth. Correlate with estimated fetal weight, biometric percentiles, interval growth, Doppler, and the clinical dating history. Do not diagnose growth restriction or macrosomia from this difference alone.</p>";
+      } else {
+        html += "<p class='note'>Continue to use the established estimated date of delivery. Interpret the biometric age as fetal size, not as a reason to revise pregnancy dating.</p>";
+      }
+    }
+    var ciNow = calcCI(bpd, toCmB("b-ofd"));
+    if (ciNow != null && (ciNow < 74 || ciNow > 83)) {
+      html += '<p class="note">Cephalic index is outside 74–83. These equations use the measured BPD, not a shape-corrected BPD. Head shape can move a BPD-based age.</p>';
+    }
+    if (fl > 0 && ac > 0 && (fl / ac) < 0.16) {
+      html += '<p class="note">FL/AC is below 0.16. That is the skeletal-dysplasia screen already used on the biometry tab. The femur was not removed from this four-parameter age, and it was not replaced with an estimate.</p>';
+    }
+    var ageForAcc = pack.anchor.days != null ? pack.anchor.days / 7 : (primary ? primary.weeks : null);
+    if (ageForAcc != null && ageForAcc < 14) html += '<p class="note">NICHD 2017 was fit from 14 weeks onward. Before that, crown-rump length is the dating measurement.</p>';
+    else if (ageForAcc != null && ageForAcc >= 28) html += '<p class="note">Third-trimester biometric dating is the least reliable and is vulnerable to growth error. Reported NICHD accuracy in this window is about ±17 days.</p>';
+    else if (ageForAcc != null) html += '<p class="note">Second-trimester biometric dating is useful and less precise than a first-trimester crown-rump length.</p>';
+    html += "<h3 style='font-size:14px;margin:12px 0 6px'>Recommendation</h3>";
+    html += "<p class='note'>Do not redate from late-pregnancy biometry when a reliable earlier method is available. The established estimated date of delivery was not revised by this calculation. NICHD is not claimed to be superior in every population, and it has not been marked here as validated in Nigeria.</p>";
+    return html;
+  }
+  function biometricAgeSentence() {
+    try {
+      var bpd = toCmB("b-bpd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+      var hc = resolveHC().cm;
+      var pack = biometricAgePack(bpd, hc, ac, fl);
+      return pack.sentence || "";
+    } catch (e) { return ""; }
+  }
 
   function accuracyBand(days, method) {
     var w = days / 7;
@@ -2400,7 +2619,7 @@
     set("efw-card", efwHtml);
 
     // --- Dating from this scan (composite + per-parameter + discordance) ---
-    var datingHtml = '<div class="card-title">Dating From This Scan</div>';
+    var datingHtml = '<div class="card-title">Hadlock age from this scan</div>';
     var Gbio = assignGestationalAge();
     var bForGA = (ci != null && (ci < 74 || ci > 83)) ? cbpd : bpd;
     var comp = Gbio.composite || gaComposite(bForGA, hc, ac, fl);
@@ -2421,6 +2640,7 @@
       datingHtml += '<span class="result-num">' + wd.w + '</span><span class="result-unit">w</span><span class="result-num">' + wd.d + '</span><span class="result-unit">d</span>';
       datingHtml += '<div class="chip">' + comp.label + '</div>';
       datingHtml += '<div class="note">' + trimesterLabel(compDays) + '</div>';
+      datingHtml += '<p class="note">Hadlock size-derived age from this scan. It does not replace an established CRL, ART, or typed obstetric age.</p>';
 
       if (perParam.length >= 2) {
         var daysArr = perParam.map(function (p) { return p.w * 7; });
@@ -2450,6 +2670,7 @@
       datingHtml += '<p class="empty">Enter at least AC and FL (BPD, OFD, HC improve accuracy and enable the discordance check).</p>';
     }
     set("dating-card", datingHtml);
+    set("bioage-card", biometricAgeHtml(bpd, hc, ac, fl));
 
     // --- Growth / centile ---
     var growthHtml = '<div class="card-title">Growth Centile</div>';
@@ -6379,7 +6600,8 @@
   function buildReportSections() {
     var sections = [
       { id: "head-card", title: "Head Shape" }, { id: "efw-card", title: "Estimated Fetal Weight" },
-      { id: "ratio-card", title: "Body Proportion" }, { id: "dating-card", title: "Dating From This Scan" },
+      { id: "ratio-card", title: "Body Proportion" }, { id: "dating-card", title: "Hadlock age from this scan" },
+      { id: "bioage-card", title: "Biometric age" },
       { id: "growth-card", title: "Growth Centile" }, { id: "edd-card", title: "Estimated Due Date" },
       { id: "redate-card", title: "LMP vs Ultrasound" }, { id: "fhr-card", title: "Fetal Heart Rate" },
       { id: "doppler-card", title: "Doppler" }, { id: "organ-result", title: "Organ Size" }, { id: "anomaly-result", title: "Anomaly Scan" }
@@ -7698,8 +7920,14 @@
     var hc = resolveHC().cm;
     var efw = hadlockEFW(bpd, hc, ac, fl);
     var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
+    var typedDays = estWk != null ? estWk * 7 + (estD || 0) : null;
     var gaDays = G.preferredDays;
-    var gaW = gaDays != null ? gaDays / 7 : (estWk != null ? estWk + (estD || 0) / 7 : null);
+    var method = G.method || "";
+    if (typedDays != null && (method === "composite" || method === "" || gaDays == null)) {
+      gaDays = typedDays;
+      method = "typed established age";
+    }
+    var gaW = gaDays != null ? gaDays / 7 : null;
     var pct = (efw && gaW != null) ? lookupPercentile(gaW, efw.grams) : null;
     var uapi = num(val("dp-uapi")), mcapi = num(val("dp-mcapi")), mcapsv = num(val("dp-mcapsv"));
     var cpr = (mcapi != null && uapi) ? mcapi / uapi : null;
@@ -7721,7 +7949,7 @@
       cx: num(val("ex-cx")),
       fhrEx: num(val("ex-fhr")),
       gaDays: gaDays, gaLabel: (function () { if (gaDays == null) return ""; var wd = weeksDaysFromDays(gaDays); return wd.w + "w" + wd.d + "d"; })(),
-      method: G.method || "",
+      method: method,
       bpd: bpd, ofd: ofd, hc: hc, ac: ac, fl: fl,
       efw: efw ? Math.round(efw.grams) : null,
       efwPct: pct && !pct.outOfRange ? pct.percentile : null,
@@ -8082,6 +8310,10 @@
           });
         } catch (eFl) {}
         if (flags.length) bits.push("Measurement labels: " + flags.join(" "));
+        try {
+          var bioLine = biometricAgeSentence();
+          if (bioLine) bits.push(bioLine);
+        } catch (eBio) {}
       }
       bits.push("Decision support only. Edit this wording. Local protocol outranks this text.");
       return bits.join(" ");
@@ -8857,6 +9089,9 @@
           });
         }
         if (Gaud && Gaud.flags && Gaud.flags.length) html += '<p class="note">' + fEsc(Gaud.flags[0]) + "</p>";
+        var packA = biometricAgePack(Gaud.bpd, Gaud.hc, Gaud.ac, Gaud.fl);
+        if (packA.nichd && !packA.nichd.implausible) html += organRow("NICHD 2017 age", wdWords(packA.nichd.weeks), "Table 2, millimetres; size estimate, not a new EDD");
+        if (packA.had && !packA.had.implausible) html += organRow("Hadlock 1984 four-parameter", wdWords(packA.had.weeks), "cm; not averaged with NICHD");
       } catch (eAud) {}
       if (snap.bpp && snap.bpp.denom) {
         function bpPt(v) { return v == null ? "—" : String(v); }
@@ -9731,6 +9966,13 @@
     ok("Doppler impression names DV a-wave", /a-wave/.test(dopImp) && /uterine-artery/.test(dopImp), dopImp.slice(0, 160));
     var cmpI = intervalCompare({ date: "2026-10-09T00:00:00.000Z", efw: 2000, uapi: 1.4, cpr: 0.9 }, { date: "2026-09-25T00:00:00.000Z", efw: 1600, uapi: 1.1, cpr: 1.2 });
     ok("Interval CPR and UA deltas", cmpI && Math.abs(cmpI.dCpr - (0.9 - 1.2)) < 0.001 && Math.abs(cmpI.dUapi - 0.3) < 0.001 && cmpI.days === 14, cmpI && ("days " + cmpI.days));
+    var nichdEx = nichd2017Weeks(8.2, 30.1, 30, 6.2);
+    ok("NICHD Table 2 uses millimetres", nichdEx && Math.abs(nichdEx.weeks - 31.2426) < 0.01 && !nichdEx.implausible, nichdEx && nichdEx.weeks.toFixed(3));
+    ok("NICHD refuses a missing femur", nichd2017Weeks(8.2, 30.1, 30, null) == null, "");
+    var hadEx = hadlock4Weeks(8.2, 30.1, 30, 6.2);
+    var modelGap = Math.round(nichdEx.weeks * 7) - Math.round(hadEx.weeks * 7);
+    ok("NICHD and Hadlock are not averaged", modelGap === -9, String(modelGap));
+    ok("32-week size within NICHD band", biometricBand(Math.round(nichdEx.weeks * 7) - 224, nichdWindowDays(224)) === "concordant", wdWords(nichdEx.weeks));
     set("self-test-out", lines.join("\n"));
   }
 
@@ -9879,7 +10121,7 @@
         }
       });
     }
-    var ids = ["b-bpd","b-ofd","b-hc","b-ac","b-fl","b-estwk","b-estd",
+    var ids = ["b-bpd","b-ofd","b-hc","b-ac","b-fl","b-estwk","b-estd","b-biomodel","b-showmean",
       "d-lmp","d-cycle","d-luteal","d-crl","d-msd","d-scandate","d-art","d-embryo","d-prior-edd","d-prior-src","d-lock","d-x-fgr","d-x-macro","d-x-acdist","d-x-skel","d-x-cranial","d-x-hc","d-x-twins","fhr-wk","fhr-d","fhr-bpm",
       "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv","dp-angle","dp-q-ua","dp-q-mca","dp-q-wave","dp-q-alara",
       "dp-utpi","dp-notch","dp-dvpi","dp-dvaw"];
