@@ -584,6 +584,7 @@
       <button type="button" class="icon-btn" id="theme-toggle" aria-pressed="false">Dark room</button>
       <button type="button" class="icon-btn" id="fs-down" aria-label="Smaller text">A-</button>
       <button type="button" class="icon-btn" id="fs-up" aria-label="Larger text">A+</button>
+      <button type="button" class="icon-btn" id="new-exam">+ New exam</button>
       <button type="button" class="icon-btn" id="jump-open">Search</button>
       <button type="button" class="icon-btn" id="modules-toggle" aria-pressed="false">All modules</button>
     </div>
@@ -625,6 +626,30 @@
             <div class="field"><label>Initials</label><div class="row"><input id="ex-initials" maxlength="10" placeholder="-"></div></div>
           </div>
           <div class="field"><label>Indication</label><div class="row"><input id="ex-indication" placeholder="e.g. growth, nodule, PMB"></div></div>
+          <div class="grid2">
+            <div class="field"><label>Examination date</label><div class="row"><input id="ex-date" type="date"></div></div>
+            <div class="field"><label>Age (years)</label><div class="row"><input id="ex-age" type="number" inputMode="numeric" min="0" max="120" placeholder="-"></div></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Sex</label><div class="row"><select id="ex-sex"><option value="">-</option><option value="female">Female</option><option value="male">Male</option><option value="not stated">Not stated</option></select></div></div>
+            <div class="field"><label>Referring clinician</label><div class="row"><input id="ex-referrer" maxlength="60" placeholder="initials or name"></div></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Report region</label><div class="row"><select id="ex-region"><option value="NG">Nigeria</option><option value="UK">United Kingdom</option><option value="US">United States</option><option value="EU">Europe</option></select></div></div>
+            <div class="field"><label>Worksheet</label><div class="row"><select id="ex-worksheet"><option value="">Standard checklist</option><option value="growth">Growth scan worksheet</option></select></div></div>
+          </div>
+          <p class="note">Region changes report spelling only (colour or color, EDD wording). It does not change a formula or a threshold. Age is optional. Do not enter a date of birth or a legal name. The growth worksheet is a local reminder list, not a new guideline.</p>
+          <details>
+            <summary>Build a local worksheet</summary>
+            <p class="note">Individual mode on this device. A worksheet only reminds you which fields to fill. It is not a shared clinic protocol, and it does not change a formula or a threshold.</p>
+            <div class="field"><label>Worksheet name</label><div class="row"><input id="ws-name" maxlength="40" placeholder="e.g. My growth scan"></div></div>
+            <div id="ws-picks"></div>
+            <div class="btn-row" style="flex-wrap:wrap">
+              <button type="button" class="btn-primary" id="ws-save" style="width:auto">Save worksheet</button>
+              <button type="button" class="btn-ghost" id="ws-del" style="width:auto">Delete selected</button>
+            </div>
+            <p class="note" id="ws-msg"></p>
+          </details>
           <div class="field"><label>Approach</label><div class="row"><select id="ex-approach"><option value="">-</option><option value="transvaginal">Transvaginal</option><option value="transabdominal">Transabdominal</option><option value="combined">Combined TV + TA</option></select></div></div>
           <p class="note" style="margin-top:0;">SRU 7 mm / 25 mm demise lines, TV cervix, and endometrium are transvaginal criteria. Transabdominal alone is not equivalent.</p>
           <div id="exam-prior"></div>
@@ -1610,6 +1635,8 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.5.0</strong> (12 Oct 2026) — Local worksheet builder (required and optional fields from a fixed catalog; no new thresholds). + New exam saves the current worksheet as a draft, then clears the form. Still individual mode on this device: no clinic accounts and no cloud sync. Formulas unchanged.</li>
+        <li><strong>3.4.0</strong> (11 Oct 2026) — Worksheet drafts (continue, duplicate, delete, finalize), report revisions that keep the earlier final copy, optional age/sex/referrer/exam date, a local growth-scan checklist, and a region label that changes spelling only. Formulas unchanged.</li>
         <li><strong>3.3.0</strong> (10 Oct 2026) — NICHD 2017 four-parameter biometric age (Skupski Table 2, millimetres) beside Hadlock 1984. The two are not averaged. Neither replaces an established CRL, ART, or typed obstetric age. Formulas already in the dating engine are unchanged.</li>
         <li><strong>3.2.0</strong> (9 Oct 2026) — Interval comparison now includes CPR, MCA-PSV MoM, breast size, liver, spleen, vessels, atrium, and IPP when those values were saved, and prints the change since the last visit (including UA-PI). Doppler and twin wrap-up name the DV a-wave, uterine-artery PI, and that one biometry set is not discordance or TTTS. Formula audit shows cephalic index, FL/AC, and each parameter’s gestational age. Formulas unchanged.</li>
         <li><strong>3.1.0</strong> (8 Oct 2026) — Both kidneys; fasting gallbladder wall and CBD (ranges, not a stone diagnosis); chorionicity as documentation, not a score; scrotal flow and breast laterality; obstetric measurement labels inside the editable impression; Reports timeline columns for endometrium, thyroid, kidney, prostate, cervix, and carotid. Formulas unchanged.</li>
@@ -1653,7 +1680,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 3.3.0 · Clinical Sonography Companion. Last reviewed 26 Sep 2026 with the citations in References. Formulas unchanged in this workflow release.</p>
+    <p class="note">Babsinogen 3.5.0 · Clinical Sonography Companion. Last reviewed 26 Sep 2026 with the citations in References. Formulas unchanged in this workflow release.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -1675,7 +1702,7 @@
     <div class="report-meta" id="report-meta"></div>
   </div>
   <div id="report-body"></div>
-  <div class="report-footer">Generated by Babsinogen (Caliper module). Decision support only &mdash; correlate with clinical findings and departmental protocol.</div>
+  <div class="report-footer" id="report-foot">Generated by Babsinogen (Caliper module). Decision support only &mdash; correlate with clinical findings and departmental protocol.</div>
 </div>
 
 <script>
@@ -3004,6 +3031,7 @@
       var cpr = mcapi / uapi;
       html += '<div class="hairline"></div>';
       html += '<div class="compare-row"><span class="compare-label">Cerebroplacental ratio (MCA-PI \u00f7 UA-PI)</span><span class="compare-value">' + cpr.toFixed(2) + '</span></div>';
+      html += '<p class="note">CPR = MCA PI / UA PI = ' + mcapi.toFixed(2) + ' / ' + uapi.toFixed(2) + ' = ' + cpr.toFixed(2) + '. Below 1.0 is a qualitative brain-sparing flag, not a delivery order.</p>';
       if (cpr < 1.0) html += '<div class="badge warn">CPR &lt; 1.0 \u2014 brain-sparing pattern</div>';
       else html += '<div class="badge ok">CPR \u2265 1.0</div>';
     }
@@ -7350,6 +7378,65 @@
       var savedFs = localStorage.getItem("babsinogen.fs");
       if (savedFs) document.documentElement.setAttribute("data-fs", savedFs);
     } catch (e3) {}
+    try {
+      var savedRegion = localStorage.getItem("babsinogen.region");
+      var regionSel = document.getElementById("ex-region");
+      if (regionSel && savedRegion) regionSel.value = savedRegion;
+    } catch (eR) {}
+    var regionSel2 = document.getElementById("ex-region");
+    if (regionSel2) regionSel2.addEventListener("change", function () {
+      try { localStorage.setItem("babsinogen.region", regionSel2.value || "NG"); } catch (eS) {}
+    });
+    renderWsPicks(null);
+    refreshWorksheetSelect();
+    var wsSave = document.getElementById("ws-save");
+    if (wsSave) wsSave.addEventListener("click", function () {
+      var name = (val("ws-name") || "").trim();
+      var picked = worksheetFromPicks();
+      var msg = document.getElementById("ws-msg");
+      if (!name) { if (msg) msg.textContent = "Name the worksheet first."; return; }
+      if (!picked.required.length) { if (msg) msg.textContent = "Mark at least one item Required. Off means the worksheet ignores it."; return; }
+      var rows = loadWorksheets();
+      var cur = val("ex-worksheet") || "";
+      var id = cur.indexOf("c:") === 0 ? cur.slice(2) : ("w" + Date.now().toString(36)).replace(/[^a-z0-9]/gi, "").slice(0, 12);
+      var next = rows.filter(function (r) { return r.id !== id; });
+      next.push({ id: id, name: name.slice(0, 40), required: picked.required, optional: picked.optional });
+      saveWorksheets(next);
+      refreshWorksheetSelect();
+      var sel = document.getElementById("ex-worksheet");
+      if (sel) sel.value = "c:" + id;
+      if (msg) msg.textContent = "Saved on this device. It will appear in Before finalizing. Nothing was uploaded.";
+      try { renderExamWrap(); } catch (eW) {}
+    });
+    var wsDel = document.getElementById("ws-del");
+    if (wsDel) wsDel.addEventListener("click", function () {
+      var cur = val("ex-worksheet") || "";
+      var msg = document.getElementById("ws-msg");
+      if (cur.indexOf("c:") !== 0) { if (msg) msg.textContent = "Select a saved local worksheet in the Worksheet menu, then delete it."; return; }
+      if (!window.confirm("Delete this worksheet from this device?")) return;
+      saveWorksheets(loadWorksheets().filter(function (r) { return ("c:" + r.id) !== cur; }));
+      refreshWorksheetSelect();
+      var sel = document.getElementById("ex-worksheet");
+      if (sel) sel.selectedIndex = 0;
+      renderWsPicks(null);
+      var nameEl = document.getElementById("ws-name");
+      if (nameEl) nameEl.value = "";
+      if (msg) msg.textContent = "Deleted on this device.";
+      try { renderExamWrap(); } catch (eW2) {}
+    });
+    var wsSel = document.getElementById("ex-worksheet");
+    if (wsSel) wsSel.addEventListener("change", function () {
+      var cur = wsSel.value || "";
+      if (cur.indexOf("c:") !== 0) return;
+      var spec = null;
+      loadWorksheets().forEach(function (w) { if (("c:" + w.id) === cur) spec = w; });
+      if (!spec) return;
+      var nameEl = document.getElementById("ws-name");
+      if (nameEl) nameEl.value = spec.name;
+      renderWsPicks(spec);
+    });
+    var newExam = document.getElementById("new-exam");
+    if (newExam) newExam.addEventListener("click", function () { blankExamination(); });
     var fd = document.getElementById("fs-down");
     var fu = document.getElementById("fs-up");
     if (fd) fd.addEventListener("click", function () { applyFs(-1); });
@@ -7491,10 +7578,33 @@
     try { localStorage.setItem(EXAM_KEY, JSON.stringify(rows.slice(-80))); } catch (e) {}
   }
   var DRAFT_KEY = "babsinogen.draft.v1";
+  var DRAFTS_KEY = "babsinogen.drafts.v1";
   var draftTimer = null;
+  var activeDraftId = "";
+  var reopenLineage = null;
+  function loadDrafts() {
+    try { return JSON.parse(localStorage.getItem(DRAFTS_KEY) || "[]") || []; } catch (e) { return []; }
+  }
+  function saveDrafts(rows) {
+    try { localStorage.setItem(DRAFTS_KEY, JSON.stringify((rows || []).slice(-12))); } catch (e) {}
+  }
+  function nextRevision(prev) {
+    if (!prev || !prev.date) return { revision: 1, revises: "" };
+    return { revision: (prev.revision || 1) + 1, revises: prev.date };
+  }
+  function regionPack() {
+    var r = val("ex-region") || "NG";
+    var map = {
+      NG: { name: "Nigeria", colour: "colour", edd: "estimated date of delivery (EDD)" },
+      UK: { name: "United Kingdom", colour: "colour", edd: "estimated date of delivery (EDD)" },
+      US: { name: "United States", colour: "color", edd: "estimated due date (EDD)" },
+      EU: { name: "Europe", colour: "colour", edd: "estimated date of delivery (EDD)" }
+    };
+    return map[r] || map.NG;
+  }
   function draftHasContent(s) {
     if (!s) return false;
-    return !!(s.pid || s.indication || s.approach || s.efw || s.crl || s.ac || s.hc || s.cx || s.endo || s.brCat || (s.tirads && s.tirads.tr) || (s.impression && String(s.impression).length > 24) || (s.fields && Object.keys(s.fields).length > 2));
+    return !!(s.pid || s.indication || s.approach || s.referrer || s.age || s.efw || s.crl || s.ac || s.hc || s.cx || s.endo || s.brCat || (s.tirads && s.tirads.tr) || (s.impression && String(s.impression).length > 24) || (s.fields && Object.keys(s.fields).length > 2));
   }
   function saveDraftNow() {
     try {
@@ -7502,7 +7612,13 @@
       if (!draftHasContent(snap) && !activeExam) return;
       snap._draftExam = activeExam ? activeExam.id : (snap.exam || "");
       snap._draftAt = new Date().toISOString();
+      if (!activeDraftId) activeDraftId = "d" + Date.now().toString(36);
+      snap._draftId = activeDraftId;
+      snap.status = "draft";
       localStorage.setItem(DRAFT_KEY, JSON.stringify(snap));
+      var pile = loadDrafts().filter(function (r) { return r._draftId !== activeDraftId; });
+      pile.push(snap);
+      saveDrafts(pile);
     } catch (eD) {}
   }
   function scheduleDraft() {
@@ -7513,11 +7629,32 @@
     try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (e) { return null; }
   }
   function discardDraft() {
+    var id = activeDraftId;
     try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    activeDraftId = "";
+    if (id) saveDrafts(loadDrafts().filter(function (r) { return r._draftId !== id; }));
+  }
+  function draftById(id) {
+    var rows = loadDrafts();
+    for (var i = 0; i < rows.length; i++) if (rows[i]._draftId === id) return rows[i];
+    return null;
+  }
+  function duplicateDraft(id) {
+    var src = draftById(id);
+    if (!src) return;
+    var copy = JSON.parse(JSON.stringify(src));
+    copy._draftId = "d" + Date.now().toString(36);
+    copy._draftAt = new Date().toISOString();
+    copy.status = "draft";
+    copy.indication = ((copy.indication || "") + " copy").trim();
+    var rows = loadDrafts();
+    rows.push(copy);
+    saveDrafts(rows);
   }
   function resumeDraft() {
     var d = loadDraft();
     if (!d) return;
+    activeDraftId = d._draftId || activeDraftId;
     var eid = d._draftExam || d.exam;
     if (eid && eid !== "ad-hoc") {
       var e = examResolved(eid);
@@ -7534,7 +7671,7 @@
 
 
   var SNAP_IDS = [
-    "ex-pid","ex-initials","ex-indication","ex-approach","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-cx","ex-fhr",
+    "ex-pid","ex-initials","ex-indication","ex-date","ex-age","ex-sex","ex-referrer","ex-region","ex-worksheet","ex-approach","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-cx","ex-fhr",
     "d-crl","d-msd","d-scandate","b-bpd","b-ofd","b-hc","b-ac","b-fl",
     "dp-uapi","dp-mcapi","dp-mcapsv","dp-wk","dp-d","dp-aedf","dp-redf","dp-dvpi","dp-dvaw","dp-utpi","dp-notch","dp-q-ua","dp-q-mca","dp-q-wave","dp-q-alara",
     "bpp-breath","bpp-move","bpp-tone","bpp-af","bpp-nst",
@@ -7939,6 +8076,12 @@
       exam: activeExam ? activeExam.id : "ad-hoc",
       pid: val("ex-pid") || val("log-pid") || "",
       initials: val("ex-initials") || val("log-initials") || "",
+      age: num(val("ex-age")),
+      sex: val("ex-sex") || "",
+      referrer: val("ex-referrer") || "",
+      examDate: val("ex-date") || "",
+      region: val("ex-region") || "NG",
+      worksheet: val("ex-worksheet") || "",
       indication: val("ex-indication"),
       fetuses: val("ex-fetuses"),
       cardiac: val("ex-cardiac"),
@@ -8844,7 +8987,7 @@
     var chart = (pid || folder) ? folderChartHtml(rows, pid || folder) : "";
     function visitBtn(r) {
       var name = (function () { var e = examById(r.exam); return e ? e.name : (r.exam || "exam"); })();
-      var sub = [r.initials, r.pid, r.gaLabel, serialKey(r)].filter(Boolean).join(" \u00b7 ");
+      var sub = [r.initials, r.pid, r.gaLabel, serialKey(r), r.revision > 1 ? ("rev " + r.revision) : ""].filter(Boolean).join(" \u00b7 ");
       var snip = r.impression ? String(r.impression).replace(/\s+/g, " ").slice(0, 110) : "";
       var del = r.live ? "" : "<button type='button' class='tl-delete' data-delete='" + fEsc(r.date) + "'>Remove from this device</button>";
       return "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><button type='button' class='exam-card' data-reopen='" + fEsc(r.date) + "' style='min-height:auto;width:100%'><strong>" + fEsc(name) + "</strong><span>" + fEsc(sub || "Tap to reopen") + "</span>" + (snip ? "<span class='tl-snippet'>" + fEsc(snip) + (r.impression.length > 110 ? "\u2026" : "") + "</span>" : "") + "</button>" + del + "</li>";
@@ -8987,6 +9130,8 @@
       }
     }
     restoreSnapFields(s.fields);
+    if (s._draftId) activeDraftId = s._draftId;
+    reopenLineage = (s.status === "final") ? { date: s.date, revision: s.revision || 1 } : null;
     if (typeof renderClinical === "function") renderClinical();
     if (typeof renderOrganResult === "function") try { renderOrganResult(); } catch (eR) {}
     renderExamWrap();
@@ -9027,16 +9172,173 @@
     return '<div class="card-title">Learning point (optional)</div><details><summary>' + fEsc(row[0]) + "</summary><p class='note'>" + fEsc(row[1]) + "</p></details><p class='note'>Optional. Never delays emergency care.</p>";
   }
 
+
+  var WS_KEY = "babsinogen.worksheets.v1";
+  var WS_CATALOG = [
+    { id: "bpd", text: "BPD", test: function () { return toCmB("b-bpd") != null; }, jump: { tab: "biometry", field: "b-bpd" } },
+    { id: "hc", text: "HC", test: function () { try { return resolveHC().cm != null; } catch (e) { return false; } }, jump: { tab: "biometry", field: "b-hc" } },
+    { id: "ac", text: "AC", test: function () { return toCmB("b-ac") != null; }, jump: { tab: "biometry", field: "b-ac" } },
+    { id: "fl", text: "FL", test: function () { return toCmB("b-fl") != null; }, jump: { tab: "biometry", field: "b-fl" } },
+    { id: "efw", text: "EFW (needs AC and FL)", test: function () { return toCmB("b-ac") != null && toCmB("b-fl") != null; }, jump: { tab: "biometry", field: "b-ac" } },
+    { id: "ga", text: "GA for the EFW centile", test: function () { return num(val("b-estwk")) != null || !!val("d-crl") || !!val("d-lmp") || !!val("d-art") || !!val("d-prior-edd"); }, jump: { tab: "biometry", field: "b-estwk" } },
+    { id: "fluid", text: "Fluid (SDP or AFI)", test: function () { return anomNum("an-afval") != null; }, jump: { tab: "anomaly", organ: "fluid", field: "an-afval" } },
+    { id: "placenta", text: "Placenta vs internal os", test: function () { return !!val("ex-plac-os"); }, jump: { tab: "exam", field: "ex-plac-os" } },
+    { id: "presentation", text: "Presentation", test: function () { return !!val("ex-presentation"); }, jump: { tab: "exam", field: "ex-presentation" } },
+    { id: "uapi", text: "UA-PI", test: function () { return num(val("dp-uapi")) != null; }, jump: { tab: "doppler", field: "dp-uapi" } },
+    { id: "mcapi", text: "MCA-PI", test: function () { return num(val("dp-mcapi")) != null; }, jump: { tab: "doppler", field: "dp-mcapi" } },
+    { id: "cpr", text: "CPR (needs both PIs)", test: function () { return num(val("dp-uapi")) != null && num(val("dp-mcapi")) != null; }, jump: { tab: "doppler", field: "dp-mcapi" } },
+    { id: "dv", text: "Ductus venosus", test: function () { return num(val("dp-dvpi")) != null || checked("dp-dvaw"); }, jump: { tab: "doppler", field: "dp-dvpi" } },
+    { id: "cx", text: "Cervical length", test: function () { return num(val("ex-cx")) != null; }, jump: { tab: "exam", field: "ex-cx" } }
+  ];
+  function loadWorksheets() {
+    var known = {};
+    WS_CATALOG.forEach(function (c) { known[c.id] = 1; });
+    var rows = [];
+    try { rows = JSON.parse(localStorage.getItem(WS_KEY) || "[]") || []; } catch (e) { rows = []; }
+    return rows.filter(function (r) { return r && r.id && r.name; }).slice(0, 8).map(function (r) {
+      function keep(list) { return (r[list] || []).filter(function (id) { return known[id]; }); }
+      return {
+        id: String(r.id).replace(/[^a-z0-9]/gi, "").slice(0, 12),
+        name: String(r.name).slice(0, 40),
+        required: keep("required"),
+        optional: keep("optional")
+      };
+    }).filter(function (r) { return r.id && r.required.length; });
+  }
+  function saveWorksheets(rows) {
+    try { localStorage.setItem(WS_KEY, JSON.stringify((rows || []).slice(0, 8))); } catch (e) {}
+  }
+  function customWorksheetItems(id) {
+    var spec = null;
+    loadWorksheets().forEach(function (w) { if (w.id === id) spec = w; });
+    if (!spec) return [];
+    var byId = {};
+    WS_CATALOG.forEach(function (c) { byId[c.id] = c; });
+    var out = [];
+    function push(cid, level) {
+      var c = byId[cid];
+      if (!c) return;
+      out.push({ level: level, text: c.text, ok: !!c.test(), jump: c.jump });
+    }
+    spec.required.forEach(function (cid) { push(cid, "required"); });
+    spec.optional.forEach(function (cid) {
+      if (spec.required.indexOf(cid) !== -1) return;
+      push(cid, "optional");
+    });
+    return out;
+  }
+  function refreshWorksheetSelect() {
+    var el = document.getElementById("ex-worksheet");
+    if (!el) return;
+    var cur = el.value;
+    Array.prototype.forEach.call(el.querySelectorAll("option[data-custom]"), function (o) { o.remove(); });
+    loadWorksheets().forEach(function (w) {
+      var o = document.createElement("option");
+      o.value = "c:" + w.id;
+      o.setAttribute("data-custom", "1");
+      o.textContent = w.name;
+      el.appendChild(o);
+    });
+    el.value = cur;
+    if (el.value !== cur) el.selectedIndex = 0;
+  }
+  function renderWsPicks(spec) {
+    var box = document.getElementById("ws-picks");
+    if (!box) return;
+    var req = {}, opt = {};
+    if (spec) {
+      (spec.required || []).forEach(function (id) { req[id] = 1; });
+      (spec.optional || []).forEach(function (id) { opt[id] = 1; });
+    }
+    var html = "";
+    WS_CATALOG.forEach(function (c) {
+      var v = req[c.id] ? "required" : (opt[c.id] ? "optional" : "");
+      html += '<div class="field"><label>' + fEsc(c.text) + '</label><div class="row"><select data-ws-item="' + c.id + '">' +
+        '<option value="">Off</option><option value="required"' + (v === "required" ? " selected" : "") + ">Required</option>" +
+        '<option value="optional"' + (v === "optional" ? " selected" : "") + ">Optional</option></select></div></div>";
+    });
+    box.innerHTML = html;
+  }
+  function worksheetFromPicks() {
+    var required = [], optional = [];
+    document.querySelectorAll("#ws-picks [data-ws-item]").forEach(function (el) {
+      var id = el.getAttribute("data-ws-item");
+      if (el.value === "required") required.push(id);
+      else if (el.value === "optional") optional.push(id);
+    });
+    return { required: required, optional: optional };
+  }
+  function blankExamination() {
+    var snap = null;
+    try { snap = currentSnapshot(); } catch (e) { snap = null; }
+    var dirty = !!(activeExam || (snap && draftHasContent(snap)));
+    if (dirty && !window.confirm("Start a blank examination? What you have typed stays in Drafts on this device.")) return;
+    if (dirty) saveDraftNow();
+    activeDraftId = "";
+    activeExam = null;
+    reopenLineage = null;
+    document.body.removeAttribute("data-exam");
+    document.body.removeAttribute("data-family");
+    ["view-exam", "view-biometry", "view-dating", "view-doppler", "view-anomaly", "view-impress", "view-organ"].forEach(function (vid) {
+      var root = document.getElementById(vid);
+      if (!root) return;
+      root.querySelectorAll("input, select, textarea").forEach(function (el) {
+        if (el.id === "ex-region" || el.id === "ws-name") return;
+        if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+        else if (el.tagName === "SELECT") el.selectedIndex = 0;
+        else el.value = "";
+      });
+    });
+    try { hcManual = false; } catch (eH) {}
+    var hc = document.getElementById("b-hc");
+    if (hc) hc.removeAttribute("data-auto");
+    var ta = document.getElementById("ex-impression");
+    if (ta) delete ta.dataset.touched;
+    try { renderExamBar(); } catch (eB) {}
+    try { if (typeof renderClinical === "function") renderClinical(); } catch (eC) {}
+    if (window.__showTab) window.__showTab("home");
+    try { renderHome(); } catch (eR) {}
+  }
+
+  var lastMissItems = [];
+  function worksheetItems() {
+    var spec = val("ex-worksheet") || "";
+    if (spec.indexOf("c:") === 0) return customWorksheetItems(spec.slice(2));
+    if (spec !== "growth") return [];
+    var bpd = toCmB("b-bpd"), ac = toCmB("b-ac"), fl = toCmB("b-fl"), hc = null;
+    try { hc = resolveHC().cm; } catch (eHc) {}
+    var uapi = num(val("dp-uapi")), mcapi = num(val("dp-mcapi"));
+    var hasGa = num(val("b-estwk")) != null || !!val("d-crl") || !!val("d-lmp") || !!val("d-art") || !!val("d-prior-edd");
+    function item(level, text, ok, jump) { return { level: level, text: text, ok: !!ok, jump: jump }; }
+    return [
+      item("required", "BPD", bpd != null, { tab: "biometry", field: "b-bpd" }),
+      item("required", "HC", hc != null, { tab: "biometry", field: "b-hc" }),
+      item("required", "AC", ac != null, { tab: "biometry", field: "b-ac" }),
+      item("required", "FL", fl != null, { tab: "biometry", field: "b-fl" }),
+      item("required", "EFW (needs AC and FL)", ac != null && fl != null, { tab: "biometry", field: "b-ac" }),
+      item("required", "GA for the EFW centile", hasGa, { tab: "biometry", field: "b-estwk" }),
+      item("required", "Fluid (SDP or AFI)", anomNum("an-afval") != null, { tab: "anomaly", organ: "fluid", field: "an-afval" }),
+      item("required", "Placenta vs internal os", !!val("ex-plac-os"), { tab: "exam", field: "ex-plac-os" }),
+      item("required", "Presentation", !!val("ex-presentation"), { tab: "exam", field: "ex-presentation" }),
+      item("required", "UA-PI", uapi != null, { tab: "doppler", field: "dp-uapi" }),
+      item("required", "MCA-PI", mcapi != null, { tab: "doppler", field: "dp-mcapi" }),
+      item("required", "CPR (needs both PIs)", uapi != null && mcapi != null, { tab: "doppler", field: "dp-mcapi" }),
+      item("optional", "Ductus venosus", num(val("dp-dvpi")) != null || checked("dp-dvaw"), { tab: "doppler", field: "dp-dvpi" }),
+      item("optional", "Cervical length", num(val("ex-cx")) != null, { tab: "exam", field: "ex-cx" })
+    ];
+  }
   function dontMissHtml() {
     var items = completenessFor(activeExam);
     var miss = items.filter(function (i) { return (i.level === "required" || i.level === "recommended") && !i.ok; });
+    var wsMiss = worksheetItems().filter(function (w) { return w.level === "required" && !w.ok; });
+    lastMissItems = miss.concat(wsMiss);
     var done = items.filter(function (i) { return (i.level === "required" || i.level === "recommended") && i.ok; });
     var abn = items.filter(function (i) { return i.level === "abnormal" || i.level === "concern"; });
     var html = '<div class="card-title">Before finalizing</div>';
-    if (!miss.length && !abn.length) html += '<div class="badge ok">No missing required/recommended fields flagged on this examination type.</div>';
-    if (miss.length) {
+    if (!lastMissItems.length && !abn.length) html += '<div class="badge ok">No missing required/recommended fields flagged on this examination type.</div>';
+    if (lastMissItems.length) {
       html += "<ul class='imp-list'>";
-      miss.forEach(function (i, ix) {
+      lastMissItems.forEach(function (i, ix) {
         var label = (i.level === "required" ? "Required: " : "Recommended: ") + i.text;
         if (i.jump) html += "<li><button type='button' class='jump-miss' data-miss='" + ix + "'>" + fEsc(label) + "</button></li>";
         else html += "<li>" + fEsc(label) + "</li>";
@@ -9051,6 +9353,14 @@
       abn.forEach(function (i) { html += "<li>" + fEsc(i.text) + "</li>"; });
       html += "</ul>";
     }
+    var optWs = worksheetItems().filter(function (w) { return w.level === "optional" && !w.ok; });
+    if (val("ex-worksheet") === "growth") html += '<p class="note">Growth worksheet is a local reminder. It does not change EFW, Doppler, or dating.</p>';
+    else if ((val("ex-worksheet") || "").indexOf("c:") === 0) {
+      var customName = "";
+      loadWorksheets().forEach(function (w) { if (("c:" + w.id) === val("ex-worksheet")) customName = w.name; });
+      html += '<p class="note">Local worksheet' + (customName ? (": " + fEsc(customName)) : "") + ". A reminder list only. It does not change a formula or a threshold.</p>";
+    }
+    if (optWs.length) html += '<p class="note">Optional and still empty: ' + fEsc(optWs.map(function (w) { return w.text; }).join(", ")) + ".</p>";
     html += '<p class="note">You may finalize anyway. Missing recommended fields are not a legal hold. Do not delay emergency care for this checklist. Tap a missing item to jump to the field.</p>';
     return html;
   }
@@ -9146,13 +9456,19 @@
       html += '<button type="button" class="exam-card" data-tab="' + t[0] + '"><strong>' + t[1] + "</strong><span>Open module</span></button>";
     });
     html += "</div></div>";
-    var draft = loadDraft();
-    if (draft && draftHasContent(draft)) {
-      var dName = (examById(draft._draftExam || draft.exam) || {}).name || draft._draftExam || "examination";
-      var dWhen = (draft._draftAt || draft.date || "").slice(0, 16).replace("T", " ");
-      var dSub = [draft.pid, draft.gaLabel, dWhen].filter(Boolean).join(" \u00b7 ");
-      html = html.replace('<h2 class="home-title">Start an examination</h2>',
-        '<div class="card draft-card"><div class="card-title">Unfinished examination</div><p><strong>' + fEsc(dName) + "</strong></p><p class='note'>" + fEsc(dSub || "Working copy on this device. Consent is only needed to archive in Reports.") + '</p><div class="btn-row" style="flex-wrap:wrap;margin-top:10px;"><button type="button" class="btn-primary" id="draft-resume" style="width:auto">Resume</button><button type="button" class="btn-ghost" id="draft-discard" style="width:auto">Discard</button></div></div><h2 class="home-title">Start an examination</h2>');
+    var drafts = loadDrafts().filter(draftHasContent).slice().sort(function (a, b) { return (b._draftAt || "").localeCompare(a._draftAt || ""); });
+    if (drafts.length) {
+      var dhtml = '<div class="card draft-card"><div class="card-title">Drafts on this device</div><p class="note">Leaving a screen does not erase measurements. Consent is only needed when you archive a final copy in Reports.</p>';
+      drafts.slice(0, 6).forEach(function (d) {
+        var dName = (examById(d._draftExam || d.exam) || {}).name || d._draftExam || "examination";
+        var dWhen = (d._draftAt || d.date || "").slice(0, 16).replace("T", " ");
+        var dSub = [d.pid, d.indication, d.gaLabel, dWhen].filter(Boolean).join(" \u00b7 ");
+        var id = fEsc(d._draftId || "");
+        dhtml += "<p><strong>" + fEsc(dName) + "</strong></p><p class='note'>" + fEsc(dSub || "Working copy") + "</p>";
+        dhtml += '<div class="btn-row" style="flex-wrap:wrap;margin:0 0 12px"><button type="button" class="btn-primary" data-draft-go="' + id + '" style="width:auto">Continue</button><button type="button" class="btn-ghost" data-draft-copy="' + id + '" style="width:auto">Duplicate</button><button type="button" class="btn-ghost" data-draft-fin="' + id + '" style="width:auto">Finalize</button><button type="button" class="btn-ghost" data-draft-del="' + id + '" style="width:auto">Delete</button></div>';
+      });
+      dhtml += "</div>";
+      html = html.replace('<h2 class="home-title">Start an examination</h2>', dhtml + '<h2 class="home-title">Start an examination</h2>');
     }
     var folders = [];
     var seenF = {};
@@ -9178,13 +9494,41 @@
       b.addEventListener("click", function () { if (window.__showTab) window.__showTab(b.getAttribute("data-tab")); });
     });
     bindReopen("home-body");
-    var dr = document.getElementById("draft-resume");
-    if (dr) dr.addEventListener("click", function () { resumeDraft(); });
-    var dd = document.getElementById("draft-discard");
-    if (dd) dd.addEventListener("click", function () {
-      if (!window.confirm("Discard the unfinished examination on this device?")) return;
-      discardDraft();
-      renderHome();
+    document.querySelectorAll("#home-body [data-draft-go]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var d = draftById(b.getAttribute("data-draft-go"));
+        if (!d) return;
+        activeDraftId = d._draftId || "";
+        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch (eK) {}
+        resumeDraft();
+      });
+    });
+    document.querySelectorAll("#home-body [data-draft-copy]").forEach(function (b) {
+      b.addEventListener("click", function () { duplicateDraft(b.getAttribute("data-draft-copy")); renderHome(); });
+    });
+    document.querySelectorAll("#home-body [data-draft-del]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var id = b.getAttribute("data-draft-del");
+        if (!window.confirm("Delete this draft from this device?")) return;
+        saveDrafts(loadDrafts().filter(function (r) { return r._draftId !== id; }));
+        if (id && id === activeDraftId) {
+          activeDraftId = "";
+          try { localStorage.removeItem(DRAFT_KEY); } catch (eK2) {}
+        }
+        renderHome();
+      });
+    });
+    document.querySelectorAll("#home-body [data-draft-fin]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var d = draftById(b.getAttribute("data-draft-fin"));
+        if (!d) return;
+        activeDraftId = d._draftId || "";
+        try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch (eK3) {}
+        resumeDraft();
+        set("ex-save-msg", "Tick consent, then Save examination. The earlier final copy, if any, stays in Reports. This save is the next revision.");
+        var box = document.getElementById("ex-consent");
+        if (box) { try { box.focus(); box.scrollIntoView({ block: "center" }); } catch (eF) {} }
+      });
     });
     document.querySelectorAll("#home-body .wl-folder").forEach(function (b) {
       b.addEventListener("click", function () {
@@ -9251,7 +9595,7 @@
     steps.forEach(function (s) {
       html += '<button type="button" class="exam-step" data-tab="' + s.tab + '" data-organ="' + (s.organ || "") + '">' + fEsc(s.label) + "</button>";
     });
-    html += '</div><button type="button" class="btn-ghost" id="exam-end" style="width:auto">End exam</button>';
+    html += '</div><button type="button" class="btn-ghost" id="exam-new" style="width:auto">+ New</button><button type="button" class="btn-ghost" id="exam-end" style="width:auto">End exam</button>';
     bar.innerHTML = html;
     bar.querySelectorAll(".exam-step").forEach(function (b) {
       b.addEventListener("click", function () {
@@ -9272,6 +9616,8 @@
         }
       });
     });
+    var neu = document.getElementById("exam-new");
+    if (neu) neu.addEventListener("click", function () { blankExamination(); });
     var end = document.getElementById("exam-end");
     if (end) end.addEventListener("click", function () {
       activeExam = null;
@@ -9450,11 +9796,10 @@
         if (window.__showTab) window.__showTab("protocol");
       });
     });
-    var missItems = completenessFor(activeExam).filter(function (i) { return (i.level === "required" || i.level === "recommended") && !i.ok; });
     document.querySelectorAll("#exam-miss [data-miss]").forEach(function (b) {
       b.addEventListener("click", function () {
         var ix = parseInt(b.getAttribute("data-miss"), 10);
-        if (missItems[ix] && missItems[ix].jump) goExamJump(missItems[ix].jump);
+        if (lastMissItems[ix] && lastMissItems[ix].jump) goExamJump(lastMissItems[ix].jump);
       });
     });
     var plaus = typeof plausibilityNotes === "function" ? plausibilityNotes() : [];
@@ -9558,8 +9903,11 @@
       if (fac.sign) body += "<p class='note' style='margin-top:24px'>Signed: " + fEsc(fac.sign) + "</p>";
       body += "<p class='note'>Decision support only. Local protocol outranks this text.</p>";
       set("report-body", body);
-      var meta = (fac.name ? fac.name + " · " : "") + (fac.clinician ? fac.clinician + " · " : "") + (snap.pid || "No folder ID") + " · " + new Date().toLocaleString("en-GB");
+      var regP = regionPack();
+      var meta = (fac.name ? fac.name + " · " : "") + (fac.clinician ? fac.clinician + " · " : "") + (snap.pid || "No folder ID") + " · " + regP.name + " · " + new Date().toLocaleString("en-GB");
       set("report-meta", meta);
+      var foot = document.getElementById("report-foot");
+      if (foot) foot.textContent = "Generated by Babsinogen. Decision support only. " + regP.edd + ". " + regP.colour.charAt(0).toUpperCase() + regP.colour.slice(1) + " Doppler spelling follows the selected region. Thresholds are not changed. Local protocol outranks this report.";
       var rt = document.querySelector(".report-title");
       if (rt) rt.textContent = title;
       window.print();
@@ -9569,11 +9917,18 @@
       if (!checked("ex-consent")) { set("ex-save-msg", "Tick consent before saving an examination on this device."); return; }
       var snap = currentSnapshot();
       snap.impression = val("ex-impression") || suggestedImpression(snap);
+      var rev = nextRevision(reopenLineage);
+      snap.status = "final";
+      snap.revision = rev.revision;
+      snap.revises = rev.revises;
       var rows = loadExamStore();
       rows.push(snap);
       saveExamStore(rows);
+      reopenLineage = { date: snap.date, revision: snap.revision };
       discardDraft();
-      set("ex-save-msg", "Saved on this device only. The unfinished copy was cleared. Clearing site data will remove it unless you export a backup.");
+      set("ex-save-msg", snap.revision > 1
+        ? ("Saved as revision " + snap.revision + " on this device. The earlier final copy is still in Reports.")
+        : "Saved on this device only. The unfinished copy was cleared. Clearing site data will remove it unless you export a backup.");
       renderExamWrap();
       if (typeof renderReportsTimeline === "function") renderReportsTimeline();
     });
@@ -9783,6 +10138,13 @@
     lines.push("Babsinogen examination report");
     lines.push("Exam: " + ((examById(snap.exam) || {}).name || snap.exam || "Ad-hoc"));
     if (snap.pid) lines.push("Folder: " + snap.pid + (snap.initials ? " · " + snap.initials : ""));
+    if (snap.examDate) lines.push("Examination date: " + snap.examDate);
+    if (snap.age != null) lines.push("Age: " + snap.age + " years");
+    if (snap.sex) lines.push("Sex: " + snap.sex);
+    if (snap.referrer) lines.push("Referring: " + snap.referrer);
+    var regR = regionPack();
+    lines.push("Report region: " + regR.name + " (" + regR.edd + "; " + regR.colour + " Doppler). Thresholds are unchanged.");
+    if (snap.revision > 1) lines.push("Revision " + snap.revision + (snap.revises ? (" of the copy saved " + String(snap.revises).slice(0, 16).replace("T", " ")) : "") + ". The earlier copy is still stored.");
     lines.push("Date: " + new Date().toLocaleString("en-GB"));
     lines.push("");
     lines.push("TECHNIQUE");
@@ -9973,6 +10335,34 @@
     var modelGap = Math.round(nichdEx.weeks * 7) - Math.round(hadEx.weeks * 7);
     ok("NICHD and Hadlock are not averaged", modelGap === -9, String(modelGap));
     ok("32-week size within NICHD band", biometricBand(Math.round(nichdEx.weeks * 7) - 224, nichdWindowDays(224)) === "concordant", wdWords(nichdEx.weeks));
+    var rev1 = nextRevision(null);
+    var rev2 = nextRevision({ date: "2026-10-01T00:00:00.000Z", revision: 1 });
+    ok("First save is revision 1", rev1.revision === 1 && !rev1.revises, String(rev1.revision));
+    ok("Later save keeps the prior date", rev2.revision === 2 && rev2.revises.indexOf("2026-10-01") === 0, rev2.revises);
+    ok("US region says color", (function () { var el = document.getElementById("ex-region"); var prev = el.value; el.value = "US"; var c = regionPack().colour; el.value = prev; return c === "color"; })(), "");
+    var wsEl = document.getElementById("ex-worksheet");
+    var wsPrev = wsEl.value;
+    wsEl.value = "growth";
+    var ws = worksheetItems();
+    wsEl.value = wsPrev;
+    ok("Growth worksheet has 12 required items", ws.filter(function (w) { return w.level === "required"; }).length === 12, String(ws.length));
+    ok("Cervix stays optional", ws.some(function (w) { return w.text === "Cervical length" && w.level === "optional"; }), "");
+    var wsStorePrev = null;
+    try { wsStorePrev = localStorage.getItem(WS_KEY); } catch (eWs) {}
+    try {
+      localStorage.setItem(WS_KEY, JSON.stringify([{ id: "t1", name: "My growth scan", required: ["bpd", "ac", "evil"], optional: ["cx"] }]));
+      refreshWorksheetSelect();
+      wsEl.value = "c:t1";
+      var customWs = worksheetItems();
+      ok("Custom worksheet keeps catalog items only", customWs.filter(function (w) { return w.level === "required"; }).length === 2 && customWs.some(function (w) { return w.text === "Cervical length" && w.level === "optional"; }), String(customWs.length));
+    } finally {
+      try {
+        if (wsStorePrev == null) localStorage.removeItem(WS_KEY);
+        else localStorage.setItem(WS_KEY, wsStorePrev);
+      } catch (eWs2) {}
+      refreshWorksheetSelect();
+      wsEl.value = wsPrev;
+    }
     set("self-test-out", lines.join("\n"));
   }
 
@@ -10121,7 +10511,7 @@
         }
       });
     }
-    var ids = ["b-bpd","b-ofd","b-hc","b-ac","b-fl","b-estwk","b-estd","b-biomodel","b-showmean",
+    var ids = ["b-bpd","b-ofd","b-hc","b-ac","b-fl","b-estwk","b-estd","b-biomodel","b-showmean","ex-date","ex-age","ex-sex","ex-referrer","ex-region","ex-worksheet",
       "d-lmp","d-cycle","d-luteal","d-crl","d-msd","d-scandate","d-art","d-embryo","d-prior-edd","d-prior-src","d-lock","d-x-fgr","d-x-macro","d-x-acdist","d-x-skel","d-x-cranial","d-x-hc","d-x-twins","fhr-wk","fhr-d","fhr-bpm",
       "dp-wk","dp-d","dp-uapi","dp-aedf","dp-redf","dp-mcapi","dp-mcapsv","dp-angle","dp-q-ua","dp-q-mca","dp-q-wave","dp-q-alara",
       "dp-utpi","dp-notch","dp-dvpi","dp-dvaw"];
