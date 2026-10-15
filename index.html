@@ -679,6 +679,21 @@
             <div class="field"><label>FHR (if not on Dating)</label><div class="row"><input id="ex-fhr" type="number" inputMode="numeric" placeholder="-"><span class="suffix">bpm</span></div></div>
           </div>
           <p class="note">Transvaginal cervical length <25 mm before 24 weeks is a short-cervix finding used in preterm-birth pathways. It is not a labour diagnosis. Empty-bladder TV technique.</p>
+          <div class="grid2">
+            <div class="field"><label>Placental site</label><div class="row"><select id="ex-plac-site"><option value="">Not stated</option><option value="anterior">Anterior</option><option value="posterior">Posterior</option><option value="fundal">Fundal</option><option value="lateral">Lateral</option></select></div></div>
+            <div class="field"><label>Edge to internal os</label><div class="row"><input id="ex-plac-edge" type="number" inputMode="decimal" step="0.1" min="0" placeholder="-"><span class="suffix">mm</span></div></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Cord insertion</label><div class="row"><select id="ex-cord"><option value="">Not assessed</option><option value="central">Central or eccentric</option><option value="marginal">Marginal</option><option value="velamentous">Velamentous</option></select></div></div>
+            <div class="field"><label>Placental shape</label><div class="row"><select id="ex-plac-shape"><option value="">Not stated</option><option value="discoid">Discoid</option><option value="bilobed">Bilobed</option><option value="succenturiate">Succenturiate lobe</option></select></div></div>
+          </div>
+          <div id="plac-out"></div>
+        </div>
+        <div class="card ob-only" id="multi-card">
+          <div class="card-title">Multiple-pregnancy surveillance</div>
+          <p class="subhead">Optional second and third fetus. Weight uses an entered gram value, or Hadlock from centimetre biometry already validated in this app. One EDD. Not a Quintero stage and not a laser decision.</p>
+          <div id="multi-slots"></div>
+          <div id="multi-out"></div>
         </div>
         <div class="card">
           <div class="card-title">Suggested impression (editable)</div>
@@ -1587,7 +1602,13 @@
           <li><strong>Gallbladder and CBD.</strong> A fasting gallbladder wall is commonly ≤3 mm. Thickening is nonspecific (cholecystitis, ascites, hepatitis, heart failure, or a non-fasting scan). CBD is commonly ≤6 mm with the gallbladder in situ; about 1 mm per decade after 60 is a teaching ceiling, and about 10 mm is often accepted after cholecystectomy. Diameter is not a stone diagnosis (Rumack & Levine).</li>
           <li><strong>Carotid (SRU 2003).</strong> Grant EG et al., <em>Radiology</em> 2003;229:340–346. NASCET percent: ICA PSV <125 cm/s = <50%; 125–230 = 50–69%; >230 = ≥70% to near occlusion. EDV and ICA/CCA ratio are concordant checks, not a replacement for PSV. Near occlusion is a qualitative string-sign, not a percent. This is not a CEA indication.</li>
           <li><strong>Carotid (SRU 2003).</strong> Grant EG et al., Radiology 2003;229:340-346. NASCET percent from ICA PSV: <125 cm/s = <50%; 125-230 = 50-69%; >230 = >=70% to near occlusion. EDV and ICA/CCA ratio check concordance. Near occlusion is qualitative. Not a CEA order.</li>
-          <li><strong>Testicular volume.</strong> Lambert B, <em>J Urol</em> 1982 — ellipsoid L×W×H×0.71. Compare sides. Not a torsion or tumour diagnosis.</li>
+          <li><strong>Testicular volume.</strong> Lambert B, <em>J Urol</em> 1982 — ellipsoid L×W×H×0.71. Compare sides. Not a torsion or tumour diagnosis. The 0.52 ellipsoid under-reads testicular volume and is not used here.</li>
+          <li><strong>PSA density.</strong> PSA (ng/mL) ÷ ellipsoid volume (cc). Benson et al., <em>J Urol</em> 1992, discussed about 0.15 ng/mL/cc. Not four official risk bands and not a cancer diagnosis.</li>
+          <li><strong>Twins — discordance and EDD.</strong> (larger − smaller) / larger. About 20% is an ACOG surveillance flag (Practice Bulletin 231). One EDD for the pregnancy. Discordance is not TTTS.</li>
+          <li><strong>TTTS fluid.</strong> Quintero et al., <em>J Perinatol</em> 1999: deepest pocket ≤2 cm and ≥8 cm at any gestation (North American / ACOG / SMFM pattern). ISUOG twin guideline (Khalil et al., <em>UOG</em> 2016) and Eurofetus: recipient ≥8 cm at or before 20 weeks and ≥10 cm after 20 weeks. This app states both. It does not assign a Quintero stage.</li>
+          <li><strong>TAPS.</strong> Khalil et al., Delphi consensus, <em>UOG</em> 2020: MCA-PSV ≥1.5 MoM and ≤0.8 MoM, or an intertwin difference ≥1.0 MoM. An older >1.5 / <1.0 pair is not used as a diagnosis here. Not a haemoglobin.</li>
+          <li><strong>Placenta and the os.</strong> RCOG Green-top 27a: low-lying if the leading edge is <20 mm from the internal os and not covering it. A third-trimester distance ≥20 mm often allows a vaginal-birth discussion. Not a caesarean order.</li>
+          <li><strong>Cord and accessory lobe.</strong> Velamentous insertion and a bilobed or succenturiate placenta can leave bridging vessels over the cervix. SMFM Consult Series #37: vasa previa needs transvaginal colour and a fetal Doppler waveform. Insertion or lobe shape alone does not confirm it.</li>
           <li>Textbook viscera: Rumack & Levine, <em>Diagnostic Ultrasound</em>.</li>
         </ul>
       </div>
@@ -1638,6 +1659,7 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.8.0</strong> (15 Oct 2026) — Multiple-pregnancy surveillance (discordance, Quintero vs ISUOG fluid, Delphi TAPS) using the existing Hadlock weight. PSA density on the prostate card. Placental edge, cord insertion, and accessory lobe notes. No dating formula was changed.</li>
         <li><strong>3.7.0</strong> (13 Oct 2026) — Eight further case schematics (still drawings, not patient images). A thyroid descriptor counts only after you change it. An ovary worksheet looks for a typed diameter, not the form’s starting structure. Formulas unchanged.</li>
         <li><strong>3.6.0</strong> (12 Oct 2026) — Schematics on eight teaching cases (not patient images). Pelvic and thyroid worksheets check that existing fields were filled. No new size cutoff and no formula change.</li>
         <li><strong>3.5.0</strong> (12 Oct 2026) — Local worksheet builder (required and optional fields from a fixed catalog; no new thresholds). + New exam saves the current worksheet as a draft, then clears the form. Still individual mode on this device: no clinic accounts and no cloud sync. Formulas unchanged.</li>
@@ -1685,7 +1707,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 3.7.0 · Clinical Sonography Companion. Last reviewed 26 Sep 2026 with the citations in References. Formulas unchanged in this workflow release.</p>
+    <p class="note">Babsinogen 3.8.0 · Clinical Sonography Companion. Last reviewed 15 Oct 2026 with the citations in References. Dating formulas unchanged in this release.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -1844,6 +1866,129 @@
     var l1 = 1.304 + 0.05281 * ac + 0.1938 * fl - 0.004 * ac * fl;
     return { grams: Math.pow(10, l1), label: "Hadlock I \u2014 AC, FL" };
   }
+
+  function psaDensity(psa, volCc) {
+    if (psa == null || volCc == null || !(volCc > 0) || !(psa >= 0) || !isFinite(psa) || !isFinite(volCc)) return null;
+    return psa / volCc;
+  }
+
+  function fetusWeightFrom(grams, bpd, hc, ac, fl) {
+    if (grams != null && grams > 0) return { grams: grams, how: "entered weight" };
+    var r = hadlockEFW(bpd, hc, ac, fl);
+    if (!r || !isFinite(r.grams) || r.grams <= 0) return null;
+    return { grams: r.grams, how: r.label };
+  }
+
+  function readFetusSlot(prefix, label) {
+    var w = fetusWeightFrom(num(val(prefix + "-efw")), num(val(prefix + "-bpd")), num(val(prefix + "-hc")), num(val(prefix + "-ac")), num(val(prefix + "-fl")));
+    var dvp = num(val(prefix + "-dvp"));
+    var mca = num(val(prefix + "-mca"));
+    var bladder = val(prefix + "-blad") || "";
+    var ua = val(prefix + "-ua") || "";
+    var any = !!w || dvp != null || mca != null || (bladder && bladder !== "not assessed") || (ua && ua !== "not assessed");
+    if (!any) return null;
+    return { id: label, grams: w ? w.grams : null, how: w ? w.how : "", dvp: dvp, mca: mca, bladder: bladder, ua: ua };
+  }
+
+  function multipleSurveillance(opts) {
+    opts = opts || {};
+    var fetuses = (opts.fetuses || []).filter(Boolean);
+    var chorion = opts.chorion || "";
+    var gaW = opts.gaDays != null ? opts.gaDays / 7 : null;
+    var lines = [];
+    var flags = { screened: false, discordance: null, quintero: false, isuogFluid: null, taps: false };
+    if (!fetuses.length) return { lines: lines, flags: flags };
+    flags.screened = true;
+    lines.push("One EDD belongs to the pregnancy. Do not give the smaller fetus a separate due date.");
+    var weights = fetuses.filter(function (f) { return f.grams != null && f.grams > 0; });
+    if (weights.length >= 2) {
+      var hi = weights[0], lo = weights[0];
+      weights.forEach(function (f) { if (f.grams > hi.grams) hi = f; if (f.grams < lo.grams) lo = f; });
+      var disc = (hi.grams - lo.grams) / hi.grams * 100;
+      flags.discordance = disc;
+      var discLine = "EFW discordance " + disc.toFixed(1) + "% = (larger \u2212 smaller) / larger. ";
+      if (disc >= 25 && (chorion === "MCDA" || chorion === "MCMA")) discLine += "At or above 25% in a monochorionic pregnancy this raises selective growth-restriction concern. It does not diagnose TTTS.";
+      else if (disc >= 20) discLine += "At or above 20%, a commonly used ACOG surveillance flag. Not TTTS and not a new EDD.";
+      else discLine += "Below 20%. Still follow the local multiple-pregnancy pathway.";
+      lines.push(discLine);
+      weights.forEach(function (f) { lines.push(f.id + " weight about " + Math.round(f.grams) + " g (" + f.how + ")."); });
+    } else if (weights.length === 1) lines.push("Only one fetal weight is entered. Discordance needs at least two.");
+    var withDvp = fetuses.filter(function (f) { return f.dvp != null; });
+    if (withDvp.length >= 2) {
+      var minD = withDvp[0], maxD = withDvp[0];
+      withDvp.forEach(function (f) { if (f.dvp < minD.dvp) minD = f; if (f.dvp > maxD.dvp) maxD = f; });
+      var oligo = minD.dvp <= 2;
+      var poly8 = maxD.dvp >= 8;
+      var poly10 = maxD.dvp >= 10;
+      var quintero = oligo && poly8;
+      flags.quintero = quintero;
+      var after20 = gaW != null && gaW >= 20;
+      var isuog = gaW == null ? null : (after20 ? (oligo && poly10) : (oligo && poly8));
+      flags.isuogFluid = isuog;
+      if (chorion === "DCDA") {
+        lines.push("Deepest pockets " + minD.dvp.toFixed(1) + " cm and " + maxD.dvp.toFixed(1) + " cm. TTTS is a monochorionic diagnosis. Do not call a dichorionic fluid difference TTTS.");
+      } else if (chorion === "MCMA") {
+        lines.push("A monoamniotic pregnancy has one sac, so a two-pocket TTTS fluid rule does not apply. Cord entanglement is the separate concern.");
+      } else {
+        var who = chorion === "MCDA" ? "MCDA" : "chorionicity not confirmed as MCDA";
+        lines.push("Deepest pockets " + minD.dvp.toFixed(1) + " cm and " + maxD.dvp.toFixed(1) + " cm (" + who + ").");
+        lines.push(quintero
+          ? "Quintero fluid pattern is met: one pocket \u22642 cm and the other \u22658 cm at any gestation (Quintero 1999; North American ACOG/SMFM pattern). This app does not assign a Quintero stage."
+          : "Quintero fluid pattern is not met (needs \u22642 cm and \u22658 cm).");
+        if (gaW == null) lines.push("ISUOG/Eurofetus uses \u22658 cm for the recipient at or before 20 weeks and \u226510 cm after 20 weeks. Enter dating before that rule is applied.");
+        else if (isuog) lines.push("ISUOG/Eurofetus fluid pattern is also met (" + (after20 ? "after 20 weeks, recipient \u226510 cm" : "before 20 weeks, recipient \u22658 cm") + "). Still not a stage or a laser decision.");
+        else if (quintero && after20) lines.push("After 20 weeks the ISUOG/Eurofetus recipient threshold is \u226510 cm, which is not met. Quintero/North American \u22658 cm is met. Say which definition you are using.");
+        else lines.push("ISUOG/Eurofetus fluid pattern is not met at this gestation.");
+        if (quintero && fetuses.some(function (f) { return f.bladder === "not visible"; })) lines.push("A bladder is recorded as not visible. That finding belongs in specialist staging. This app does not stage TTTS.");
+      }
+    }
+    var withM = fetuses.filter(function (f) { return f.mca != null; });
+    if (withM.length >= 2 && chorion === "DCDA") {
+      lines.push("MCA-PSV values are recorded. TAPS is not a dichorionic diagnosis.");
+    } else if (withM.length >= 2) {
+      var hiM = withM[0], loM = withM[0];
+      withM.forEach(function (f) { if (f.mca > hiM.mca) hiM = f; if (f.mca < loM.mca) loM = f; });
+      var delta = hiM.mca - loM.mca;
+      var delphi = (hiM.mca >= 1.5 && loM.mca <= 0.8) || delta >= 1;
+      flags.taps = delphi;
+      lines.push("MCA-PSV " + hiM.mca.toFixed(2) + " and " + loM.mca.toFixed(2) + " MoM (difference " + delta.toFixed(2) + ").");
+      lines.push(delphi
+        ? "Meets the 2020 Delphi antenatal TAPS pattern (Khalil et al., UOG): \u22651.5 MoM and \u22640.8 MoM, or a difference \u22651.0 MoM. Not a haemoglobin and not a treatment order."
+        : "Does not meet the 2020 Delphi TAPS pattern (\u22651.5 with \u22640.8 MoM, or a difference \u22651.0 MoM). An older >1.5 and <1.0 pair is not used as a diagnosis here.");
+      if (chorion !== "MCDA" && chorion !== "MCMA") lines.push("TAPS is a monochorionic condition. Confirm chorionicity before using this pattern.");
+    }
+    fetuses.forEach(function (f) {
+      if (f.ua === "REDF") lines.push(f.id + ": reversed umbilical artery end-diastolic flow. Urgent review. This does not stage TTTS and does not time delivery.");
+      else if (f.ua === "AEDF") lines.push(f.id + ": absent umbilical artery end-diastolic flow. Urgent review. This does not stage TTTS.");
+    });
+    return { lines: lines, flags: flags };
+  }
+
+  function placentaContext(o) {
+    o = o || {};
+    var lines = [];
+    var edge = o.edgeMm;
+    var os = o.os || "";
+    if (edge != null && edge < 0) lines.push("Edge-to-os distance cannot be negative.");
+    else if (edge != null) {
+      if (edge === 0) lines.push("Placental edge at the internal os (0 mm). Treat as covering until a dedicated transvaginal view says otherwise.");
+      else if (os === "previa") lines.push("Placenta previa is selected, with a measured edge of " + edge.toFixed(1) + " mm. Report whether the os is covered. This is not an automatic caesarean order.");
+      if (edge > 0 && edge < 20) lines.push("Leading edge " + edge.toFixed(1) + " mm from the internal os \u2014 low-lying by the RCOG <20 mm definition. Many second-trimester cases resolve. A persistent distance under 20 mm late in the third trimester still affects delivery planning.");
+      if (edge >= 20) lines.push("Leading edge " + edge.toFixed(1) + " mm (\u226520 mm). RCOG often treats a third-trimester distance of 20 mm or more as suitable for a vaginal-birth discussion if nothing else contraindicates it. Do not clear a mid-trimester placenta from this number alone.");
+      if (os === "clear of the os" && edge < 20) lines.push("The dropdown says clear of the os, but the distance is under 20 mm. Report the measured distance.");
+      if (os === "low-lying" && edge >= 20) lines.push("The dropdown says low-lying, but the distance is 20 mm or more. Report the measured distance.");
+    } else if (os === "previa") lines.push("Placenta previa is selected. Document whether the os is covered, preferably with the edge distance on a transvaginal view when that view is safe.");
+    else if (os === "low-lying") lines.push("Low-lying is selected. Record the millimetre distance from the leading edge to the internal os. RCOG uses <20 mm.");
+    else if (os === "vasa previa suspected") lines.push("Vasa previa is suspected. Confirm with transvaginal colour and a fetal pulsed-Doppler waveform over or near the os (SMFM Consult #37). This selection is not itself confirmation.");
+    if (o.cord === "velamentous") lines.push("Velamentous cord insertion. Fetal vessels run in the membranes. Assess the cervix for vasa previa. Insertion alone neither confirms nor excludes it.");
+    else if (o.cord === "marginal") lines.push("Marginal cord insertion is documented. The vasa-previa association is weaker than a velamentous insertion. Trace vessels if they approach the cervix.");
+    if (o.shape === "bilobed" || o.shape === "succenturiate") lines.push((o.shape === "bilobed" ? "Bilobed placenta." : "Succenturiate lobe.") + " Bridging fetal vessels can cross the internal os. Vasa previa is not excluded unless that path was checked with colour Doppler.");
+    if (o.site === "anterior" && o.move === "reduced") lines.push("An anterior placenta can make movements harder to feel. Reduced movement is not explained away by placental site.");
+    var pres = o.presentation || "";
+    if (o.gaDays != null && o.gaDays >= 252 && (pres === "breech" || pres === "transverse" || pres === "oblique")) lines.push("Non-cephalic presentation at or after 36 weeks changes delivery planning. A transverse or oblique lie also raises cord-prolapse concern if the membranes rupture. Not an automatic caesarean order.");
+    return lines;
+  }
+
 
   /* =========================================================================
      GA FROM BIOMETRY — Hadlock et al. 1984 (menstrual age, weeks; cm inputs)
@@ -3251,12 +3396,13 @@
         '<div class="field"><label>Width</label><div class="row"><input id="pr-w" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
         '</div>' +
         '<div class="field"><label>Height (AP)</label><div class="row"><input id="pr-h" type="number" inputMode="decimal" step="0.1" placeholder="\u2014"><span class="suffix">cm</span></div></div>' +
+        '<div class="field"><label>PSA (optional)</label><div class="row"><input id="pr-psa" type="number" inputMode="decimal" step="0.01" min="0" placeholder="\u2014"><span class="suffix">ng/mL</span></div></div>' +
         '<div class="hairline">' +
         '<p class="subhead">Intravesical prostatic protrusion (IPP) &mdash; transabdominal, comfortably full bladder (\u2248150\u2013250mL)</p>' +
         '<div class="field"><label>IPP, tip of protrusion to bladder base</label><div class="row"><input id="pr-ipp" type="number" inputMode="decimal" step="0.5" placeholder="\u2014"><span class="suffix">mm</span></div></div>' +
         '</div>';
       set("organ-inputs", html);
-      wireOrganInputs(["pr-l", "pr-w", "pr-h", "pr-ipp"]);
+      wireOrganInputs(["pr-l", "pr-w", "pr-h", "pr-psa", "pr-ipp"]);
     } else if (organSection === "uterus") {
       html = '<div class="card-title">Uterus &amp; Endometrium</div>' +
         '<div class="field"><label>Life stage</label><div class="row"><select id="ut-stage"><option value="prepubertal">Prepubertal</option><option value="nulliparous" selected>Nulliparous (reproductive)</option><option value="multiparous">Multiparous</option><option value="postmenopausal">Postmenopausal</option></select></div></div>' +
@@ -3589,8 +3735,16 @@
       var pvol = ellipsoidVolume(pl, pw, ph);
       if (pvol != null) {
         html += organRow("Volume", Math.round(pvol) + " cc", "\u2264 30 cc") + (pvol > PROSTATE_UPPER ? '<div class="badge warn">Enlarged</div>' : '<div class="badge ok">Normal</div>');
-        html += '<div class="note">1 cc \u2248 1 g. PSA density (PSA \u00f7 volume) is more clinically useful than PSA alone once the gland is enlarged.</div>';
+        html += '<div class="note">1 cc \u2248 1 g. Volume uses 0.52 \u00d7 L \u00d7 W \u00d7 H in centimetres.</div>';
+        var psa = num(val("pr-psa"));
+        var psad = psaDensity(psa, pvol);
+        if (psad != null) {
+          html += organRow("PSA density", psad.toFixed(3) + " ng/mL/cc", "often discussed near 0.15");
+          html += psad >= 0.15 ? '<div class="badge warn">At or above 0.15 ng/mL/cc. A discussion threshold (Benson 1992 and later pathways), not a biopsy order and not a cancer diagnosis.</div>' : '<div class="badge ok">Below 0.15 ng/mL/cc. Not a rule-out.</div>';
+          html += '<div class="note">PSA density = PSA \u00f7 volume. Societies do not publish four official bands for this number.</div>';
+        } else if (psa != null) html += '<div class="note">PSA is entered. Density needs all three axes.</div>';
       } else html += '<p class="empty">Enter length, width, and height.</p>';
+      if (pvol == null && num(val("pr-psa")) != null) html += '<div class="note">PSA is entered. Density needs all three axes.</div>';
       var ipp = num(val("pr-ipp"));
       if (ipp != null) {
         var ippc = classifyIPP(ipp);
@@ -5195,7 +5349,7 @@
       safety: "Transabdominal with a comfortably full bladder for IPP; TRUS if that is the local pathway.",
       views: ["Gland L × W × H", "Intravesical protrusion from bladder base if visible", "Residual volume if locally protocolled — not scored here"],
       measures: "Ellipsoid volume 0.52 × L × W × H. IPP grade I <5 mm, II 5-10 mm, III >10 mm (Lee 2013). IPP is independent of volume.",
-      pitfalls: ["An underfilled bladder underestimates IPP.", "Volume is not a cancer diagnosis.", "PSA density needs a volume — this app does not compute PSA."],
+      pitfalls: ["An underfilled bladder underestimates IPP.", "Volume is not a cancer diagnosis.", "PSA density is PSA \u00f7 volume. About 0.15 ng/mL/cc is a discussion threshold, not a biopsy order."],
       jump: { tab: "organ", organ: "prostate" } },
     { id: "abd", label: "Abdomen / hepatobiliary",
       when: "Pain, LFTs, organomegaly, or aorta screening.",
@@ -7710,7 +7864,7 @@
 
 
   var SNAP_IDS = [
-    "ex-pid","ex-initials","ex-indication","ex-date","ex-age","ex-sex","ex-referrer","ex-region","ex-worksheet","ex-approach","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-cx","ex-fhr",
+    "ex-pid","ex-initials","ex-indication","ex-date","ex-age","ex-sex","ex-referrer","ex-region","ex-worksheet","ex-approach","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-plac-site","ex-plac-edge","ex-cord","ex-plac-shape","ex-cx","ex-fhr",
     "d-crl","d-msd","d-scandate","b-bpd","b-ofd","b-hc","b-ac","b-fl",
     "dp-uapi","dp-mcapi","dp-mcapsv","dp-wk","dp-d","dp-aedf","dp-redf","dp-dvpi","dp-dvaw","dp-utpi","dp-notch","dp-q-ua","dp-q-mca","dp-q-wave","dp-q-alara",
     "bpp-breath","bpp-move","bpp-tone","bpp-af","bpp-nst",
@@ -7718,9 +7872,12 @@
     "br-shape","br-orient","br-margin","br-echo","br-post","br-vasc","br-special","br-side","br-size","br-cat",
     "ut-stage","ut-len","ut-context","ut-endo",
     "ov-structure","ov-diam","ov-soliddiam","ov-shadows","ov-ascites","ov-papillary","ov-colorscore","ov-irregular","ov-ca125","ov-meno","ov-l","ov-w","ov-h","ov-cyst","ov-morph",
-    "kd-len","kd-len-l","kd-cortex","lv-liver","lv-gbwall","lv-cbd","lv-gbfast","lv-postchole","o-spleen","pr-l","pr-w","pr-h","pr-ipp",
+    "kd-len","kd-len-l","kd-cortex","lv-liver","lv-gbwall","lv-cbd","lv-gbfast","lv-postchole","o-spleen","pr-l","pr-w","pr-h","pr-psa","pr-ipp",
     "sc-rl","sc-rw","sc-rh","sc-ll","sc-lw","sc-lh","sc-flow","sc-pain",
     "ca-psv","ca-edv","ca-ratio","ca-plaque","ca-near","ca-occl",
+    "twA-efw","twA-dvp","twA-mca","twA-blad","twA-ua","twA-bpd","twA-hc","twA-ac","twA-fl",
+    "twB-efw","twB-dvp","twB-mca","twB-blad","twB-ua","twB-bpd","twB-hc","twB-ac","twB-fl",
+    "twC-efw","twC-dvp","twC-mca","twC-blad","twC-ua","twC-bpd","twC-hc","twC-ac","twC-fl",
     "bk-class","bk-size","vs-portal","vs-aorta","an-afval","an-afmethod","an-atrium","an-cistmag","an-nt","imp-fca","imp-location",
     "rmi-multi","rmi-solid","rmi-bilat","rmi-ascites","rmi-mets"
   ];
@@ -8129,6 +8286,10 @@
       lie: val("ex-lie"),
       move: val("ex-move"),
       placOs: val("ex-plac-os"),
+      placSite: val("ex-plac-site") || "",
+      placEdge: num(val("ex-plac-edge")),
+      placCord: val("ex-cord") || "",
+      placShape: val("ex-plac-shape") || "",
       cx: num(val("ex-cx")),
       fhrEx: num(val("ex-fhr")),
       gaDays: gaDays, gaLabel: (function () { if (gaDays == null) return ""; var wd = weeksDaysFromDays(gaDays); return wd.w + "w" + wd.d + "d"; })(),
@@ -8187,6 +8348,17 @@
         return v;
       })(),
       ipp: num(val("pr-ipp")),
+      psa: num(val("pr-psa")),
+      psad: (function () { try { return psaDensity(num(val("pr-psa")), ellipsoidVolume(num(val("pr-l")), num(val("pr-w")), num(val("pr-h")))); } catch (e) { return null; } })(),
+      multi: (function () {
+        try {
+          return multipleSurveillance({
+            chorion: val("ex-chorion") || "",
+            gaDays: gaDays,
+            fetuses: [readFetusSlot("twA", "Fetus A"), readFetusSlot("twB", "Fetus B"), readFetusSlot("twC", "Fetus C")]
+          });
+        } catch (e) { return { lines: [], flags: { screened: false } }; }
+      })(),
       caEdv: num(val("ca-edv")),
       caRatio: num(val("ca-ratio")),
       brShape: val("br-shape") || "",
@@ -8498,6 +8670,14 @@
           if (bioLine) bits.push(bioLine);
         } catch (eBio) {}
       }
+      if (examIsOb(id)) {
+        var placLines = [];
+        try {
+          placLines = placentaContext({ site: snap.placSite, os: snap.placOs, edgeMm: snap.placEdge, cord: snap.placCord, shape: snap.placShape, presentation: snap.presentation, gaDays: snap.gaDays, move: snap.move });
+        } catch (ePl) {}
+        placLines.forEach(function (l) { bits.push(l); });
+        if (snap.multi && snap.multi.lines) snap.multi.lines.forEach(function (l) { bits.push(l); });
+      }
       bits.push("Decision support only. Edit this wording. Local protocol outranks this text.");
       return bits.join(" ");
     }
@@ -8636,11 +8816,13 @@
     if (id === "prostate") {
       if (snap.prostate != null) bits.push("Prostate volume approximately " + Math.round(snap.prostate) + " cc (ellipsoid).");
       else bits.push("Prostate ultrasound. Enter three axes on Organ for volume.");
+      if (snap.psad != null) bits.push("PSA density " + snap.psad.toFixed(3) + " ng/mL/cc" + (snap.psad >= 0.15 ? " (at or above the 0.15 discussion threshold)." : " (below 0.15).") + " Not a cancer diagnosis.");
+      else if (snap.psa != null) bits.push("PSA is entered without a volume, so density is not calculated.");
       if (snap.ipp != null) {
         var ipg = snap.ipp < 5 ? "grade I (<5 mm)" : (snap.ipp <= 10 ? "grade II (5\u201310 mm)" : "grade III (>10 mm)");
         bits.push("IPP " + snap.ipp.toFixed(1) + " mm (" + ipg + "). Independent of gland volume.");
       }
-      bits.push("PSA density is more useful than PSA alone once the gland is enlarged. Not a cancer diagnosis.");
+      if (snap.psad == null) bits.push("PSA density is PSA divided by volume. Not a cancer diagnosis.");
       return close();
     }
     if (id === "vascular") {
@@ -8735,7 +8917,7 @@
     }
     if (id === "twins") {
       bits.push(obLead() + " " + chorionSentence());
-      bits.push("This form stores one set of measurements. It does not calculate intertwin discordance, TTTS, or selective growth restriction. Save each fetus if you need a serial comparison.");
+      if (!(snap.multi && snap.multi.flags && snap.multi.flags.screened)) bits.push("This form stores one set of measurements. It does not calculate intertwin discordance, TTTS, or selective growth restriction. Use the surveillance card when both fetuses are measured.");
       if (snap.presentation) bits.push("Presentation of the fetus entered here: " + snap.presentation + ".");
       if (snap.efw != null) {
         var tw = "EFW for the fetus entered on this form is approximately " + snap.efw.toLocaleString() + " g";
@@ -9847,6 +10029,16 @@
     set("exam-survey", surveyHtml());
     set("exam-prior", priorFolderHtml());
     set("exam-meaning", meaningBlock(snap));
+    var multiHost = document.getElementById("multi-out");
+    if (multiHost) {
+      var ml = snap.multi && snap.multi.lines ? snap.multi.lines : [];
+      multiHost.innerHTML = ml.length ? ml.map(function (l) { return '<p class="note">' + fEsc(l) + "</p>"; }).join("") : '<p class="empty">Enter two weights, or two deepest pockets. Chorionicity and dating on this page are reused. CRL from the other app’s dating equation is not used.</p>';
+    }
+    var placHost = document.getElementById("plac-out");
+    if (placHost) {
+      var pln = placentaContext({ site: snap.placSite, os: snap.placOs, edgeMm: snap.placEdge, cord: snap.placCord, shape: snap.placShape, presentation: snap.presentation, gaDays: snap.gaDays, move: snap.move });
+      placHost.innerHTML = pln.length ? pln.map(function (l) { return '<p class="note">' + fEsc(l) + "</p>"; }).join("") : "";
+    }
     set("exam-miss", dontMissHtml());
     set("exam-follow", nextStepsHtml(snap));
     set("exam-ddx", findingDdxHtml(snap));
@@ -9884,8 +10076,36 @@
     scheduleDraft();
   }
 
+  function buildMultiSlots() {
+    var host = document.getElementById("multi-slots");
+    if (!host || host.dataset.ready) return;
+    host.dataset.ready = "1";
+    function slot(prefix, title) {
+      return '<details class="card" style="margin:8px 0;padding:10px"><summary><strong>' + title + '</strong></summary>' +
+        '<div class="grid2">' +
+        '<div class="field"><label>EFW if already calculated</label><div class="row"><input id="' + prefix + '-efw" type="number" inputMode="decimal" step="1" min="0" placeholder="-"><span class="suffix">g</span></div></div>' +
+        '<div class="field"><label>Deepest pocket</label><div class="row"><input id="' + prefix + '-dvp" type="number" inputMode="decimal" step="0.1" min="0" placeholder="-"><span class="suffix">cm</span></div></div>' +
+        '</div><div class="grid2">' +
+        '<div class="field"><label>MCA-PSV</label><div class="row"><input id="' + prefix + '-mca" type="number" inputMode="decimal" step="0.01" min="0" placeholder="-"><span class="suffix">MoM</span></div></div>' +
+        '<div class="field"><label>Bladder</label><div class="row"><select id="' + prefix + '-blad"><option value="not assessed">Not assessed</option><option value="visible">Visible</option><option value="not visible">Not visible</option></select></div></div>' +
+        '</div>' +
+        '<div class="field"><label>Umbilical artery</label><div class="row"><select id="' + prefix + '-ua"><option value="not assessed">Not assessed</option><option value="EDF">End-diastolic flow present</option><option value="AEDF">Absent end-diastolic flow</option><option value="REDF">Reversed end-diastolic flow</option></select></div></div>' +
+        '<details><summary>Or biometry in centimetres (Hadlock, only if EFW is empty)</summary><div class="grid2">' +
+        '<div class="field"><label>BPD</label><div class="row"><input id="' + prefix + '-bpd" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">cm</span></div></div>' +
+        '<div class="field"><label>HC</label><div class="row"><input id="' + prefix + '-hc" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">cm</span></div></div>' +
+        '<div class="field"><label>AC</label><div class="row"><input id="' + prefix + '-ac" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">cm</span></div></div>' +
+        '<div class="field"><label>FL</label><div class="row"><input id="' + prefix + '-fl" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">cm</span></div></div>' +
+        '</div></details></details>';
+    }
+    host.innerHTML = slot("twA", "Fetus A") + slot("twB", "Fetus B") + slot("twC", "Fetus C (optional)");
+    host.querySelectorAll("input,select").forEach(function (el) {
+      el.addEventListener("input", renderExamWrap);
+      el.addEventListener("change", renderExamWrap);
+    });
+  }
   function wireExam() {
-    ["ex-indication","ex-approach","ex-pid","ex-initials","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-cx","ex-fhr"].forEach(function (id) {
+    buildMultiSlots();
+    ["ex-indication","ex-approach","ex-pid","ex-initials","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-plac-site","ex-plac-edge","ex-cord","ex-plac-shape","ex-cx","ex-fhr"].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
       el.addEventListener("change", renderExamWrap);
@@ -10169,8 +10389,8 @@
     if (id === "twins") {
       if (!snap.chorion) add("Document chorionicity (lambda or T-sign). This app stores the label. It does not score it.");
       else if (snap.chorion === "MCMA") add("Monoamniotic pregnancy is a high-risk documentation. Local multiple-pregnancy protocol applies. This app does not time delivery.");
-      else if (snap.chorion === "MCDA") add("Monochorionic diamniotic pregnancy needs a local multiple-pregnancy pathway. This app does not screen TTTS.");
-      add("This form stores one fetus. Discordance needs both fetuses. It is not calculated here.");
+      else if (snap.chorion === "MCDA") add(snap.multi && snap.multi.flags && snap.multi.flags.screened ? "Monochorionic surveillance card was used. Read the Quintero, ISUOG, and Delphi lines. This is not a treatment order." : "Monochorionic diamniotic pregnancy needs a local multiple-pregnancy pathway. Fill the surveillance card if both fetuses were measured. This is not a Quintero stage.");
+      if (!(snap.multi && snap.multi.flags && snap.multi.flags.screened)) add("This form stores one fetus until the surveillance card is filled. Discordance needs both weights.");
     }
     if (id === "hb" || id === "abdomen") {
       if (snap.gbWall != null && snap.gbFast && snap.gbWall > 3) add("Fasting gallbladder wall is above 3 mm. Thickness is nonspecific. Not a cholecystitis diagnosis.");
@@ -10190,7 +10410,7 @@
     if (id === "pelvic") add("State endometrium with cycle/bleeding context. IOTA if an adnexal mass is present. Empty uterus + positive hCG is PUL until location is proven.");
     if (id === "renal") add("Bosniak class is morphology/enhancement, not diameter. Paediatric kidney lengths are means, not pass/fail.");
     if (id === "scrotal") add("Acute pain is a clinical emergency. Volume does not exclude torsion — greyscale and Doppler pattern plus clinical findings do.");
-    if (id === "prostate") add("IPP is independent of volume. PSA density needs a volume. This is not a cancer diagnosis.");
+    if (id === "prostate") add(snap.psad != null ? ("PSA density " + snap.psad.toFixed(3) + " ng/mL/cc. About 0.15 is a discussion threshold, not a biopsy order.") : "IPP is independent of volume. PSA density needs PSA and a volume. This is not a cancer diagnosis.");
     if (id === "vascular") add("SRU 2003 uses ICA PSV as the primary band. EDV and ICA/CCA ratio check concordance. Near occlusion is qualitative.");
     if (id === "abdomen" || id === "hb") add("Organ size is a descriptor. Correlate with LFTs, symptoms, and dedicated views. Portal diameter alone does not grade portal pressure.");
     if (id === "paeds") add("Paediatric kidney values in this app are published means, not pass/fail cutoffs.");
@@ -10393,6 +10613,16 @@
     ok("Synonym IUGR", smartJumpHits("IUGR").some(function (h) { return /FGR/.test(h.name); }), (smartJumpHits("IUGR")[0] || {}).name);
     var twinImp = suggestedImpression({ exam: "twins", fetuses: "Twins", cardiac: "present", chorion: "MCDA", efw: 1800, efwPct: 12, gaLabel: "32w0d" });
     ok("Twin impression refuses TTTS scoring", /does not calculate intertwin discordance/.test(twinImp) && /monochorionic diamniotic/.test(twinImp), twinImp.slice(0, 160));
+    ok("Discordance 1900 vs 1500", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 224, fetuses: [{ id: "A", grams: 1900, how: "entered weight", dvp: null, mca: null, bladder: "", ua: "" }, { id: "B", grams: 1500, how: "entered weight", dvp: null, mca: null, bladder: "", ua: "" }] }); return r.flags.discordance != null && Math.abs(r.flags.discordance - (400 / 1900 * 100)) < 0.05 && r.lines.join(" ").indexOf("TTTS") !== -1; })(), "");
+    ok("Quintero met, ISUOG after 20 weeks not met at 9 cm", (function () { var r = multipleSurveillance({ chorion: "MCDA", gaDays: 22 * 7, fetuses: [{ id: "A", grams: null, dvp: 1.5, mca: null, bladder: "visible", ua: "" }, { id: "B", grams: null, dvp: 9, mca: null, bladder: "visible", ua: "" }] }); return r.flags.quintero === true && r.flags.isuogFluid === false; })(), "");
+    ok("ISUOG before 20 weeks uses 8 cm", (function () { var r = multipleSurveillance({ chorion: "MCDA", gaDays: 18 * 7, fetuses: [{ id: "A", grams: null, dvp: 1.5, mca: null, bladder: "", ua: "" }, { id: "B", grams: null, dvp: 8, mca: null, bladder: "", ua: "" }] }); return r.flags.quintero === true && r.flags.isuogFluid === true; })(), "");
+    ok("DCDA fluid is not TTTS", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 140, fetuses: [{ id: "A", grams: null, dvp: 1, mca: 1.8, bladder: "", ua: "" }, { id: "B", grams: null, dvp: 10, mca: 0.7, bladder: "", ua: "" }] }); var t = r.lines.join(" "); return t.indexOf("Do not call a dichorionic fluid difference TTTS") !== -1 && t.indexOf("TAPS is not a dichorionic") !== -1 && r.flags.taps === false; })(), "");
+    ok("Delphi TAPS 1.6 and 0.7", (function () { var r = multipleSurveillance({ chorion: "MCDA", fetuses: [{ id: "A", grams: null, dvp: null, mca: 1.6, bladder: "", ua: "" }, { id: "B", grams: null, dvp: null, mca: 0.7, bladder: "", ua: "" }] }); return r.flags.taps === true; })(), "");
+    ok("Older 1.6 and 0.9 is not Delphi TAPS", (function () { var r = multipleSurveillance({ chorion: "MCDA", fetuses: [{ id: "A", grams: null, dvp: null, mca: 1.6, bladder: "", ua: "" }, { id: "B", grams: null, dvp: null, mca: 0.9, bladder: "", ua: "" }] }); return r.flags.taps === false && r.lines.join(" ").indexOf("not used as a diagnosis") !== -1; })(), "");
+    ok("PSA density has no invented band name", (function () { var d = psaDensity(4, 40); return d != null && Math.abs(d - 0.1) < 1e-9; })(), "");
+    ok("Twin Hadlock is not divided twice", (function () { var direct = hadlockEFW(9.2, 33, 32, 7.2); var via = fetusWeightFrom(null, 9.2, 33, 32, 7.2); return direct && via && Math.abs(direct.grams - via.grams) < 0.01; })(), "");
+    ok("Edge 15 mm is low-lying not a caesarean order", (function () { var t = placentaContext({ edgeMm: 15, os: "" }).join(" "); return t.indexOf("low-lying") !== -1 && t.indexOf("automatic") === -1; })(), "");
+    ok("Velamentous does not confirm vasa previa", (function () { var t = placentaContext({ cord: "velamentous" }).join(" "); return t.indexOf("neither confirms nor excludes") !== -1; })(), "");
     var dopImp = suggestedImpression({ exam: "doppler", fetuses: "Singleton", cardiac: "present", dvaw: true, utpi: 1.8, uapi: 1.4, gaLabel: "29w0d" });
     ok("Doppler impression names DV a-wave", /a-wave/.test(dopImp) && /uterine-artery/.test(dopImp), dopImp.slice(0, 160));
     var cmpI = intervalCompare({ date: "2026-10-09T00:00:00.000Z", efw: 2000, uapi: 1.4, cpr: 0.9 }, { date: "2026-09-25T00:00:00.000Z", efw: 1600, uapi: 1.1, cpr: 1.2 });
