@@ -85,9 +85,35 @@
   .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--accent2); margin-bottom: 12px; text-transform: uppercase; }
   .title-row { display: flex; align-items: center; gap: 14px; }
   .logo-mark {
-    width: 60px; height: 60px; border-radius: 16px; object-fit: cover;
-    box-shadow: none; outline: 0; background: #B84E3E;
+    width: 56px; height: 56px; border-radius: 16px; object-fit: cover;
+    box-shadow: 0 10px 24px rgba(26, 39, 68, 0.16); outline: 0; background: transparent;
   }
+  .app { padding-bottom: 96px; }
+  .dock {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px;
+    background: color-mix(in srgb, var(--panel) 94%, transparent);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    padding: 4px 8px calc(8px + env(safe-area-inset-bottom));
+  }
+  .dock button {
+    background: transparent; border: 0; color: var(--muted);
+    font-size: 11px; font-weight: 700; min-height: 48px; border-radius: 12px;
+  }
+  .dock button.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .sheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .sheet-grid button {
+    text-align: left; background: var(--panel2); border: 0; border-radius: 12px;
+    padding: 12px; min-height: 52px; color: var(--paper); font-weight: 650;
+  }
+  details.depth-fold { padding: 8px 16px 16px; }
+  details.depth-fold > summary {
+    cursor: pointer; font-family: var(--display); font-weight: 600; color: var(--accent2);
+    padding: 10px 0; list-style: none;
+  }
+  details.depth-fold > summary::-webkit-details-marker { display: none; }
+  .card:empty { display: none; padding: 0; margin: 0; box-shadow: none; }
   .title-row h1 {
     font-family: var(--display); font-size: 34px; font-weight: 600;
     letter-spacing: -0.02em; color: var(--accent); line-height: 1.08;
@@ -567,7 +593,7 @@
   </div>
 </div>
 <div id="boot-splash" class="boot-splash" aria-hidden="true">
-  <img src="logo-mark.png?v=10" width="96" height="96" alt="">
+  <img src="logo-mark.png?v=12" width="96" height="96" alt="">
   <p class="boot-name">Babsinogen</p>
   <p class="boot-sub">Clinical Sonography Companion</p>
 </div>
@@ -577,11 +603,11 @@
     <div class="eyebrow">BABSINOGEN &middot; CLINICAL SONOGRAPHY COMPANION</div>
     <div class="title-row">
       <div class="logo-wrap" aria-hidden="true">
-        <img src="logo-mark.png?v=10" width="60" height="60" alt="Babsinogen" class="logo-mark">
+        <img src="logo-mark.png?v=12" width="60" height="60" alt="Babsinogen" class="logo-mark">
       </div>
       <h1>Babsinogen</h1>
     </div>
-    <p class="tagline">Scan → measure → check → interpret → report → learn. Pick the examination you are performing. Decision support only — not a substitute for clinical judgement.</p>
+    <p class="tagline">Pick the examination. Measure, then write one report on Exam.</p>
     <div class="hero-meta">
       <div class="offline-chip"><span class="dot"></span>Works fully offline once installed &mdash; no data leaves this device</div>
       <button type="button" class="icon-btn" id="theme-toggle" aria-pressed="false">Dark room</button>
@@ -593,6 +619,42 @@
     </div>
   </header>
 
+  <nav class="dock" aria-label="Primary">
+    <button type="button" data-dock="home" class="on">Home</button>
+    <button type="button" data-dock="measure">Measure</button>
+    <button type="button" data-dock="exam">Exam</button>
+    <button type="button" data-dock="report">Report</button>
+    <button type="button" data-dock="more">More</button>
+  </nav>
+  <div id="measure-sheet" class="jump-overlay" hidden>
+    <div class="jump-box">
+      <p class="card-title">Measure</p>
+      <p class="note">Calculators. They feed the single report on Exam. They are not separate reports.</p>
+      <div class="sheet-grid">
+        <button type="button" data-tab="dating">Dating and EDD</button>
+        <button type="button" data-tab="biometry">Biometry / EFW</button>
+        <button type="button" data-tab="doppler">Doppler</button>
+        <button type="button" data-tab="anomaly">Anomaly markers</button>
+        <button type="button" data-tab="follicle">Folliculometry</button>
+        <button type="button" data-tab="organ">Organ size</button>
+        <button type="button" data-tab="impress">BPP and context</button>
+      </div>
+    </div>
+  </div>
+  <div id="more-sheet" class="jump-overlay" hidden>
+    <div class="jump-box">
+      <p class="card-title">More</p>
+      <p class="note">Library and archive. Saved reports live here. Writing the report stays on Exam.</p>
+      <div class="sheet-grid">
+        <button type="button" data-tab="log">Saved reports</button>
+        <button type="button" data-tab="protocol">Protocols</button>
+        <button type="button" data-tab="weeks">Scan weeks</button>
+        <button type="button" data-tab="cases">Cases</button>
+        <button type="button" data-tab="quiz">Quiz</button>
+        <button type="button" data-tab="refs">References</button>
+      </div>
+    </div>
+  </div>
   <nav class="tabs" aria-label="Clinical modules">
     <button class="tab" data-tab="home">Home</button>
     <button class="tab" data-tab="exam">Exam wrap-up</button>
@@ -602,10 +664,10 @@
     <button class="tab" data-tab="biometry">Biometry</button>
     <button class="tab" data-tab="doppler">Doppler</button>
     <button class="tab" data-tab="anomaly">Anomaly</button>
-    <button class="tab" data-tab="impress">Impression</button>
+    <button class="tab" data-tab="impress">BPP and context</button>
     <button class="tab" data-tab="follicle">Folliculometry</button>
     <button class="tab" data-tab="organ">Organ Size</button>
-    <button class="tab" data-tab="log">Reports &amp; Log</button>
+    <button class="tab" data-tab="log">Saved reports</button>
     <button class="tab" data-tab="quiz">Quiz</button>
     <button class="tab" data-tab="cases">Cases</button>
     <button class="tab" data-tab="refs">References</button>
@@ -695,8 +757,9 @@
           <div id="multi-slots"></div>
           <div id="multi-out"></div>
         </div>
-        <div class="card">
-          <div class="card-title">Suggested impression (editable)</div>
+        <div class="card" id="report-card">
+          <div class="card-title">Report</div>
+          <p class="subhead">This is the only place the examination report is written. Print uses this text. Saved reports only store a copy.</p>
           <p class="subhead">Never locked. Regenerating overwrites only if you have not typed.</p>
           <div class="field"><label>Template</label><div class="row"><select id="ex-template">
             <option value="">keep current wording</option>
@@ -740,17 +803,20 @@
       </div>
       <div>
         <div class="card" id="exam-prescan"></div>
-        <div class="card" id="exam-how"></div>
-        <div class="card" id="exam-cal"></div>
-        <div class="card" id="exam-survey"></div>
-        <div class="card" id="exam-meaning"></div>
         <div class="card" id="exam-miss"></div>
         <div class="card" id="exam-follow"></div>
-        <div class="card" id="exam-ddx"></div>
-        <div class="card" id="exam-pitfalls"></div>
-        <div class="card" id="exam-audit"></div>
-        <div class="card" id="exam-serial"></div>
-        <div class="card" id="exam-learn"></div>
+        <details class="card depth-fold">
+          <summary>More for this scan — technique, audit, differentials</summary>
+          <div class="card" id="exam-how"></div>
+          <div class="card" id="exam-cal"></div>
+          <div class="card" id="exam-survey"></div>
+          <div class="card" id="exam-meaning"></div>
+          <div class="card" id="exam-ddx"></div>
+          <div class="card" id="exam-pitfalls"></div>
+          <div class="card" id="exam-audit"></div>
+          <div class="card" id="exam-serial"></div>
+          <div class="card" id="exam-learn"></div>
+        </details>
       </div>
     </div>
   </section>
@@ -1003,9 +1069,9 @@
   <section class="panel-view" id="view-log">
     <div class="layout stack">
       <div class="card">
-        <div class="card-title">Report, No Saving Required</div>
-        <p class="subhead">Builds a printable summary from whatever is currently entered across the other tabs. Nothing is stored anywhere for this option.</p>
-        <button class="btn-primary" id="report-now-btn">Generate Report From Current Entries</button>
+        <div class="card-title">Archive, not a second report</div>
+        <p class="subhead">The report is written and printed on Exam. This button prints that same report. Nothing new is calculated here.</p>
+        <button class="btn-primary" id="report-now-btn">Print the Exam report</button>
       </div>
 
       <div class="card">
@@ -1082,7 +1148,7 @@
       <div>
         <div class="card">
           <div class="card-title">Scan context</div>
-          <p class="subhead">This module reads dating, biometry, Doppler, FHR, fluid, and anomaly entries already on those tabs, then applies SRU / ACOG / ISUOG criteria. Add only what those tabs do not capture.</p>
+          <p class="subhead">Not a second report. BPP and extra context live here and flow into the Exam report. This page reads dating, biometry, Doppler, FHR, fluid, and anomaly entries, then applies SRU / ACOG / ISUOG criteria.</p>
           <div class="field">
             <label>Indication</label>
             <div class="row">
@@ -1659,6 +1725,7 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.9.0</strong> (16 Oct 2026) — Clearer mark, a five-item dock, and one report. Exam is where the report is written and printed. The archive only stores a copy. Depth sits behind one disclosure. Formulas unchanged.</li>
         <li><strong>3.8.0</strong> (15 Oct 2026) — Multiple-pregnancy surveillance (discordance, Quintero vs ISUOG fluid, Delphi TAPS) using the existing Hadlock weight. PSA density on the prostate card. Placental edge, cord insertion, and accessory lobe notes. No dating formula was changed.</li>
         <li><strong>3.7.0</strong> (13 Oct 2026) — Eight further case schematics (still drawings, not patient images). A thyroid descriptor counts only after you change it. An ovary worksheet looks for a typed diameter, not the form’s starting structure. Formulas unchanged.</li>
         <li><strong>3.6.0</strong> (12 Oct 2026) — Schematics on eight teaching cases (not patient images). Pelvic and thyroid worksheets check that existing fields were filled. No new size cutoff and no formula change.</li>
@@ -1707,7 +1774,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 3.8.0 · Clinical Sonography Companion. Last reviewed 15 Oct 2026 with the citations in References. Dating formulas unchanged in this release.</p>
+    <p class="note">Babsinogen 3.9.0 · Clinical Sonography Companion. One report, written on Exam. Dating formulas unchanged.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -6820,6 +6887,48 @@
     }).join("");
   }
 
+  function printExaminationReport() {
+      var snap = currentSnapshot();
+      var fac = facilityObj();
+      var title = (fac.name || "Babsinogen") + " — examination report";
+      var body = "";
+      if (fac.address) body += "<p class='note'>" + fEsc(fac.address) + "</p>";
+      body += "<h3>Examination</h3><p>" + fEsc(activeExam ? activeExam.name : "Ad-hoc") + "</p>";
+      body += "<h3>Indication</h3><p>" + fEsc(snap.indication || "—") + "</p>";
+      body += "<h3>Findings</h3>";
+      findingsLines(snap).forEach(function (ln) {
+        var parts = ln.split(": ");
+        if (parts.length >= 2) body += "<div class='rline'><span>" + fEsc(parts[0]) + "</span><span>" + fEsc(parts.slice(1).join(": ")) + "</span></div>";
+        else body += "<p>" + fEsc(ln) + "</p>";
+      });
+      if (snap.presentation) body += "<div class='rline'><span>Presentation</span><span>" + fEsc(snap.presentation) + "</span></div>";
+      if (snap.placOs) body += "<div class='rline'><span>Placenta / os</span><span>" + fEsc(snap.placOs) + "</span></div>";
+      body += "<h3>Impression</h3><p>" + fEsc(val("ex-impression") || suggestedImpression(snap)) + "</p>";
+      var ddxFlags = findingDdxList(snap);
+      if (ddxFlags.length) {
+        body += "<h3>Differentials considered (not a diagnosis)</h3><ul>";
+        ddxFlags.forEach(function (f) {
+          body += "<li>" + fEsc(f.name) + ": " + fEsc((f.ddx || []).join("; ")) + "</li>";
+        });
+        body += "</ul>";
+      }
+      body += "<h3>Suggested next step</h3>" + nextStepsHtml(snap);
+      if (snap.pid) {
+        body += "<h3>Serial on this folder</h3>" + serialCompareHtml(snap.pid);
+      }
+      if (fac.sign) body += "<p class='note' style='margin-top:24px'>Signed: " + fEsc(fac.sign) + "</p>";
+      body += "<p class='note'>Decision support only. Local protocol outranks this text.</p>";
+      set("report-body", body);
+      var regP = regionPack();
+      var meta = (fac.name ? fac.name + " · " : "") + (fac.clinician ? fac.clinician + " · " : "") + (snap.pid || "No folder ID") + " · " + regP.name + " · " + new Date().toLocaleString("en-GB");
+      set("report-meta", meta);
+      var foot = document.getElementById("report-foot");
+      if (foot) foot.textContent = "Generated by Babsinogen. Decision support only. " + regP.edd + ". " + regP.colour.charAt(0).toUpperCase() + regP.colour.slice(1) + " Doppler spelling follows the selected region. Thresholds are not changed. Local protocol outranks this report.";
+      var rt = document.querySelector(".report-title");
+      if (rt) rt.textContent = title;
+      window.print();
+  }
+
   function showReport(meta) {
     var sections = buildReportSections();
     set("report-body", reportHtmlFromSections(sections));
@@ -6862,7 +6971,7 @@
   }
 
   function initPatientLog() {
-    document.getElementById("report-now-btn").addEventListener("click", function () { showReport(); });
+    document.getElementById("report-now-btn").addEventListener("click", function () { printExaminationReport(); });
 
     var consentBox = document.getElementById("log-consent");
     var saveBtn = document.getElementById("log-save-btn");
@@ -7634,6 +7743,35 @@
     var fu = document.getElementById("fs-up");
     if (fd) fd.addEventListener("click", function () { applyFs(-1); });
     if (fu) fu.addEventListener("click", function () { applyFs(1); });
+    function closeSheets() {
+      ["measure-sheet", "more-sheet"].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) { el.classList.remove("open"); el.hidden = true; }
+      });
+    }
+    document.querySelectorAll(".dock button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var which = b.getAttribute("data-dock");
+        closeSheets();
+        if (which === "measure" || which === "more") {
+          var sheet = document.getElementById(which + "-sheet");
+          if (sheet) { sheet.hidden = false; sheet.classList.add("open"); }
+          return;
+        }
+        if (which === "report") window.__scrollReport = true;
+        if (window.__showTab) window.__showTab(which === "report" ? "exam" : which);
+      });
+    });
+    document.querySelectorAll("#measure-sheet [data-tab], #more-sheet [data-tab]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        closeSheets();
+        if (window.__showTab) window.__showTab(b.getAttribute("data-tab"));
+      });
+    });
+    ["measure-sheet", "more-sheet"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("click", function (e) { if (e.target === el) closeSheets(); });
+    });
     var mt = document.getElementById("modules-toggle");
     if (mt) mt.addEventListener("click", function () {
       var nav = document.querySelector(".tabs");
@@ -9703,7 +9841,7 @@
       html += "</div></details>";
     });
     html += '<div class="card"><div class="card-title">Tools</div><div class="exam-grid">';
-    [["dating","Dating & EDD"],["biometry","Biometry / EFW"],["weeks","Scan weeks"],["protocol","Protocols / red flags"],["quiz","Quiz"],["cases","Cases"],["log","Reports & backup"],["refs","Evidence library"]].forEach(function (t) {
+    [["dating","Dating and EDD"],["biometry","Biometry / EFW"],["doppler","Doppler"],["log","Saved reports"],["protocol","Protocols"],["refs","Evidence"]].forEach(function (t) {
       html += '<button type="button" class="exam-card" data-tab="' + t[0] + '"><strong>' + t[1] + "</strong><span>Open module</span></button>";
     });
     html += "</div></div>";
@@ -10160,47 +10298,7 @@
       } catch (e) {}
     });
     var printB = document.getElementById("ex-print");
-    if (printB) printB.addEventListener("click", function () {
-      var snap = currentSnapshot();
-      var fac = facilityObj();
-      var title = (fac.name || "Babsinogen") + " — examination report";
-      var body = "";
-      if (fac.address) body += "<p class='note'>" + fEsc(fac.address) + "</p>";
-      body += "<h3>Examination</h3><p>" + fEsc(activeExam ? activeExam.name : "Ad-hoc") + "</p>";
-      body += "<h3>Indication</h3><p>" + fEsc(snap.indication || "—") + "</p>";
-      body += "<h3>Findings</h3>";
-      findingsLines(snap).forEach(function (ln) {
-        var parts = ln.split(": ");
-        if (parts.length >= 2) body += "<div class='rline'><span>" + fEsc(parts[0]) + "</span><span>" + fEsc(parts.slice(1).join(": ")) + "</span></div>";
-        else body += "<p>" + fEsc(ln) + "</p>";
-      });
-      if (snap.presentation) body += "<div class='rline'><span>Presentation</span><span>" + fEsc(snap.presentation) + "</span></div>";
-      if (snap.placOs) body += "<div class='rline'><span>Placenta / os</span><span>" + fEsc(snap.placOs) + "</span></div>";
-      body += "<h3>Impression</h3><p>" + fEsc(val("ex-impression") || suggestedImpression(snap)) + "</p>";
-      var ddxFlags = findingDdxList(snap);
-      if (ddxFlags.length) {
-        body += "<h3>Differentials considered (not a diagnosis)</h3><ul>";
-        ddxFlags.forEach(function (f) {
-          body += "<li>" + fEsc(f.name) + ": " + fEsc((f.ddx || []).join("; ")) + "</li>";
-        });
-        body += "</ul>";
-      }
-      body += "<h3>Suggested next step</h3>" + nextStepsHtml(snap);
-      if (snap.pid) {
-        body += "<h3>Serial on this folder</h3>" + serialCompareHtml(snap.pid);
-      }
-      if (fac.sign) body += "<p class='note' style='margin-top:24px'>Signed: " + fEsc(fac.sign) + "</p>";
-      body += "<p class='note'>Decision support only. Local protocol outranks this text.</p>";
-      set("report-body", body);
-      var regP = regionPack();
-      var meta = (fac.name ? fac.name + " · " : "") + (fac.clinician ? fac.clinician + " · " : "") + (snap.pid || "No folder ID") + " · " + regP.name + " · " + new Date().toLocaleString("en-GB");
-      set("report-meta", meta);
-      var foot = document.getElementById("report-foot");
-      if (foot) foot.textContent = "Generated by Babsinogen. Decision support only. " + regP.edd + ". " + regP.colour.charAt(0).toUpperCase() + regP.colour.slice(1) + " Doppler spelling follows the selected region. Thresholds are not changed. Local protocol outranks this report.";
-      var rt = document.querySelector(".report-title");
-      if (rt) rt.textContent = title;
-      window.print();
-    });
+    if (printB) printB.addEventListener("click", function () { printExaminationReport(); });
     var saveB = document.getElementById("ex-save");
     if (saveB) saveB.addEventListener("click", function () {
       if (!checked("ex-consent")) { set("ex-save-msg", "Tick consent before saving an examination on this device."); return; }
@@ -10695,6 +10793,13 @@
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
+      var dockFor = { home: "home", exam: "exam", dating: "measure", biometry: "measure", doppler: "measure", anomaly: "measure", follicle: "measure", organ: "measure", impress: "measure", log: "more", quiz: "more", cases: "more", refs: "more", protocol: "more", weeks: "more" };
+      document.querySelectorAll(".dock button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-dock") === dockFor[name]); });
+      if (name === "exam" && window.__scrollReport) {
+        window.__scrollReport = false;
+        var rc = document.getElementById("report-card");
+        if (rc) rc.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
       if (name === "organ" && !window.__organReady) {
         window.__organReady = true;
         renderOrganPicker();
