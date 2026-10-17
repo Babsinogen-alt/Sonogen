@@ -113,9 +113,14 @@
     padding: 10px 0; list-style: none;
   }
   details.depth-fold > summary::-webkit-details-marker { display: none; }
+  details.card > summary.card-title { cursor: pointer; list-style: none; margin-bottom: 0; }
+  details.card[open] > summary.card-title { margin-bottom: 14px; }
+  details.card > summary.card-title::-webkit-details-marker { display: none; }
+  .report-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .report-actions .btn-primary, .report-actions .btn-ghost { width: auto; margin: 0; }
   .card:empty { display: none; padding: 0; margin: 0; box-shadow: none; }
   .title-row h1 {
-    font-family: var(--display); font-size: 34px; font-weight: 600;
+    font-family: var(--display); font-size: 30px; font-weight: 600;
     letter-spacing: -0.02em; color: var(--accent); line-height: 1.08;
   }
   .tagline { font-size: 15px; color: var(--muted); margin-top: 10px; line-height: 1.55; max-width: 54ch; }
@@ -593,29 +598,26 @@
   </div>
 </div>
 <div id="boot-splash" class="boot-splash" aria-hidden="true">
-  <img src="logo-mark.png?v=12" width="96" height="96" alt="">
+  <img src="logo-mark.png?v=13" width="96" height="96" alt="">
   <p class="boot-name">Babsinogen</p>
   <p class="boot-sub">Clinical Sonography Companion</p>
 </div>
 <div class="app" id="app">
 
   <header class="header">
-    <div class="eyebrow">BABSINOGEN &middot; CLINICAL SONOGRAPHY COMPANION</div>
     <div class="title-row">
       <div class="logo-wrap" aria-hidden="true">
-        <img src="logo-mark.png?v=12" width="60" height="60" alt="Babsinogen" class="logo-mark">
+        <img src="logo-mark.png?v=13" width="60" height="60" alt="" class="logo-mark">
       </div>
-      <h1>Babsinogen</h1>
+      <div>
+        <h1>Babsinogen</h1>
+        <p class="tagline" style="margin-top:2px">Measure, check, then one report.</p>
+      </div>
     </div>
-    <p class="tagline">Pick the examination. Measure, then write one report on Exam.</p>
     <div class="hero-meta">
-      <div class="offline-chip"><span class="dot"></span>Works fully offline once installed &mdash; no data leaves this device</div>
-      <button type="button" class="icon-btn" id="theme-toggle" aria-pressed="false">Dark room</button>
-      <button type="button" class="icon-btn" id="fs-down" aria-label="Smaller text">A-</button>
-      <button type="button" class="icon-btn" id="fs-up" aria-label="Larger text">A+</button>
-      <button type="button" class="icon-btn" id="new-exam">+ New exam</button>
+      <button type="button" class="btn-primary" id="new-exam" style="width:auto;margin:0">New exam</button>
       <button type="button" class="icon-btn" id="jump-open">Search</button>
-      <button type="button" class="icon-btn" id="modules-toggle" aria-pressed="false">All modules</button>
+      <div class="offline-chip" style="margin:0"><span class="dot"></span>On this device only</div>
     </div>
   </header>
 
@@ -644,7 +646,13 @@
   <div id="more-sheet" class="jump-overlay" hidden>
     <div class="jump-box">
       <p class="card-title">More</p>
-      <p class="note">Library and archive. Saved reports live here. Writing the report stays on Exam.</p>
+      <p class="note">Library and display. Writing and printing stay on Report.</p>
+      <div class="sheet-grid" style="margin-bottom:10px">
+        <button type="button" class="icon-btn" id="theme-toggle" aria-pressed="false">Dark room</button>
+        <button type="button" class="icon-btn" id="modules-toggle" aria-pressed="false">All modules</button>
+        <button type="button" class="icon-btn" id="fs-down" aria-label="Smaller text">Smaller text</button>
+        <button type="button" class="icon-btn" id="fs-up" aria-label="Larger text">Larger text</button>
+      </div>
       <div class="sheet-grid">
         <button type="button" data-tab="log">Saved reports</button>
         <button type="button" data-tab="protocol">Protocols</button>
@@ -720,8 +728,8 @@
           <div id="exam-prior"></div>
           <p class="note">Two identifiers (folder ID + initials) help you reopen a serial scan. Do not use a hospital MRN unless local policy allows on-device storage.</p>
         </div>
-        <div class="card ob-only">
-          <div class="card-title">Obstetric context</div>
+        <details class="card ob-only">
+          <summary class="card-title">Obstetric context</summary>
           <div class="grid2">
             <div class="field"><label>Fetuses</label><div class="row"><select id="ex-fetuses"><option value="Singleton">Singleton</option><option value="Twins">Twins</option><option value="Higher-order">Higher-order</option></select></div></div>
             <div class="field"><label>Cardiac activity</label><div class="row"><select id="ex-cardiac"><option value="">-</option><option value="present">Present</option><option value="absent">Absent</option></select></div></div>
@@ -750,17 +758,44 @@
             <div class="field"><label>Placental shape</label><div class="row"><select id="ex-plac-shape"><option value="">Not stated</option><option value="discoid">Discoid</option><option value="bilobed">Bilobed</option><option value="succenturiate">Succenturiate lobe</option></select></div></div>
           </div>
           <div id="plac-out"></div>
-        </div>
-        <div class="card ob-only" id="multi-card">
-          <div class="card-title">Multiple-pregnancy surveillance</div>
+        </details>
+        <details class="card ob-only" id="multi-card">
+          <summary class="card-title">Twins and higher-order</summary>
           <p class="subhead">Optional second and third fetus. Weight uses an entered gram value, or Hadlock from centimetre biometry already validated in this app. One EDD. Not a Quintero stage and not a laser decision.</p>
           <div id="multi-slots"></div>
           <div id="multi-out"></div>
+        </details>
+        <div class="card">
+          <div class="card-title">Report</div>
+          <p class="subhead">One written report. It is not repeated on this checklist.</p>
+          <button type="button" class="btn-primary" id="goto-report">Open the report</button>
         </div>
+      </div>
+      <div>
+        <div class="card" id="exam-prescan"></div>
+        <div class="card" id="exam-miss"></div>
+        <div class="card" id="exam-follow"></div>
+        <details class="card depth-fold">
+          <summary>More for this scan — technique, audit, differentials</summary>
+          <div class="card" id="exam-how"></div>
+          <div class="card" id="exam-cal"></div>
+          <div class="card" id="exam-survey"></div>
+          <div class="card" id="exam-meaning"></div>
+          <div class="card" id="exam-ddx"></div>
+          <div class="card" id="exam-pitfalls"></div>
+          <div class="card" id="exam-audit"></div>
+          <div class="card" id="exam-serial"></div>
+          <div class="card" id="exam-learn"></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel-view" id="view-report">
+    <p style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 12px">One report</p>
         <div class="card" id="report-card">
           <div class="card-title">Report</div>
-          <p class="subhead">This is the only place the examination report is written. Print uses this text. Saved reports only store a copy.</p>
-          <p class="subhead">Never locked. Regenerating overwrites only if you have not typed.</p>
+          <p class="subhead">This is the only written report. Print, copy, and save use this text. The archive stores a copy. It does not write a second one.</p>
           <div class="field"><label>Template</label><div class="row"><select id="ex-template">
             <option value="">keep current wording</option>
             <option value="growth">Normal growth scan skeleton</option>
@@ -784,7 +819,7 @@
             <option value="vascular">Carotid skeleton</option>
           </select></div></div>
           <textarea id="ex-impression" rows="8" style="width:100%;min-height:160px;background:var(--panel2);color:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px;font-family:var(--sans);font-size:14px;"></textarea>
-          <div class="btn-row" style="margin-top:10px;flex-wrap:wrap;">
+          <div class="report-actions">
             <button type="button" class="btn-ghost" id="ex-regen" style="width:auto;">Regenerate</button>
             <button type="button" class="btn-ghost" id="ex-copy-imp" style="width:auto;">Copy impression</button>
             <button type="button" class="btn-ghost" id="ex-copy-find" style="width:auto;">Copy findings</button>
@@ -800,25 +835,6 @@
           <button type="button" class="btn-primary" id="ex-save">Save examination</button>
           <p class="note" id="ex-save-msg">Browser storage is not a hospital record. Export a backup from Reports if these data matter.</p>
         </div>
-      </div>
-      <div>
-        <div class="card" id="exam-prescan"></div>
-        <div class="card" id="exam-miss"></div>
-        <div class="card" id="exam-follow"></div>
-        <details class="card depth-fold">
-          <summary>More for this scan — technique, audit, differentials</summary>
-          <div class="card" id="exam-how"></div>
-          <div class="card" id="exam-cal"></div>
-          <div class="card" id="exam-survey"></div>
-          <div class="card" id="exam-meaning"></div>
-          <div class="card" id="exam-ddx"></div>
-          <div class="card" id="exam-pitfalls"></div>
-          <div class="card" id="exam-audit"></div>
-          <div class="card" id="exam-serial"></div>
-          <div class="card" id="exam-learn"></div>
-        </details>
-      </div>
-    </div>
   </section>
 
   <!-- ===================== TAB 1: BIOMETRY ===================== -->
@@ -1069,13 +1085,14 @@
   <section class="panel-view" id="view-log">
     <div class="layout stack">
       <div class="card">
-        <div class="card-title">Archive, not a second report</div>
-        <p class="subhead">The report is written and printed on Exam. This button prints that same report. Nothing new is calculated here.</p>
-        <button class="btn-primary" id="report-now-btn">Print the Exam report</button>
+        <div class="card-title">Archive</div>
+        <p class="subhead">Saved copies of the report. To write or print, open Report.</p>
+        <button class="btn-primary" id="report-now-btn">Open the report</button>
       </div>
 
-      <div class="card">
-        <div class="card-title">Save This Episode (Optional)</div>
+      <details class="card">
+        <summary class="card-title">Older episode shortcut</summary>
+        <div class="card-title" style="margin-top:8px">Save this episode (optional)</div>
         <p class="subhead">Off by default. Only save if the patient has consented to their measurements being kept on this device for follow-up. Nothing leaves this device either way.</p>
         <label class="check-row"><input type="checkbox" id="log-consent"> Patient has consented to saving this episode on this device</label>
         <div class="grid2">
@@ -1085,7 +1102,7 @@
         <div class="field"><label>Note (optional)</label><div class="row"><input id="log-note" type="text" placeholder="—" maxlength="120"></div></div>
         <button class="btn-primary" id="log-save-btn" disabled>Save Current Entries As Episode</button>
         <p class="note" id="log-save-msg"></p>
-      </div>
+      </details>
 
       <div class="card">
         <div class="card-title">Saved Episodes <span id="log-count" class="chip" style="margin:0"></span></div>
@@ -1725,6 +1742,7 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.10.0</strong> (17 Oct 2026) — New mark. Home, Measure, Exam, Report, and More. The written report lives on one screen. Obstetric detail and twins stay folded. Formulas unchanged.</li>
         <li><strong>3.9.0</strong> (16 Oct 2026) — Clearer mark, a five-item dock, and one report. Exam is where the report is written and printed. The archive only stores a copy. Depth sits behind one disclosure. Formulas unchanged.</li>
         <li><strong>3.8.0</strong> (15 Oct 2026) — Multiple-pregnancy surveillance (discordance, Quintero vs ISUOG fluid, Delphi TAPS) using the existing Hadlock weight. PSA density on the prostate card. Placental edge, cord insertion, and accessory lobe notes. No dating formula was changed.</li>
         <li><strong>3.7.0</strong> (13 Oct 2026) — Eight further case schematics (still drawings, not patient images). A thyroid descriptor counts only after you change it. An ovary worksheet looks for a typed diameter, not the form’s starting structure. Formulas unchanged.</li>
@@ -1774,7 +1792,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 3.9.0 · Clinical Sonography Companion. One report, written on Exam. Dating formulas unchanged.</p>
+    <p class="note">Babsinogen 3.10.0 · Clinical Sonography Companion. One report screen. Dating formulas unchanged.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -6508,7 +6526,7 @@
     if (!rec) {
       set("f-series-card", '<div class="card-title">Serial scans</div><p class="empty">Open or create a patient folder to start a series.</p>');
       set("f-chart-card", '<div class="card-title">Follicle growth trend</div><p class="empty">Select a patient first.</p>');
-      set("f-scan-report-card", '<div class="card-title">Latest scan report</div><p class="empty">Select a patient first.</p>');
+      set("f-scan-report-card", '<div class="card-title">Cycle interpretation</div><p class="empty">Select a patient first.</p>');
       set("f-trend-card", '<div class="card-title">Trend interpretation</div><p class="empty">Select a patient first.</p>');
       set("f-final-card", '<div class="card-title">End-of-tracking interpretation</div><p class="empty">Select a patient first.</p>');
       return;
@@ -6546,7 +6564,7 @@
 
     if (scans.length) {
       var lastN = fScanNarrative(cycle, scans, scans.length - 1);
-      var sr = '<div class="card-title">Latest scan report</div><div class="impression ' + (lastN.label.cls === "warn" ? "warn" : "") + '"><h3>' + fEsc(lastN.label.label) + '</h3><p>' + fEsc(lastN.text) + '</p></div>';
+      var sr = '<div class="card-title">Cycle interpretation</div><div class="impression ' + (lastN.label.cls === "warn" ? "warn" : "") + '"><h3>' + fEsc(lastN.label.label) + '</h3><p>' + fEsc(lastN.text) + '</p></div>';
       if (lastN.ov.signs.length) {
         sr += '<p class="note">Ovulation score: ' + lastN.ov.score + ' independent sign' + (lastN.ov.score === 1 ? "" : "s") + ' (2 = probable; 3+ with collapse or corpus luteum = consistent with ovulation). Ultrasound cannot prove oocyte release.</p>';
       }
@@ -6555,7 +6573,7 @@
       var fin = fFinalNarrative(cycle, scans);
       set("f-final-card", '<div class="card-title">' + fEsc(fin.title) + '</div><div class="impression ' + (fin.cls === "warn" ? "warn" : "") + '"><h3>Structured impression</h3><p>' + fEsc(fin.text) + '</p></div>');
     } else {
-      set("f-scan-report-card", '<div class="card-title">Latest scan report</div><p class="empty">Save a scan to generate a structured report.</p>');
+      set("f-scan-report-card", '<div class="card-title">Cycle interpretation</div><p class="empty">Save a scan to see the cycle interpretation.</p>');
       set("f-trend-card", '<div class="card-title">Trend interpretation</div><p class="empty">Needs at least two visits.</p>');
       set("f-final-card", '<div class="card-title">End-of-tracking interpretation</div><p class="empty">Complete the series (or tick “last scan”) for an end-of-period impression.</p>');
     }
@@ -6971,7 +6989,9 @@
   }
 
   function initPatientLog() {
-    document.getElementById("report-now-btn").addEventListener("click", function () { printExaminationReport(); });
+    document.getElementById("report-now-btn").addEventListener("click", function () { if (window.__showTab) window.__showTab("report"); });
+    var gotoReport = document.getElementById("goto-report");
+    if (gotoReport) gotoReport.addEventListener("click", function () { if (window.__showTab) window.__showTab("report"); });
 
     var consentBox = document.getElementById("log-consent");
     var saveBtn = document.getElementById("log-save-btn");
@@ -7758,8 +7778,7 @@
           if (sheet) { sheet.hidden = false; sheet.classList.add("open"); }
           return;
         }
-        if (which === "report") window.__scrollReport = true;
-        if (window.__showTab) window.__showTab(which === "report" ? "exam" : which);
+        if (window.__showTab) window.__showTab(which);
       });
     });
     document.querySelectorAll("#measure-sheet [data-tab], #more-sheet [data-tab]").forEach(function (b) {
@@ -9821,9 +9840,8 @@
 
   function renderHome() {
     var groups = ["Obstetrics", "Gynaecology", "General"];
-    var html = '<p class="home-flow">Scan → measure → check → interpret → report → learn</p>';
-    html += '<h2 class="home-title">Start an examination</h2>';
-    html += '<p class="tagline" style="margin-bottom:18px">Choose the examination you are performing. Calculators stay available underneath. Decision support only.</p>';
+    var html = '<h2 class="home-title">Start an examination</h2>';
+    html += '<p class="tagline" style="margin-bottom:18px">Choose the scan. Measure fills the calculators. Report is the only place the wording is written.</p>';
     var recents = loadExamStore().slice(-4).reverse();
     if (recents.length) {
       html += '<div class="card"><div class="card-title">Recent on this device</div><ul class="timeline">';
@@ -9840,11 +9858,7 @@
       });
       html += "</div></details>";
     });
-    html += '<div class="card"><div class="card-title">Tools</div><div class="exam-grid">';
-    [["dating","Dating and EDD"],["biometry","Biometry / EFW"],["doppler","Doppler"],["log","Saved reports"],["protocol","Protocols"],["refs","Evidence"]].forEach(function (t) {
-      html += '<button type="button" class="exam-card" data-tab="' + t[0] + '"><strong>' + t[1] + "</strong><span>Open module</span></button>";
-    });
-    html += "</div></div>";
+    html += '<p class="note">Calculators are under Measure. Protocols, cases, and the archive are under More.</p>';
     var drafts = loadDrafts().filter(draftHasContent).slice().sort(function (a, b) { return (b._draftAt || "").localeCompare(a._draftAt || ""); });
     if (drafts.length) {
       var dhtml = '<div class="card draft-card"><div class="card-title">Drafts on this device</div><p class="note">Leaving a screen does not erase measurements. Consent is only needed when you archive a final copy in Reports.</p>';
@@ -10789,17 +10803,13 @@
   function onReady() {
     // Tabs
     var tabs = document.querySelectorAll(".tab");
-    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), home: document.getElementById("view-home"), exam: document.getElementById("view-exam"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol"), cases: document.getElementById("view-cases") };
+    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), home: document.getElementById("view-home"), exam: document.getElementById("view-exam"), report: document.getElementById("view-report"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol"), cases: document.getElementById("view-cases") };
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
-      var dockFor = { home: "home", exam: "exam", dating: "measure", biometry: "measure", doppler: "measure", anomaly: "measure", follicle: "measure", organ: "measure", impress: "measure", log: "more", quiz: "more", cases: "more", refs: "more", protocol: "more", weeks: "more" };
+      var dockFor = { home: "home", exam: "exam", report: "report", dating: "measure", biometry: "measure", doppler: "measure", anomaly: "measure", follicle: "measure", organ: "measure", impress: "measure", log: "more", quiz: "more", cases: "more", refs: "more", protocol: "more", weeks: "more" };
       document.querySelectorAll(".dock button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-dock") === dockFor[name]); });
-      if (name === "exam" && window.__scrollReport) {
-        window.__scrollReport = false;
-        var rc = document.getElementById("report-card");
-        if (rc) rc.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      if (name === "report") { try { renderExamWrap(); } catch (eRp) {} }
       if (name === "organ" && !window.__organReady) {
         window.__organReady = true;
         renderOrganPicker();
