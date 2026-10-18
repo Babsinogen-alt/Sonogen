@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Babsinogen — Obstetric &amp; Sonographic Biometry</title>
+<title>Sonogen — Obstetric &amp; Sonographic Biometry</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#C45C4A">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -12,7 +12,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Babsinogen">
+<meta name="apple-mobile-web-app-title" content="Sonogen">
 <style>
   :root {
     --bg: #F4EFE6;
@@ -81,11 +81,11 @@
   button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   .app { max-width: 1120px; margin: 0 auto; }
 
-  .header { margin-bottom: 22px; }
+  .header { margin-bottom: 10px; }
   .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; color: var(--accent2); margin-bottom: 12px; text-transform: uppercase; }
   .title-row { display: flex; align-items: center; gap: 14px; }
   .logo-mark {
-    width: 56px; height: 56px; border-radius: 16px; object-fit: cover;
+    width: 44px; height: 44px; border-radius: 14px; object-fit: cover;
     box-shadow: 0 10px 24px rgba(26, 39, 68, 0.16); outline: 0; background: transparent;
   }
   .app { padding-bottom: 96px; }
@@ -132,14 +132,14 @@
   .offline-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
 
   .tabs {
-    display: none; gap: 4px; margin: 0 -16px 22px; padding: 8px 16px 10px;
+    display: none !important; gap: 4px; margin: 0 -16px 22px; padding: 8px 16px 10px;
     overflow-x: auto; scrollbar-width: none;
     position: sticky; top: 0; z-index: 20;
     background: color-mix(in srgb, var(--ink-page) 88%, white);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
   }
-  .tabs.show-modules { display: flex; }
+  .tabs, .tabs.show-modules { display: none !important; }
   body[data-family="gyn"] .ob-only, body[data-family="gen"] .ob-only { display: none !important; }
   .exam-step.on { background: var(--accent); color: var(--on-accent); }
   .home-group summary { cursor: pointer; font-family: var(--display); font-size: 18px; padding: 4px 0 10px; list-style: none; }
@@ -461,7 +461,18 @@
   @media (prefers-reduced-motion: reduce) { .boot-splash { display: none; } }
 
 
-  .home-title { font-family: var(--display); font-size: 28px; font-weight: 600; color: var(--paper); margin: 4px 0 8px; }
+  .home-kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 6px 0 10px; }
+  .home-title { font-family: var(--display); font-size: 28px; font-weight: 600; color: var(--paper); margin: 4px 0 12px; }
+  .launch-list { display: flex; flex-direction: column; gap: 10px; }
+  .launch-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%; text-align: left; background: var(--panel); color: var(--paper);
+    border: 0; border-radius: 18px; padding: 16px 16px; min-height: 72px; box-shadow: var(--shadow);
+  }
+  .launch-row strong { display: block; font-family: var(--display); font-size: 18px; font-weight: 600; }
+  .launch-row span span { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+  .launch-chev { color: var(--muted); font-size: 22px; line-height: 1; }
+  .home-back { background: none; border: 0; color: var(--accent); font-weight: 650; padding: 4px 0 12px; min-height: 44px; }
   .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
   .exam-card {
     text-align: left; background: var(--panel2); border: 1px solid var(--line); border-radius: 14px;
@@ -483,6 +494,7 @@
     border-radius: 999px; min-height: 40px;
   }
   .bottom-nav {
+    display: none !important;
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
     display: flex; justify-content: space-around; gap: 4px;
     background: color-mix(in srgb, var(--panel) 92%, transparent);
@@ -599,25 +611,19 @@
 </div>
 <div id="boot-splash" class="boot-splash" aria-hidden="true">
   <img src="logo-mark.png?v=13" width="96" height="96" alt="">
-  <p class="boot-name">Babsinogen</p>
+  <p class="boot-name">Sonogen</p>
   <p class="boot-sub">Clinical Sonography Companion</p>
 </div>
 <div class="app" id="app">
 
   <header class="header">
     <div class="title-row">
-      <div class="logo-wrap" aria-hidden="true">
-        <img src="logo-mark.png?v=13" width="60" height="60" alt="" class="logo-mark">
+      <img src="logo-mark.png?v=13" width="44" height="44" alt="" class="logo-mark">
+      <div style="flex:1;min-width:0">
+        <h1>Sonogen</h1>
+        <p class="tagline" style="margin-top:0">Clinical sonography</p>
       </div>
-      <div>
-        <h1>Babsinogen</h1>
-        <p class="tagline" style="margin-top:2px">Measure, check, then one report.</p>
-      </div>
-    </div>
-    <div class="hero-meta">
-      <button type="button" class="btn-primary" id="new-exam" style="width:auto;margin:0">New exam</button>
-      <button type="button" class="icon-btn" id="jump-open">Search</button>
-      <div class="offline-chip" style="margin:0"><span class="dot"></span>On this device only</div>
+      <button type="button" class="icon-btn" id="jump-open" aria-label="Search">Search</button>
     </div>
   </header>
 
@@ -631,7 +637,7 @@
   <div id="measure-sheet" class="jump-overlay" hidden>
     <div class="jump-box">
       <p class="card-title">Measure</p>
-      <p class="note">Calculators. They feed the single report on Exam. They are not separate reports.</p>
+      <p class="note">Calculators. They fill the one report. They are not separate reports.</p>
       <div class="sheet-grid">
         <button type="button" data-tab="dating">Dating and EDD</button>
         <button type="button" data-tab="biometry">Biometry / EFW</button>
@@ -648,8 +654,8 @@
       <p class="card-title">More</p>
       <p class="note">Library and display. Writing and printing stay on Report.</p>
       <div class="sheet-grid" style="margin-bottom:10px">
+        <button type="button" class="icon-btn" id="new-exam-more">New examination</button>
         <button type="button" class="icon-btn" id="theme-toggle" aria-pressed="false">Dark room</button>
-        <button type="button" class="icon-btn" id="modules-toggle" aria-pressed="false">All modules</button>
         <button type="button" class="icon-btn" id="fs-down" aria-label="Smaller text">Smaller text</button>
         <button type="button" class="icon-btn" id="fs-up" aria-label="Larger text">Larger text</button>
       </div>
@@ -660,31 +666,16 @@
         <button type="button" data-tab="cases">Cases</button>
         <button type="button" data-tab="quiz">Quiz</button>
         <button type="button" data-tab="refs">References</button>
+        <button type="button" data-tab="about">About</button>
       </div>
     </div>
   </div>
-  <nav class="tabs" aria-label="Clinical modules">
-    <button class="tab" data-tab="home">Home</button>
-    <button class="tab" data-tab="exam">Exam wrap-up</button>
-    <button class="tab" data-tab="dating">Dating &amp; EDD</button>
-    <button class="tab" data-tab="weeks">Scan weeks</button>
-    <button class="tab" data-tab="protocol">Protocols</button>
-    <button class="tab" data-tab="biometry">Biometry</button>
-    <button class="tab" data-tab="doppler">Doppler</button>
-    <button class="tab" data-tab="anomaly">Anomaly</button>
-    <button class="tab" data-tab="impress">BPP and context</button>
-    <button class="tab" data-tab="follicle">Folliculometry</button>
-    <button class="tab" data-tab="organ">Organ Size</button>
-    <button class="tab" data-tab="log">Saved reports</button>
-    <button class="tab" data-tab="quiz">Quiz</button>
-    <button class="tab" data-tab="cases">Cases</button>
-    <button class="tab" data-tab="refs">References</button>
-  </nav>
   <div id="crit-bar" class="crit-bar" role="status" aria-live="polite"></div>
 
   <div id="exam-bar" hidden></div>
 
-  <section class="panel-view" id="view-home">
+  <section class="panel-view active" id="view-home">
+    <button type="button" class="btn-primary" id="new-exam">New examination</button>
     <div id="home-body"></div>
   </section>
 
@@ -1587,6 +1578,7 @@
   </section>
 
   <section class="panel-view" id="view-cases">
+    <div id="case-of-day"></div>
     <div class="card" id="case-area"></div>
   </section>
 
@@ -1594,7 +1586,7 @@
   <section class="panel-view" id="view-refs">
     <div class="card">
       <div class="card-title">How to use these citations</div>
-      <p class="subhead">Every formula and threshold in Babsinogen is mapped to a published source. Prefer the primary paper or society statement when counselling or writing a formal report. This page is the bibliography; the calculators remain decision support, not a textbook.</p>
+      <p class="subhead">Every formula and threshold in Sonogen is mapped to a published source. Prefer the primary paper or society statement when counselling or writing a formal report. This page is the bibliography; the calculators remain decision support, not a textbook.</p>
     </div>
     <div class="ref-grid">
       <div class="card ref-block">
@@ -1729,6 +1721,7 @@
   </section>
 
 
+  <section class="panel-view" id="view-about">
     <div class="card ref-block" id="privacy-card">
       <h3>Privacy (this device only)</h3>
       <ul>
@@ -1742,6 +1735,8 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.12.0</strong> (18 Oct 2026) — Home is a short list: Obstetrics, Gynaecology, General, then the examination. The old top menu is gone. Privacy and the changelog stay under More → About. The name is Sonogen. Formulas unchanged.</li>
+        <li><strong>3.11.0</strong> (17 Oct 2026) — The app is named Sonogen. One bottom menu. Privacy, the changelog, and the disclaimer live under More → About, not on Home. Formulas unchanged.</li>
         <li><strong>3.10.0</strong> (17 Oct 2026) — New mark. Home, Measure, Exam, Report, and More. The written report lives on one screen. Obstetric detail and twins stay folded. Formulas unchanged.</li>
         <li><strong>3.9.0</strong> (16 Oct 2026) — Clearer mark, a five-item dock, and one report. Exam is where the report is written and printed. The archive only stores a copy. Depth sits behind one disclosure. Formulas unchanged.</li>
         <li><strong>3.8.0</strong> (15 Oct 2026) — Multiple-pregnancy surveillance (discordance, Quintero vs ISUOG fluid, Delphi TAPS) using the existing Hadlock weight. PSA density on the prostate card. Placental edge, cord insertion, and accessory lobe notes. No dating formula was changed.</li>
@@ -1790,31 +1785,27 @@
       </table>
     </div>
   <footer class="footer">
-    <p class="disclaimer">MEDICAL DISCLAIMER: Babsinogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
+    <p class="disclaimer">MEDICAL DISCLAIMER: Sonogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Babsinogen 3.10.0 · Clinical Sonography Companion. One report screen. Dating formulas unchanged.</p>
+    <p class="note">Sonogen 3.12.0 · Clinical sonography companion. One menu. Formulas unchanged.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
   </footer>
+  </section>
+
 
 </div>
 
-<nav class="bottom-nav" aria-label="Primary">
-    <button type="button" data-go="home">Home</button>
-    <button type="button" data-go="exam">Exam</button>
-    <button type="button" id="nav-search">Search</button>
-    <button type="button" data-go="log">Reports</button>
-    <button type="button" data-go="cases">Learn</button>
-  </nav>
+
 
 <div id="report-view">
   <div class="report-header">
-    <div class="report-title">Babsinogen &mdash; Scan Summary</div>
+    <div class="report-title">Sonogen &mdash; Scan Summary</div>
     <div class="report-meta" id="report-meta"></div>
   </div>
   <div id="report-body"></div>
-  <div class="report-footer" id="report-foot">Generated by Babsinogen (Caliper module). Decision support only &mdash; correlate with clinical findings and departmental protocol.</div>
+  <div class="report-footer" id="report-foot">Generated by Sonogen (Caliper module). Decision support only &mdash; correlate with clinical findings and departmental protocol.</div>
 </div>
 
 <script>
@@ -5875,19 +5866,19 @@
     var oldMeta = metaEl ? metaEl.textContent : "";
     var oldBody = body ? body.innerHTML : "";
     var oldFoot = foot ? foot.textContent : "";
-    if (titleEl) titleEl.textContent = "Babsinogen — topic certificate";
+    if (titleEl) titleEl.textContent = "Sonogen — topic certificate";
     if (metaEl) metaEl.textContent = dateStr;
     body.innerHTML = '<div class="cert-wrap">' +
       "<h1>Self-assessment record</h1>" +
       "<p>This certifies that</p>" +
-      '<p class="cert-name">' + (initials ? esc(initials) : "a Babsinogen user") + "</p>" +
+      '<p class="cert-name">' + (initials ? esc(initials) : "a Sonogen user") + "</p>" +
       "<p>completed the topic</p>" +
       "<p><strong>" + esc(meta.name) + "</strong></p>" +
       "<p>Score: " + correctCount + " / " + total + " (" + pct + "%) — " + esc(quizGradeLabel(pct)) + "</p>" +
       "<p>" + (passed ? "Threshold for a passed record on this device: ≥75%." : "Below 75% — recorded as attempted, not passed.") + "</p>" +
       "<p style='margin-top:24px;font-size:12px;'>Not CME, not a licence, not FDA clearance. Generated locally; nothing was uploaded.</p>" +
       "</div>";
-    if (foot) foot.textContent = "Babsinogen decision-support self-assessment. Correlate with clinical training and departmental protocol.";
+    if (foot) foot.textContent = "Sonogen decision-support self-assessment. Correlate with clinical training and departmental protocol.";
     function restore() {
       if (titleEl) titleEl.innerHTML = oldTitle;
       if (metaEl) metaEl.textContent = oldMeta;
@@ -6908,7 +6899,7 @@
   function printExaminationReport() {
       var snap = currentSnapshot();
       var fac = facilityObj();
-      var title = (fac.name || "Babsinogen") + " — examination report";
+      var title = (fac.name || "Sonogen") + " — examination report";
       var body = "";
       if (fac.address) body += "<p class='note'>" + fEsc(fac.address) + "</p>";
       body += "<h3>Examination</h3><p>" + fEsc(activeExam ? activeExam.name : "Ad-hoc") + "</p>";
@@ -6941,7 +6932,7 @@
       var meta = (fac.name ? fac.name + " · " : "") + (fac.clinician ? fac.clinician + " · " : "") + (snap.pid || "No folder ID") + " · " + regP.name + " · " + new Date().toLocaleString("en-GB");
       set("report-meta", meta);
       var foot = document.getElementById("report-foot");
-      if (foot) foot.textContent = "Generated by Babsinogen. Decision support only. " + regP.edd + ". " + regP.colour.charAt(0).toUpperCase() + regP.colour.slice(1) + " Doppler spelling follows the selected region. Thresholds are not changed. Local protocol outranks this report.";
+      if (foot) foot.textContent = "Generated by Sonogen. Decision support only. " + regP.edd + ". " + regP.colour.charAt(0).toUpperCase() + regP.colour.slice(1) + " Doppler spelling follows the selected region. Thresholds are not changed. Local protocol outranks this report.";
       var rt = document.querySelector(".report-title");
       if (rt) rt.textContent = title;
       window.print();
@@ -7103,7 +7094,7 @@
     var text = examsCsvText();
     var a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([text], { type: "text/csv" }));
-    a.download = "babsinogen-exams.csv";
+    a.download = "sonogen-exams.csv";
     a.click();
   }
   var reportsExamFilter = "all";
@@ -7309,7 +7300,17 @@
       caseId = n.id; renderCaseDetail._pick = null; renderCaseDetail._id = null; renderCases();
     });
   }
-  function initCases() { window.__casesReady = true; renderCases(); }
+  function initCases() {
+    window.__casesReady = true;
+    var slot = document.getElementById("case-of-day");
+    if (slot && !slot.dataset.filled) {
+      slot.innerHTML = caseOfDayHtml();
+      slot.dataset.filled = "1";
+      var cod = document.getElementById("cod-open");
+      if (cod) cod.addEventListener("click", function () { if (window.__showTab) window.__showTab("cases"); });
+    }
+    renderCases();
+  }
 
   var JUMP_INDEX = [
     { name: "Measurement search", hint: "Type AC 32 cm, CRL 62, cervix 22, AFI 5", tab: "exam", keys: "AC BPD HC FL CRL MSD NT AFI SDP EFW endometrium measure" },
@@ -7335,8 +7336,8 @@
     { name: "Quiz", hint: "clinical scenarios", tab: "quiz" },
     { name: "Cases", hint: "decision cases, SRU, Doppler, IOTA", tab: "cases" },
     { name: "References & limitations", hint: "sources, FDA, safety", tab: "refs" },
-    { name: "Privacy", hint: "no accounts, local only, GDPR erasure", tab: "refs", keys: "privacy HIPAA GDPR" },
-    { name: "Changelog", hint: "versions, last reviewed", tab: "refs", keys: "changelog version" },
+    { name: "Privacy", hint: "no accounts, local only, GDPR erasure", tab: "about", keys: "privacy HIPAA GDPR" },
+    { name: "Changelog", hint: "versions, last reviewed", tab: "about", keys: "changelog version" },
     { name: "Carotid SRU", hint: "ICA PSV 125 / 230, NASCET percent", tab: "organ", organ: "carotid", keys: "carotid stenosis I65 PSV EDV" },
     { name: "Scrotal volume", hint: "Lambert 0.71 ellipsoid", tab: "organ", organ: "scrotal", keys: "testis scrotal torsion volume" },
     { name: "O00.9 Ectopic", hint: "ICD-10 lookup — verify locally", tab: "impress", keys: "O00 ectopic ICD" },
@@ -7759,6 +7760,12 @@
     });
     var newExam = document.getElementById("new-exam");
     if (newExam) newExam.addEventListener("click", function () { blankExamination(); });
+    var newExamMore = document.getElementById("new-exam-more");
+    if (newExamMore) newExamMore.addEventListener("click", function () {
+      var sheet = document.getElementById("more-sheet");
+      if (sheet) { sheet.classList.remove("open"); sheet.hidden = true; }
+      blankExamination();
+    });
     var fd = document.getElementById("fs-down");
     var fu = document.getElementById("fs-up");
     if (fd) fd.addEventListener("click", function () { applyFs(-1); });
@@ -7778,6 +7785,7 @@
           if (sheet) { sheet.hidden = false; sheet.classList.add("open"); }
           return;
         }
+        if (which === "home") window.__homeOpen = "";
         if (window.__showTab) window.__showTab(which);
       });
     });
@@ -7819,7 +7827,7 @@
       var sec = val("err-sec") || "other";
       var kind = val("err-kind") || "error";
       var body = (document.getElementById("err-text") || {}).value || "";
-      var report = "Babsinogen " + kind + " (local only)\nSection: " + sec + "\n" + body.trim() + "\nDo not include patient identifiers.";
+      var report = "Sonogen " + kind + " (local only)\nSection: " + sec + "\n" + body.trim() + "\nDo not include patient identifiers.";
       function done(ok) {
         var st = document.getElementById("err-status");
         if (st) st.textContent = ok ? "Copied. Paste into an email or GitHub issue if you wish. Nothing left this device." : "Copy failed — select the text manually.";
@@ -8397,7 +8405,7 @@
     if (!b) return;
     b.addEventListener("click", function () {
       var text = "When to seek care\n\n" + seekCareLines().map(function (ln, i) { return (i + 1) + ". " + ln; }).join("\n") +
-        "\n\nLocal emergency contacts outrank this list. Not a diagnosis. Babsinogen.";
+        "\n\nLocal emergency contacts outrank this list. Not a diagnosis. Sonogen.";
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text);
       var m = document.getElementById("wk-seek-msg");
       if (m) m.textContent = "Copied on this device. Paste into a leaflet or notes as you wish.";
@@ -9840,28 +9848,40 @@
 
   function renderHome() {
     var groups = ["Obstetrics", "Gynaecology", "General"];
-    var html = '<h2 class="home-title">Start an examination</h2>';
-    html += '<p class="tagline" style="margin-bottom:18px">Choose the scan. Measure fills the calculators. Report is the only place the wording is written.</p>';
+    var blurbs = {
+      Obstetrics: "Dating, growth, anatomy, Doppler",
+      Gynaecology: "Pelvis, follicles, adnexa",
+      General: "Thyroid, breast, abdomen, vessels"
+    };
+    var focus = window.__homeOpen || "";
+    var html = "";
+    var device = "";
     var recents = loadExamStore().slice(-4).reverse();
     if (recents.length) {
-      html += '<div class="card"><div class="card-title">Recent on this device</div><ul class="timeline">';
+      device += '<div class="card-title">Recent</div><ul class="timeline">';
       recents.forEach(function (r) {
         var nm = (function () { var e = examById(r.exam); return e ? e.name : (r.exam || "exam"); })();
-        html += "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><button type='button' class='jump-miss' data-reopen='" + fEsc(r.date) + "'>" + fEsc(nm) + " · " + fEsc(r.gaLabel || r.pid || r.initials || "reopen") + (r.efw ? " · " + r.efw + " g" : "") + "</button></li>";
+        device += "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><button type='button' class='jump-miss' data-reopen='" + fEsc(r.date) + "'>" + fEsc(nm) + " · " + fEsc(r.gaLabel || r.pid || r.initials || "reopen") + (r.efw ? " · " + r.efw + " g" : "") + "</button></li>";
       });
-      html += "</ul></div>";
+      device += "</ul>";
     }
-    groups.forEach(function (g, gi) {
-      html += '<details class="home-group card" ' + (gi === 0 ? "open" : "") + '><summary>' + g + "</summary><div class='exam-grid'>";
-      EXAM_CATALOG.filter(function (e) { return e.group === g; }).forEach(function (e) {
-        html += '<button type="button" class="exam-card" data-exam="' + e.id + '"><strong>' + fEsc(e.name) + "</strong><span>" + fEsc(e.hint) + "</span></button>";
+    if (!focus) {
+      html += '<p class="home-kicker">Examinations</p><div class="launch-list">';
+      groups.forEach(function (g) {
+        html += '<button type="button" class="launch-row" data-home-group="' + g + '"><span><strong>' + g + '</strong><span>' + blurbs[g] + '</span></span><span class="launch-chev" aria-hidden="true">\u203a</span></button>';
       });
-      html += "</div></details>";
-    });
-    html += '<p class="note">Calculators are under Measure. Protocols, cases, and the archive are under More.</p>';
+      html += "</div>";
+    } else {
+      html += '<button type="button" class="home-back" data-home-back="1">\u2039 Examinations</button>';
+      html += '<h2 class="home-title">' + focus + "</h2><div class='launch-list'>";
+      EXAM_CATALOG.filter(function (e) { return e.group === focus; }).forEach(function (e) {
+        html += '<button type="button" class="launch-row" data-exam="' + e.id + '"><span><strong>' + fEsc(e.name) + "</strong><span>" + fEsc(e.hint) + "</span></span></button>";
+      });
+      html += "</div>";
+    }
     var drafts = loadDrafts().filter(draftHasContent).slice().sort(function (a, b) { return (b._draftAt || "").localeCompare(a._draftAt || ""); });
     if (drafts.length) {
-      var dhtml = '<div class="card draft-card"><div class="card-title">Drafts on this device</div><p class="note">Leaving a screen does not erase measurements. Consent is only needed when you archive a final copy in Reports.</p>';
+      var dhtml = '<div class="card-title">Drafts</div><p class="note">A draft stays on this device until you delete it. Saving a final copy still needs consent.</p>';
       drafts.slice(0, 6).forEach(function (d) {
         var dName = (examById(d._draftExam || d.exam) || {}).name || d._draftExam || "examination";
         var dWhen = (d._draftAt || d.date || "").slice(0, 16).replace("T", " ");
@@ -9870,8 +9890,7 @@
         dhtml += "<p><strong>" + fEsc(dName) + "</strong></p><p class='note'>" + fEsc(dSub || "Working copy") + "</p>";
         dhtml += '<div class="btn-row" style="flex-wrap:wrap;margin:0 0 12px"><button type="button" class="btn-primary" data-draft-go="' + id + '" style="width:auto">Continue</button><button type="button" class="btn-ghost" data-draft-copy="' + id + '" style="width:auto">Duplicate</button><button type="button" class="btn-ghost" data-draft-fin="' + id + '" style="width:auto">Finalize</button><button type="button" class="btn-ghost" data-draft-del="' + id + '" style="width:auto">Delete</button></div>';
       });
-      dhtml += "</div>";
-      html = html.replace('<h2 class="home-title">Start an examination</h2>', dhtml + '<h2 class="home-title">Start an examination</h2>');
+      device += dhtml;
     }
     var folders = [];
     var seenF = {};
@@ -9882,16 +9901,22 @@
       folders.push(r);
     });
     if (folders.length) {
-      html += '<div class="card"><div class="card-title">Folders on this device</div><p class="subhead">Open a folder ID into wrap-up, then pick the examination. Not a hospital worklist.</p><div class="worklist">';
+      device += '<div class="card-title">Folders</div><p class="subhead">Open a folder, then pick the examination. Not a hospital worklist.</p><div class="worklist">';
       folders.slice(0, 8).forEach(function (r) {
-        html += '<button type="button" class="btn-ghost wl-folder" data-pid="' + fEsc(r.pid) + '" style="width:auto">' + fEsc(r.pid + (r.initials ? " \u00b7 " + r.initials : "")) + "</button>";
+        device += '<button type="button" class="btn-ghost wl-folder" data-pid="' + fEsc(r.pid) + '" style="width:auto">' + fEsc(r.pid + (r.initials ? " \u00b7 " + r.initials : "")) + "</button>";
       });
-      html += "</div></div>";
+      device += "</div>";
     }
-    html += caseOfDayHtml();
+    if (device) html += '<details class="card home-group"><summary>On this device</summary>' + device + '</details>';
     set("home-body", html);
     document.querySelectorAll("#home-body [data-exam]").forEach(function (b) {
       b.addEventListener("click", function () { startExam(b.getAttribute("data-exam")); });
+    });
+    document.querySelectorAll("#home-body [data-home-group]").forEach(function (b) {
+      b.addEventListener("click", function () { window.__homeOpen = b.getAttribute("data-home-group"); renderHome(); });
+    });
+    document.querySelectorAll("#home-body [data-home-back]").forEach(function (b) {
+      b.addEventListener("click", function () { window.__homeOpen = ""; renderHome(); });
     });
     document.querySelectorAll("#home-body [data-tab]").forEach(function (b) {
       b.addEventListener("click", function () { if (window.__showTab) window.__showTab(b.getAttribute("data-tab")); });
@@ -10536,7 +10561,7 @@
     var lines = [];
     var fac = facilityObj();
     if (fac.name) lines.push(fac.name);
-    lines.push("Babsinogen examination report");
+    lines.push("Sonogen examination report");
     lines.push("Exam: " + ((examById(snap.exam) || {}).name || snap.exam || "Ad-hoc"));
     if (snap.pid) lines.push("Folder: " + snap.pid + (snap.initials ? " · " + snap.initials : ""));
     if (snap.examDate) lines.push("Examination date: " + snap.examDate);
@@ -10567,7 +10592,7 @@
     return lines.join("\n");
   }
   function folderSummaryText(pid, rows) {
-    var lines = ["Babsinogen folder summary", "Folder: " + (pid || "(none)"), "Visits: " + (rows ? rows.length : 0), ""];
+    var lines = ["Sonogen folder summary", "Folder: " + (pid || "(none)"), "Visits: " + (rows ? rows.length : 0), ""];
     (rows || []).forEach(function (r) {
       lines.push((r.date || "").slice(0, 10) + " · " + ((examById(r.exam) || {}).name || r.exam || "exam") + " · " + (serialKey(r) || r.gaLabel || "—"));
       if (r.impression) lines.push("  " + String(r.impression).replace(/\s+/g, " ").slice(0, 180));
@@ -10593,7 +10618,7 @@
     set("report-body", body);
     set("report-meta", (fac.name ? fac.name + " · " : "") + (pid || "No folder ID") + " · " + new Date().toLocaleString("en-GB"));
     var rt = document.querySelector(".report-title");
-    if (rt) rt.textContent = (fac.name || "Babsinogen") + " — folder summary";
+    if (rt) rt.textContent = (fac.name || "Sonogen") + " — folder summary";
     window.print();
   }
 
@@ -10803,11 +10828,11 @@
   function onReady() {
     // Tabs
     var tabs = document.querySelectorAll(".tab");
-    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), home: document.getElementById("view-home"), exam: document.getElementById("view-exam"), report: document.getElementById("view-report"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol"), cases: document.getElementById("view-cases") };
+    var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), home: document.getElementById("view-home"), exam: document.getElementById("view-exam"), report: document.getElementById("view-report"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), about: document.getElementById("view-about"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol"), cases: document.getElementById("view-cases") };
     function showTab(name) {
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
-      var dockFor = { home: "home", exam: "exam", report: "report", dating: "measure", biometry: "measure", doppler: "measure", anomaly: "measure", follicle: "measure", organ: "measure", impress: "measure", log: "more", quiz: "more", cases: "more", refs: "more", protocol: "more", weeks: "more" };
+      var dockFor = { home: "home", exam: "exam", report: "report", dating: "measure", biometry: "measure", doppler: "measure", anomaly: "measure", follicle: "measure", organ: "measure", impress: "measure", log: "more", quiz: "more", cases: "more", refs: "more", about: "more", protocol: "more", weeks: "more" };
       document.querySelectorAll(".dock button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-dock") === dockFor[name]); });
       if (name === "report") { try { renderExamWrap(); } catch (eRp) {} }
       if (name === "organ" && !window.__organReady) {
