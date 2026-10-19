@@ -858,9 +858,9 @@
               <div class="field"><div class="row"><input id="b-estd" type="number" inputMode="numeric" min="0" max="6" placeholder="d"></div></div>
             </div>
             <p class="note">Left blank, the centile uses this scan's own composite dating instead — fine for a single dating scan, but for true growth surveillance use the GA from an earlier, more reliable scan. This box is an obstetric age, not a biometric age.</p>
-            <div class="field"><label>Biometric-age model</label><div class="row"><select id="b-biomodel"><option value="nichd">NICHD 2017 (default)</option><option value="hadlock">Hadlock 1984 four-parameter</option><option value="both">Both — not averaged</option></select></div></div>
-            <label class="check-row"><input type="checkbox" id="b-showmean"> Show the arithmetic mean of the four Hadlock parameter ages</label>
-            <p class="note">Biometric age describes fetal size. It does not replace an established due date. NICHD needs BPD, HC, AC, and FL. A missing value is not guessed.</p>
+            <div class="field"><label>Biometric-age model</label><div class="row"><select id="b-biomodel"><option value="hadlock">Hadlock 1984 four-parameter (default)</option><option value="both">Hadlock and NICHD — not averaged</option><option value="nichd">NICHD 2017 only</option></select></div></div>
+            <label class="check-row"><input type="checkbox" id="b-showmean" checked> Show the arithmetic mean of the four Hadlock parameter ages</label>
+            <p class="note">Hadlock 1984 is the default because it tracks an earlier size standard. NICHD 2017 uses the correct Table 2 equation, but on the same measurements it usually reads younger: it was fit to larger fetuses in a 2009–2013 United States cohort. That difference is not a millimetre error. Neither formula replaces a crown-rump length.</p>
           </div>
         </div>
       </div>
@@ -1735,6 +1735,7 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.15.0</strong> (19 Oct 2026) — Hadlock 1984 is the default biometric age. NICHD 2017 stays available and is not averaged with it. The arithmetic mean of the four Hadlock ages is shown. Formulas unchanged.</li>
         <li><strong>3.14.0</strong> (19 Oct 2026) — New home-screen mark: a terracotta tile and an ultrasound trace. The circle emblem is gone. Formulas unchanged.</li>
         <li><strong>3.12.0</strong> (18 Oct 2026) — Home is a short list: Obstetrics, Gynaecology, General, then the examination. The old top menu is gone. Privacy and the changelog stay under More → About. The name is Sonogen. Formulas unchanged.</li>
         <li><strong>3.11.0</strong> (17 Oct 2026) — The app is named Sonogen. One bottom menu. Privacy, the changelog, and the disclaimer live under More → About, not on Home. Formulas unchanged.</li>
@@ -1770,7 +1771,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Sonogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Sonogen 3.14.0 · Clinical sonography companion. One menu. Formulas unchanged.</p>
+    <p class="note">Sonogen 3.15.0 · Clinical sonography companion. One menu. Formulas unchanged.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -2156,8 +2157,8 @@
     return { days: null, name: "", edd: null, method: "none", provisional: false, manualDays: manualDays };
   }
   function biometricAgePack(bpd, hc, ac, fl) {
-    var model = val("b-biomodel") || "nichd";
-    if (model !== "hadlock" && model !== "both") model = "nichd";
+    var model = val("b-biomodel") || "hadlock";
+    if (model !== "nichd" && model !== "both") model = "hadlock";
     var wantN = model === "nichd" || model === "both";
     var wantH = model === "hadlock" || model === "both";
     var anchor = establishedDatingAnchor();
@@ -2185,7 +2186,7 @@
         bits.push("The models differ by " + signed(gap) + " days (" + gapWord + "). They are not averaged.");
       }
       if (anchor.days != null) {
-        var primary = nichd || had;
+        var primary = (model === "nichd") ? nichd : (had || nichd);
         var diff = Math.round(primary.weeks * 7) - Math.round(anchor.days);
         var win = nichdWindowDays(anchor.days);
         bits.push("Compared with the established age, the difference is " + signed(diff) + " days (" + bandWords(biometricBand(diff, win)) + ").");
@@ -2241,9 +2242,11 @@
     }
     if (pack.mean != null) {
       html += "<div class='rline'><span>Arithmetic mean of individual Hadlock ages</span><span>" + fEsc(wdWords(pack.mean)) + "</span></div>";
-      html += '<p class="note">Equal-weighted average of the four single-parameter Hadlock ages. This is not the NICHD model and not the Hadlock combination equation.</p>';
+      html += '<p class="note">Equal-weighted average of the four single-parameter Hadlock ages. Hadlock 1984 found this average was not significantly different from the combination equation. A gap of a few days is expected. This is not the NICHD model, and it does not revise an established due date.</p>';
     }
-    var primary = (pack.nichd && !pack.nichd.implausible) ? pack.nichd : ((pack.had && !pack.had.implausible) ? pack.had : null);
+    var primary = (pack.model === "nichd")
+      ? ((pack.nichd && !pack.nichd.implausible) ? pack.nichd : null)
+      : ((pack.had && !pack.had.implausible) ? pack.had : ((pack.nichd && !pack.nichd.implausible) ? pack.nichd : null));
     html += "<h3 style='font-size:14px;margin:12px 0 6px'>Comparison</h3>";
     if (!primary) {
       html += '<p class="empty">No usable biometric age to compare.</p>';
