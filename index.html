@@ -684,10 +684,11 @@
       <div>
         <div class="card">
           <div class="card-title">Folder</div>
-          <p class="subhead">Optional. Stays on this device. Do not use a hospital MRN unless local policy allows on-device storage.</p>
+          <p class="subhead">Saved on this device under the name you enter.</p>
+          <div class="field"><label>Patient name</label><div class="row"><input id="ex-name" maxlength="80" placeholder="Full name" autocomplete="name"></div></div>
           <div class="grid2">
-            <div class="field"><label>Folder ID</label><div class="row"><input id="ex-pid" maxlength="20" placeholder="-"></div></div>
-            <div class="field"><label>Initials</label><div class="row"><input id="ex-initials" maxlength="10" placeholder="-"></div></div>
+            <div class="field"><label>Hospital / folder number</label><div class="row"><input id="ex-pid" maxlength="32" placeholder="-"></div></div>
+            <div class="field"><label>Other ID</label><div class="row"><input id="ex-initials" maxlength="24" placeholder="phone, initials, or unit number"></div></div>
           </div>
           <div class="field"><label>Indication</label><div class="row"><input id="ex-indication" placeholder="e.g. growth, nodule, PMB"></div></div>
           <div class="grid2">
@@ -702,7 +703,6 @@
             <div class="field"><label>Report region</label><div class="row"><select id="ex-region"><option value="NG">Nigeria</option><option value="UK">United Kingdom</option><option value="US">United States</option><option value="EU">Europe</option></select></div></div>
             <div class="field"><label>Worksheet</label><div class="row"><select id="ex-worksheet"><option value="">Standard checklist</option><option value="growth">Growth scan worksheet</option><option value="pelvic">Pelvic scan worksheet</option><option value="thyroid">Thyroid scan worksheet</option></select></div></div>
           </div>
-          <p class="note">Region changes report spelling only (colour or color, EDD wording). It does not change a formula or a threshold. Age is optional. Do not enter a date of birth or a legal name. Growth, pelvic, and thyroid worksheets are reminder lists. They do not add a size cutoff.</p>
           <details>
             <summary>Build a local worksheet</summary>
             <p class="note">Individual mode on this device. A worksheet only reminds you which fields to fill. It is not a shared clinic protocol, and it does not change a formula or a threshold.</p>
@@ -717,7 +717,6 @@
           <div class="field"><label>Approach</label><div class="row"><select id="ex-approach"><option value="">-</option><option value="transvaginal">Transvaginal</option><option value="transabdominal">Transabdominal</option><option value="combined">Combined TV + TA</option></select></div></div>
           <p class="note" style="margin-top:0;">SRU 7 mm / 25 mm demise lines, TV cervix, and endometrium are transvaginal criteria. Transabdominal alone is not equivalent.</p>
           <div id="exam-prior"></div>
-          <p class="note">Two identifiers (folder ID + initials) help you reopen a serial scan. Do not use a hospital MRN unless local policy allows on-device storage.</p>
         </div>
         <details class="card ob-only">
           <summary class="card-title">Obstetric context</summary>
@@ -824,7 +823,7 @@
         <div class="card">
           <label class="check-row"><input type="checkbox" id="ex-consent"> Patient consented to save this examination on this device</label>
           <button type="button" class="btn-primary" id="ex-save">Save examination</button>
-          <p class="note" id="ex-save-msg">Browser storage is not a hospital record. Export a backup from Reports if these data matter.</p>
+          <p class="note" id="ex-save-msg"></p>
         </div>
   </section>
 
@@ -846,20 +845,17 @@
             <label>HC <span class="chip" id="hc-src">editable</span></label>
             <div class="row"><input id="b-hc" type="number" inputMode="decimal" step="0.1" placeholder="type, or leave blank to auto-fill"><span class="suffix" id="u5">cm</span></div>
           </div>
-          <p class="note" style="margin-top:0;">HC is always editable. If you leave it blank, it fills from 1.62 × (BPD + OFD) as soon as both diameters are entered. Type a traced or machine-ellipse HC to keep that value. Clear the box to return to auto-fill. Auto HC is used for EFW and dating unless you override it.</p>
           <div class="grid2">
             <div class="field"><label>AC *</label><div class="row"><input id="b-ac" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix" id="u3">cm</span></div></div>
             <div class="field"><label>FL *</label><div class="row"><input id="b-fl" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix" id="u4">cm</span></div></div>
           </div>
           <div class="hairline">
-            <label style="display:block;font-size:12.5px;color:var(--muted);margin-bottom:8px;">Established GA (optional — from LMP or an earlier dating scan; used for the growth centile below)</label>
+            <label style="display:block;font-size:12.5px;color:var(--muted);margin-bottom:8px;">Established GA, if already known</label>
             <div class="grid2">
               <div class="field"><div class="row"><input id="b-estwk" type="number" inputMode="numeric" placeholder="wk"></div></div>
               <div class="field"><div class="row"><input id="b-estd" type="number" inputMode="numeric" min="0" max="6" placeholder="d"></div></div>
             </div>
-            <p class="note">Left blank, the centile uses this scan's own composite dating instead — fine for a single dating scan, but for true growth surveillance use the GA from an earlier, more reliable scan. This box is an obstetric age, not a biometric age.</p>
             <div class="field"><label>Reference population</label><div class="row"><select id="b-pop"><option value="NG">Nigeria / Africa</option><option value="US">United States</option><option value="INT">Other</option></select></div></div>
-            <p class="note">The population chooses which biometric age is used. Nigeria / Africa uses the mean of the four Hadlock ages. The regression stays on screen for comparison and is not averaged in. United States uses NICHD 2017. This is not a Nigerian growth chart, and it does not replace a crown-rump length.</p>
           </div>
         </div>
       </div>
@@ -886,7 +882,6 @@
             <div class="field"><label>Cycle length</label><div class="row"><input id="d-cycle" type="number" inputMode="numeric" min="21" max="45" placeholder="28"><span class="suffix">days</span></div></div>
             <div class="field"><label>Luteal phase</label><div class="row"><input id="d-luteal" type="number" inputMode="numeric" min="10" max="16" placeholder="14"><span class="suffix">days</span></div></div>
           </div>
-          <p class="note">Naegele assumes a 28-day cycle and ovulation on day 14. Cycle length 21–45 and luteal 10–16 days adjust the EDD (EDD = LMP + cycle − luteal + 266).</p>
         </div>
         <div class="card">
           <div class="card-title">First-Trimester Measurements</div>
@@ -895,7 +890,6 @@
           <div class="hairline">
             <div class="field"><label>Scan date</label><div class="row"><input id="d-scandate" type="date"></div></div>
           </div>
-          <p class="note">The Biometry tab's composite second/third-trimester dating is pulled in automatically below when available.</p>
         </div>
         <div class="card">
           <div class="card-title">Dating hierarchy (ACOG 700)</div>
@@ -932,7 +926,6 @@
           </div>
           <label class="check-row"><input type="checkbox" id="d-lock"> Lock the preferred EDD on this device — later scans will not overwrite it</label>
           <div class="hairline"></div>
-          <p class="note" style="margin-top:0;">Exclude a parameter from <em>dating</em> only when it is distorted or pathological. Do not average a small AC into the due date if you already suspect FGR.</p>
           <label class="check-row"><input type="checkbox" id="d-x-fgr"> Suspected FGR — exclude AC from dating</label>
           <label class="check-row"><input type="checkbox" id="d-x-macro"> Suspected macrosomia / maternal diabetes — exclude AC from dating</label>
           <label class="check-row"><input type="checkbox" id="d-x-acdist"> AC distorted (ascites, omphalocele, mass) — exclude AC</label>
@@ -994,7 +987,7 @@
       <div>
         <div class="card">
           <div class="card-title">Exam protocol</div>
-          <p class="subhead">ISUOG-style checklists, published pitfalls, and a look-up atlas of ultrasound red flags. Local protocol outranks this card. Ticks stay on this device only — no patient identifiers.</p>
+          <p class="subhead">Checklists and red flags. Ticks stay on this device.</p>
           <div class="unit-toggle" id="proto-mode" style="margin-bottom:12px;">
             <button type="button" data-mode="check" class="on">Checklists</button>
             <button type="button" data-mode="flags">Red flags</button>
@@ -1043,10 +1036,8 @@
         <div class="card">
           <div class="card-title">Technique</div>
           <label class="check-row"><input type="checkbox" id="dp-angle"> Angle of insonation greater than 30 degrees (or MCA-PSV not near 0)</label>
-          <p class="note">ISUOG: keep the Doppler angle as small as possible. MCA-PSV should be as near 0 as practical. PI/RI are less angle-dependent than absolute velocity.</p>
           <div class="hairline"></div>
           <div class="card-title">Technical quality (self-attested)</div>
-          <p class="subhead">Software cannot see your waveform. Tick what you actually did. Unticked items are completeness reminders, not proof of a bad study.</p>
           <label class="check-row"><input type="checkbox" id="dp-q-ua"> UA sampled from a free loop (not at the fetal abdomen or placenta)</label>
           <label class="check-row"><input type="checkbox" id="dp-q-mca"> MCA sampled near the origin, angle as near 0° as practical</label>
           <label class="check-row"><input type="checkbox" id="dp-q-wave"> Adequate waveform without fetal breathing artefact</label>
@@ -1086,7 +1077,7 @@
         <p class="subhead">Off by default. Only save if the patient has consented to their measurements being kept on this device for follow-up. Nothing leaves this device either way.</p>
         <label class="check-row"><input type="checkbox" id="log-consent"> Patient has consented to saving this episode on this device</label>
         <div class="grid2">
-          <div class="field"><label>Initials (optional)</label><div class="row"><input id="log-initials" type="text" placeholder="—" maxlength="10"></div></div>
+          <div class="field"><label>Patient name</label><div class="row"><input id="log-initials" type="text" placeholder="—" maxlength="80" autocomplete="name"></div></div>
           <div class="field"><label>Patient / folder ID (optional)</label><div class="row"><input id="log-pid" type="text" placeholder="—" maxlength="20"></div></div>
         </div>
         <div class="field"><label>Note (optional)</label><div class="row"><input id="log-note" type="text" placeholder="—" maxlength="120"></div></div>
@@ -1102,7 +1093,7 @@
       <div class="card">
         <div class="card-title">Examination timeline</div>
         <p class="subhead">Saved examinations on this device, grouped by folder ID. Search, filter by exam family, or tap a folder to isolate that patient. Tap a visit — or a point on the EFW graph — to reopen. Not a hospital record.</p>
-        <div class="field tl-filter"><label>Find</label><div class="row"><input id="tl-q" type="search" placeholder="Folder ID, initials, or thyroid / growth…" autocomplete="off"></div></div>
+        <div class="field tl-filter"><label>Find</label><div class="row"><input id="tl-q" type="search" placeholder="Name, number, or exam" autocomplete="off"></div></div>
         <div class="week-chip-row" id="tl-exam-chips"></div>
         <div class="week-chip-row tl-folders" id="tl-folder-chips"></div>
         <div class="btn-row" style="margin-bottom:10px;">
@@ -1347,9 +1338,9 @@
       <div>
         <div class="card">
           <div class="card-title">Patient folders <span class="chip" id="f-patient-count"></span></div>
-          <p class="subhead">One folder per woman and tracking cycle, kept on this device. Search by initials or clinic ID, then open to add or edit scans. Nothing is uploaded.</p>
+          <p class="subhead">One folder per woman and tracking cycle, kept on this device. Search by name, number, or day-1 date.</p>
           <div class="grid2">
-            <div class="field"><label>Search</label><div class="row"><input id="f-patient-search" type="search" placeholder="Initials, clinic ID, or day-1 date" autocomplete="off"></div></div>
+            <div class="field"><label>Search</label><div class="row"><input id="f-patient-search" type="search" placeholder="Name, number, or day-1 date" autocomplete="off"></div></div>
             <div class="field"><label>&nbsp;</label><div class="row"><button type="button" class="btn-primary" id="f-new-patient" style="width:100%;">New patient</button></div></div>
           </div>
           <div class="f-patient-list" id="f-patient-list"></div>
@@ -1357,11 +1348,10 @@
             <div class="hairline">
               <div class="f-id-chip" id="f-patient-heading">Current folder</div>
               <div class="grid2">
-                <div class="field"><label>Initials</label><div class="row"><input id="f-initials" type="text" maxlength="12" placeholder="e.g. A.O." autocomplete="off"></div></div>
-                <div class="field"><label>Clinic ID / MRN</label><div class="row"><input id="f-mrn" type="text" maxlength="24" placeholder="folder number" autocomplete="off"></div></div>
+                <div class="field"><label>Patient name</label><div class="row"><input id="f-name" type="text" maxlength="80" placeholder="Full name" autocomplete="name"></div></div>
+                <div class="field"><label>Clinic / hospital number</label><div class="row"><input id="f-mrn" type="text" maxlength="32" placeholder="folder number" autocomplete="off"></div></div>
               </div>
               <div class="field"><label>Folder note (optional)</label><div class="row"><input id="f-pnote" type="text" maxlength="80" placeholder="e.g. IUI cycle 2"></div></div>
-              <p class="note">Use initials and a clinic ID — not a full name — so the folder is findable without storing more than you need.</p>
               <div class="btn-row">
                 <button type="button" class="btn-ghost" id="f-close-patient">Close folder</button>
                 <button type="button" class="btn-danger" id="f-delete-patient" style="width:auto;">Delete this patient</button>
@@ -1597,7 +1587,8 @@
           <li><strong>ART dating.</strong> ACOG 700: assign EDD from embryo age and transfer date. GA (days) = (scan minus transfer) + 14 + embryo age. EDD = transfer + 266 minus embryo age (day-5 blastocyst = transfer + 261 d; day-3 = transfer + 263 d). Do not replace an ART EDD with later biometry.</li>
           <li><strong>CRL lock.</strong> A first-trimester CRL EDD is not revised by second- or third-trimester biometry. Later discordance is a growth problem.</li>
           <li><strong>Parameter exclusion.</strong> Do not average a pathological AC or FL into the due date. FL/AC below 0.16 (Hadlock AJR 1983) screens skeletal dysplasia. Abnormal cephalic index (74-83 working band; Hadlock 1981 mean 78.3, 2 SD about 70-86) uses area-corrected BPD = sqrt((BPD x OFD)/1.265) (Doubilet and Greenes 1984), not sqrt(BPD x OFD).</li>
-          <li><strong>Hadlock 1984 combinations.</strong> Single-parameter and combination menstrual-age equations (Radiology 1984;152:497-501). Four-parameter: MA = 10.85 + 0.060(HC)(FL) + 0.670(BPD) + 0.168(AC), cm. Hadlock found the arithmetic mean of the four single-parameter ages was not significantly different from that regression. For Nigeria / Africa this app uses the mean as the biometric age and shows the regression only for comparison. Neither one replaces a crown-rump length.</li>
+          <li><strong>Head circumference on the measurement screen.</strong> The box is editable. Left blank, HC fills from 1.62 × (BPD + OFD). A typed or traced value is kept. Clear the box to return to auto-fill.</li>
+          <li><strong>Hadlock 1984.</strong> Radiology 1984;152:497-501. Single-parameter ages are averaged for Nigeria / Africa. The regression, shown only for comparison, is MA = 10.85 + 0.060(HC)(FL) + 0.670(BPD) + 0.168(AC), centimetres. Hadlock found the mean and the regression were not significantly different.</li>
           <li><strong>NICHD 2017 biometric age.</strong> Skupski et al., <em>Obstet Gynecol</em> 2017;130:433–441, Table 2 unrounded coefficients, measurements in millimetres. Used when the reference population is the United States. It often reads younger than Hadlock on the same measurements because that cohort’s fetuses were larger. It is not a Nigerian reference and it does not replace CRL or ART dating.</li>
           <li><strong>Redating.</strong> ACOG/AIUM/SMFM Committee Opinion 700 (2017): ≤8w6d >5 days; 9w0d–13w6d >7 days; 14–15w6d >7 days; 16–21w6d >10 days; 22–27w6d >14 days; ≥28 weeks >21 days.</li>
           <li><strong>Later dating rank.</strong> Chervenak et al., <em>AJR</em> 1991 — shape-corrected BPD and HC (plus FL in the third trimester) outperform AC for dating.</li>
@@ -1727,13 +1718,14 @@
         <li>No accounts, no cookies for tracking, no analytics, no cloud sync.</li>
         <li>Calculators run in the browser. Folliculometry folders, quiz/case progress, bookmarks, theme, and text size use localStorage. The optional patient log uses IndexedDB and stays off until per-episode consent is ticked.</li>
         <li>Report-an-error text is copied locally; nothing is uploaded from this app.</li>
-        <li>Clearing site data for this origin deletes those stores (GDPR erasure on this device). Do not type names, MRNs, or other identifiers into free-text fields.</li>
+        <li>Clearing site data for this origin deletes saved names, numbers, and examinations on this device. Export a backup first if you need to keep them.</li>
         <li>This tool is not FDA-cleared or CE-marked as a medical device. It is decision support for qualified professionals.</li>
       </ul>
     </div>
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.17.0</strong> (21 Oct 2026) — Nigeria uses the Hadlock mean as the age on the measurement screen, with the regression beside it and the EDD on the same card. How-to notes moved to References. Examinations save under the patient name.</li>
         <li><strong>3.16.0</strong> (20 Oct 2026) — Reference population chooses the biometric age. Nigeria / Africa uses the mean of the four Hadlock ages. The regression is comparison only. United States uses NICHD 2017. Formulas unchanged.</li>
         <li><strong>3.15.0</strong> (19 Oct 2026) — Hadlock 1984 is the default biometric age. NICHD 2017 stays available and is not averaged with it. The arithmetic mean of the four Hadlock ages is shown. Formulas unchanged.</li>
         <li><strong>3.14.0</strong> (19 Oct 2026) — New home-screen mark: a terracotta tile and an ultrasound trace. The circle emblem is gone. Formulas unchanged.</li>
@@ -1771,7 +1763,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Sonogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Sonogen 3.16.0 · Clinical sonography companion. One menu. Formulas unchanged.</p>
+    <p class="note">Sonogen 3.17.0 · Clinical sonography companion. One menu. Formulas unchanged.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -2430,8 +2422,23 @@
     if (crl != null && crl < 5) warnings.push("CRL <5 mm is very early; MSD or a short-interval repeat is often more informative.");
     var msdDays = (crl == null && msd != null) ? gaFromMSDmm(msd) : null;
     var msdEDD = msdDays != null ? addDays(scan, 280 - msdDays) : null;
-    var bioDays = comp ? comp.weeks * 7 : null;
-    var bioLabel = comp ? comp.label : null;
+    var popId = "NG";
+    try { popId = populationChoice(); } catch (ePop) { popId = "NG"; }
+    var bioWeeks = null;
+    var bioLabel = null;
+    if (popId === "US" && bUse != null && hUse != null && aUse != null && fUse != null) {
+      var nAge = nichd2017Weeks(bUse, hUse, aUse, fUse);
+      if (nAge && !nAge.implausible) { bioWeeks = nAge.weeks; bioLabel = "NICHD 2017"; }
+    }
+    if (bioWeeks == null && popId !== "INT" && indMean != null) {
+      bioWeeks = indMean;
+      bioLabel = "Mean of " + used.join(", ");
+    }
+    if (bioWeeks == null && comp) {
+      bioWeeks = comp.weeks;
+      bioLabel = comp.label;
+    }
+    var bioDays = bioWeeks != null ? bioWeeks * 7 : null;
     var priorDays = priorEdd ? Math.round((scan - priorEdd) / 86400000) + 280 : null;
 
     var preferredDays = null, preferredEDD = null, method = null, locked = false, usIsCRL = false;
@@ -2464,10 +2471,10 @@
       preferredDays = bioDays;
       preferredEDD = addDays(scan, 280 - bioDays);
       method = "composite";
-      if (preferredDays / 7 >= 28) warnings.push("No prior dating; composite biometry at \u226528 weeks. Accuracy \u00b13 weeks. EDD provisional. Do not redate a possibly growth-restricted fetus.");
-      else if (preferredDays / 7 >= 22) warnings.push("No first-trimester CRL. Composite biometry at 22\u201327+6: \u00b110\u201314 days.");
-      else warnings.push("No first-trimester CRL. Composite biometry at 14\u201321+6: \u00b17\u201310 days.");
-      if (used.length === 1) warnings.push("Single-parameter dating. Hadlock 1984 allows it, but combination equations are tighter. Add the missing measurements.");
+      if (preferredDays / 7 >= 28) warnings.push("Do not redate from a third-trimester measurement alone. Accuracy about \u00b13 weeks. EDD provisional. Do not redate a possibly growth-restricted fetus.");
+      else if (preferredDays / 7 >= 22) warnings.push("No first-trimester CRL. Biometric age at 22\u201327+6: about \u00b110\u201314 days.");
+      else warnings.push("No first-trimester CRL. Biometric age at 14\u201321+6: about \u00b17\u201310 days.");
+      if (used.length === 1) warnings.push("Only one measurement. Add the others before relying on this age.");
     } else if (lmpDays != null) {
       preferredDays = lmpDays;
       preferredEDD = lmpEDD;
@@ -2859,15 +2866,11 @@
         headHtml += '<div class="result-sub">Cephalic index ' + ci.toFixed(1) + '% \u2014 <strong>' + ciInfo.label + '</strong> (' + ciInfo.detail + ')</div>';
         headHtml += '<div class="badge ' + ciInfo.cls + '">CI ' + ci.toFixed(1) + '% \u00b7 normal 74\u201383</div>';
       }
-      if (H.source === "measured" && H.derived != null) {
-        var delta = Math.abs(H.cm - H.derived) / H.derived;
-        headHtml += '<div class="note">Ellipse estimate from BPD+OFD is ' + H.derived.toFixed(1) + ' cm.</div>';
-        if (delta > 0.05) headHtml += '<div class="badge warn">Typed HC differs from 1.62 \u00d7 (BPD+OFD) by ' + (delta * 100).toFixed(0) + '% \u2014 recheck plane, calipers, or whether the machine used a different ellipse factor.</div>';
+      if (H.source === "measured" && H.derived != null && Math.abs(H.cm - H.derived) / H.derived > 0.05) {
+        headHtml += '<div class="badge warn">Typed HC differs from 1.62 \u00d7 (BPD+OFD) by more than 5%. Recheck the calipers.</div>';
       }
-      if (ci != null && (ci < 74 || ci > 83)) {
-        headHtml += '<div class="note flag">Shape-corrected BPD: ' + cbpd.toFixed(2) + ' cm. Head shape is outside the normal range, so raw BPD will bias BPD-based dating \u2014 the composite dating below automatically uses the corrected value in place of raw BPD.</div>';
-      } else if (cbpd != null) {
-        headHtml += '<div class="note">Shape-corrected BPD: ' + cbpd.toFixed(2) + ' cm (nearly identical to raw BPD here, as expected for a normal head shape).</div>';
+      if (ci != null && (ci < 74 || ci > 83) && cbpd != null) {
+        headHtml += '<div class="badge warn">Shape-corrected BPD ' + cbpd.toFixed(2) + ' cm is used for dating.</div>';
       }
     } else {
       headHtml += '<p class="empty">Enter BPD and OFD to auto-fill HC, or type a measured HC. CI still needs both diameters.</p>';
@@ -2891,64 +2894,54 @@
     }
     set("efw-card", efwHtml);
 
-    // --- Dating from this scan (composite + per-parameter + discordance) ---
-    var datingHtml = '<div class="card-title">Hadlock age from this scan</div>';
+    var datingHtml = '<div class="card-title">Gestational age</div>';
     var Gbio = assignGestationalAge();
-    var bForGA = (ci != null && (ci < 74 || ci > 83)) ? cbpd : bpd;
-    var comp = Gbio.composite || gaComposite(bForGA, hc, ac, fl);
+    var comp = Gbio.composite;
     var perParam = [];
-    Object.keys(Gbio.individual).forEach(function (k) {
+    Object.keys(Gbio.individual || {}).forEach(function (k) {
       perParam.push({ p: k + (k === "BPD" && Gbio.ci != null && (Gbio.ci < 74 || Gbio.ci > 83) ? " (corrected)" : ""), w: Gbio.individual[k] });
     });
-    if (!perParam.length) {
-      if (bpd != null) perParam.push({ p: "BPD" + ((ci != null && (ci < 74 || ci > 83)) ? " (corrected)" : ""), w: gaBPD(bForGA) });
-      if (hc != null) perParam.push({ p: "HC", w: gaHC(hc) });
-      if (ac != null) perParam.push({ p: "AC", w: gaAC(ac) });
-      if (fl != null) perParam.push({ p: "FL", w: gaFL(fl) });
-    }
-
-    if (comp) {
-      var compDays = comp.weeks * 7;
-      var wd = weeksDaysFromDays(compDays);
+    var headlineDays = Gbio.bioDays;
+    if (headlineDays != null) {
+      var wd = weeksDaysFromDays(headlineDays);
       datingHtml += '<span class="result-num">' + wd.w + '</span><span class="result-unit">w</span><span class="result-num">' + wd.d + '</span><span class="result-unit">d</span>';
-      datingHtml += '<div class="chip">' + comp.label + '</div>';
-      datingHtml += '<div class="note">' + trimesterLabel(compDays) + '</div>';
-      datingHtml += '<p class="note">Hadlock size-derived age from this scan. It does not replace an established CRL, ART, or typed obstetric age.</p>';
-
-      if (perParam.length >= 2) {
-        var daysArr = perParam.map(function (p) { return p.w * 7; });
-        var spread = Math.max.apply(null, daysArr) - Math.min.apply(null, daysArr);
-        var threshold = acogThresholdDays(comp.weeks, false);
+      datingHtml += '<div class="chip">' + fEsc(Gbio.bioLabel || "Biometric age") + '</div>';
+      datingHtml += '<div class="note">' + trimesterLabel(headlineDays) + '</div>';
+      var meanEdd = Gbio.scan ? addDays(Gbio.scan, 280 - headlineDays) : null;
+      if (Gbio.preferredEDD && Gbio.method !== "composite") {
+        datingHtml += '<div class="compare-row"><span class="compare-label">Established EDD</span><span class="compare-value">' + formatDate(Gbio.preferredEDD) + '</span></div>';
+      }
+      if (meanEdd) {
+        var eddName = (Gbio.method === "composite" || !Gbio.preferredEDD) ? "EDD" : "EDD from this age";
+        datingHtml += '<div class="compare-row"><span class="compare-label">' + eddName + '</span><span class="compare-value">' + formatDate(meanEdd) + '</span></div>';
+      }
+      if (perParam.length) {
         datingHtml += '<table class="ref"><tr><th>Parameter</th><th>GA</th></tr>';
         perParam.forEach(function (p) {
           var pwd = weeksDaysFromDays(p.w * 7);
           datingHtml += '<tr><td>' + p.p + '</td><td class="num">' + pwd.w + 'w' + pwd.d + 'd</td></tr>';
         });
         datingHtml += '</table>';
-        if (threshold != null) {
-          if (spread > threshold) {
-            datingHtml += '<div class="badge warn">Discordant \u2014 spread ' + spread + 'd exceeds the ' + threshold + 'd ACOG threshold for this GA</div>';
-          } else {
-            datingHtml += '<div class="badge ok">Concordant \u2014 spread ' + spread + 'd, within the ' + threshold + 'd ACOG threshold</div>';
-          }
-        }
-        var guidance = compDays < 14 * 7
-          ? "Below 14 weeks, prefer CRL over biometry for dating if available."
-          : (compDays < 28 * 7
-            ? "2nd trimester: shape-corrected BPD and HC are the most accurate dating parameters (Chervenak et al., AJR 1991); AC is least reliable for dating \u2014 it is expected to diverge most, and that is more informative about growth than about the true date."
-            : "3rd trimester: shape-corrected BPD, HC, and FL remain the best dating predictors; raw BPD and AC are least reliable this late. Third-trimester dating in general carries a wide margin (\u00b121\u201330 days) \u2014 avoid redating on this alone, especially if the fetus may be growth-restricted.");
-        datingHtml += '<div class="note">' + guidance + '</div>';
+      }
+      if (comp && Gbio.bioLabel && Gbio.bioLabel.indexOf("Mean") === 0) {
+        var regWd = weeksDaysFromDays(comp.weeks * 7);
+        var gap = Math.round(comp.weeks * 7) - Math.round(headlineDays);
+        datingHtml += '<div class="compare-row"><span class="compare-label">Hadlock regression (comparison)</span><span class="compare-value">' + regWd.w + 'w ' + regWd.d + 'd (' + (gap > 0 ? "+" : "") + gap + ' d)</span></div>';
+      }
+      if (headlineDays >= 28 * 7) {
+        datingHtml += '<p class="note">Do not redate from a third-trimester measurement alone.</p>';
       }
     } else {
-      datingHtml += '<p class="empty">Enter at least AC and FL (BPD, OFD, HC improve accuracy and enable the discordance check).</p>';
+      datingHtml += '<p class="empty">Enter BPD, HC, AC, and FL.</p>';
     }
     set("dating-card", datingHtml);
-    set("bioage-card", biometricAgeHtml(bpd, hc, ac, fl));
+    var bioAgeEl = document.getElementById("bioage-card");
+    if (bioAgeEl) { bioAgeEl.innerHTML = ""; bioAgeEl.hidden = true; }
 
     // --- Growth / centile ---
     var growthHtml = '<div class="card-title">Growth Centile</div>';
     var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
-    var gaForPct = estWk != null ? (estWk + (estD || 0) / 7) : (comp ? comp.weeks : null);
+    var gaForPct = estWk != null ? (estWk + (estD || 0) / 7) : (Gbio.bioDays != null ? Gbio.bioDays / 7 : (comp ? comp.weeks : null));
     if (efw && gaForPct != null) {
       var pctRes = lookupPercentile(gaForPct, efw.grams);
       if (pctRes && !pctRes.outOfRange) {
@@ -2959,7 +2952,6 @@
           // no-op, just keeping branch readable
         }
         growthHtml += buildGrowthChart(gaForPct, efw.grams);
-        growthHtml += '<div class="note">Centile uses ' + (estWk != null ? "the established GA entered above" : "this scan's own composite GA (enter an established GA above for a true growth assessment)") + '.</div>';
       } else if (pctRes && pctRes.outOfRange) {
         growthHtml += '<p class="empty">Centile reference covers 24\u201341 weeks; this GA falls outside that range.</p>';
       }
@@ -3114,7 +3106,7 @@
     } else {
       var awd = weeksDaysFromDays(G.preferredDays);
       audit += '<span class="result-num">' + awd.w + '</span><span class="result-unit">w</span><span class="result-num">' + awd.d + '</span><span class="result-unit">d</span>';
-      var methodLab = { crl: "CRL (Robinson-Fleming)", msd: "MSD (Hellman) \u2014 provisional", art: "ART / embryo transfer", prior_crl: "Locked prior CRL EDD", prior_art: "Locked prior ART EDD", composite: "Hadlock 1984 composite", lmp: "LMP (cycle-adjusted Naegele)" }[G.method] || G.method;
+      var methodLab = G.method === "composite" && G.bioLabel ? G.bioLabel : ({ crl: "CRL (Robinson-Fleming)", msd: "MSD (Hellman) \u2014 provisional", art: "ART / embryo transfer", prior_crl: "Locked prior CRL EDD", prior_art: "Locked prior ART EDD", composite: "Hadlock mean", lmp: "LMP (cycle-adjusted Naegele)" }[G.method] || G.method);
       audit += '<div class="chip">' + methodLab + (G.locked ? " \u00b7 locked" : "") + "</div>";
       if (G.preferredEDD) audit += '<div class="compare-row"><span class="compare-label">Preferred EDD</span><span class="compare-value">' + formatDate(G.preferredEDD) + "</span></div>";
       if (G.accuracy) audit += '<div class="note">' + G.accuracy.label + "</div>";
@@ -3139,12 +3131,12 @@
           var pwd = weeksDaysFromDays(G.individual[k] * 7);
           audit += "<tr><td>" + k + '</td><td class="num">' + pwd.w + "w" + pwd.d + "d</td></tr>";
         });
-        if (G.indMean != null) {
-          var mwd = weeksDaysFromDays(G.indMean * 7);
-          audit += "<tr><td>Mean of available</td><td class=\"num\">" + mwd.w + "w" + mwd.d + "d</td></tr>";
-        }
         audit += "</table>";
-        audit += '<p class="note">Machines use the Hadlock combination equation (not the arithmetic mean). Both are shown because Hadlock 1984 found they agree. Combination is preferred when 2+ parameters remain after exclusions.</p>';
+        if (G.indMean != null && G.composite && G.bioLabel && G.bioLabel.indexOf("Mean") === 0) {
+          var cwd = weeksDaysFromDays(G.composite.weeks * 7);
+          var cgap = Math.round(G.composite.weeks * 7) - Math.round(G.indMean * 7);
+          audit += '<div class="compare-row"><span class="compare-label">Hadlock regression (comparison)</span><span class="compare-value">' + cwd.w + "w" + cwd.d + "d (" + (cgap > 0 ? "+" : "") + cgap + " d)</span></div>";
+        }
       }
       G.reasons.forEach(function (r) { audit += '<div class="note">' + r + "</div>"; });
       G.flags.forEach(function (r) { audit += '<div class="badge danger">' + r + "</div>"; });
@@ -5668,7 +5660,7 @@
     html += '<div class="impression warn"><h3>Pitfalls</h3><ul class="imp-list">';
     p.pitfalls.forEach(function (x) { html += "<li>" + x + "</li>"; });
     html += "</ul></div>";
-    html += '<p class="note">Checklist ticks are a personal aide-memoire on this device. They are not a completed legal report and they store no patient name.</p>';
+    html += '<p class="note">Ticks stay on this device. They are not a completed report.</p>';
     html += '<button type="button" class="btn-ghost" id="proto-jump" style="width:auto;">Open related calculator</button>';
     set("proto-card", html);
     document.querySelectorAll("#proto-card input[type=checkbox]").forEach(function (cb) {
@@ -5931,6 +5923,7 @@
   function fBlankRecord(partial) {
     var rec = {
       id: fNewId("p"),
+      name: "",
       initials: "",
       mrn: "",
       note: "",
@@ -5985,7 +5978,7 @@
   }
   function fPatientLabel(rec) {
     if (!rec) return "No folder open";
-    var bits = [rec.initials, rec.mrn].map(function (x) { return (x || "").trim(); }).filter(Boolean);
+    var bits = [rec.name, rec.initials, rec.mrn].map(function (x) { return (x || "").trim(); }).filter(Boolean);
     if (bits.length) return bits.join(" · ");
     if (rec.note) return rec.note;
     if (rec.cycle && rec.cycle.cd1) return "Day 1 " + rec.cycle.cd1;
@@ -5995,17 +5988,18 @@
     var last = "";
     var scans = rec.scans || [];
     if (scans.length) last = scans[scans.length - 1].date || "";
-    return [rec.initials, rec.mrn, rec.note, rec.cycle && rec.cycle.cd1, rec.cycle && rec.cycle.type, last].join(" ").toLowerCase();
+    return [rec.name, rec.initials, rec.mrn, rec.note, rec.cycle && rec.cycle.cd1, rec.cycle && rec.cycle.type, last].join(" ").toLowerCase();
   }
   function fReadIdentity() {
     return {
-      initials: val("f-initials").trim(),
+      name: val("f-name").trim(),
       mrn: val("f-mrn").trim(),
       note: val("f-pnote").trim()
     };
   }
   function fWriteIdentity(rec) {
-    document.getElementById("f-initials").value = rec && rec.initials ? rec.initials : "";
+    var nameEl = document.getElementById("f-name");
+    if (nameEl) nameEl.value = rec && (rec.name || rec.initials) ? (rec.name || rec.initials) : "";
     document.getElementById("f-mrn").value = rec && rec.mrn ? rec.mrn : "";
     document.getElementById("f-pnote").value = rec && rec.note ? rec.note : "";
   }
@@ -6015,7 +6009,8 @@
     if (!rec) return st;
     rec.cycle = fReadCycle();
     var idn = fReadIdentity();
-    rec.initials = idn.initials;
+    rec.name = idn.name;
+    rec.initials = idn.name || rec.initials || "";
     rec.mrn = idn.mrn;
     rec.note = idn.note;
     rec.updatedAt = new Date().toISOString();
@@ -6052,9 +6047,9 @@
     fWriteIdentity(rec);
     fWriteCycle(rec.cycle);
     fClearForm();
-    set("f-save-msg", "New folder. Add initials or a clinic ID so you can find it later.");
+    set("f-save-msg", "New folder. Add the name or a number so you can find it later.");
     renderFolliculometry();
-    var el = document.getElementById("f-initials");
+    var el = document.getElementById("f-name");
     if (el) el.focus();
   }
   function fDeleteActivePatient() {
@@ -6730,7 +6725,7 @@
         renderFolliculometry();
       });
     });
-    ["f-initials","f-mrn","f-pnote"].forEach(function (id) {
+    ["f-name","f-mrn","f-pnote"].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
       el.addEventListener("change", function () { fFlushActive(); renderFolliculometry(); });
@@ -7086,12 +7081,13 @@
   }
   function examsCsvText() {
     var rows = loadExamStore().slice().sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
-    var head = ["date","exam","folder_id","initials","ga","efw_g","efw_centile","ac_cm","uapi","fluid","endo_mm","tirads","approach","key","indication","impression"];
+    var head = ["date","exam","patient_name","folder_id","other_id","ga","efw_g","efw_centile","ac_cm","uapi","fluid","endo_mm","tirads","approach","key","indication","impression"];
     var lines = [head.join(",")];
     rows.forEach(function (r) {
       lines.push([
         csvEscape((r.date || "").slice(0, 19)),
         csvEscape(r.exam || ""),
+        csvEscape(r.name || ""),
         csvEscape(r.pid || ""),
         csvEscape(r.initials || ""),
         csvEscape(r.gaLabel || ""),
@@ -8044,7 +8040,7 @@
 
 
   var SNAP_IDS = [
-    "ex-pid","ex-initials","ex-indication","ex-date","ex-age","ex-sex","ex-referrer","ex-region","ex-worksheet","ex-approach","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-plac-site","ex-plac-edge","ex-cord","ex-plac-shape","ex-cx","ex-fhr",
+    "ex-name","ex-pid","ex-initials","ex-indication","ex-date","ex-age","ex-sex","ex-referrer","ex-region","ex-worksheet","ex-approach","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-plac-site","ex-plac-edge","ex-cord","ex-plac-shape","ex-cx","ex-fhr",
     "d-crl","d-msd","d-scandate","b-bpd","b-ofd","b-hc","b-ac","b-fl",
     "dp-uapi","dp-mcapi","dp-mcapsv","dp-wk","dp-d","dp-aedf","dp-redf","dp-dvpi","dp-dvaw","dp-utpi","dp-notch","dp-q-ua","dp-q-mca","dp-q-wave","dp-q-alara",
     "bpp-breath","bpp-move","bpp-tone","bpp-af","bpp-nst",
@@ -8285,8 +8281,9 @@
       html += '<p class="empty">Enter a folder ID to compare with a prior examination.</p>';
       return html;
     }
-    var saved = loadExamStore().filter(function (r) { return r.pid === pid; })
-      .sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
+    var saved = loadExamStore().filter(function (r) {
+      return (r.pid || "").trim() === pid || (r.name || "").trim() === pid;
+    }).sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
     var live = currentSnapshot();
     live.live = true;
     var rows = saved.slice(-4);
@@ -8451,6 +8448,7 @@
     return {
       date: new Date().toISOString(),
       exam: activeExam ? activeExam.id : "ad-hoc",
+      name: val("ex-name") || "",
       pid: val("ex-pid") || val("log-pid") || "",
       initials: val("ex-initials") || val("log-initials") || "",
       age: num(val("ex-age")),
@@ -9372,7 +9370,7 @@
     var folder = opts.folder || reportsFolderFilter || "";
     var rows = loadExamStore().slice().sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
     if (pid) rows = rows.filter(function (r) { return r.pid === pid; });
-    if (folder) rows = rows.filter(function (r) { return (r.pid || "") === folder; });
+    if (folder) rows = rows.filter(function (r) { return (r.pid || "") === folder || (r.name || "") === folder; });
     if (opts.group && opts.group !== "all") {
       rows = rows.filter(function (r) {
         var e = examById(r.exam);
@@ -9381,7 +9379,7 @@
     }
     if (q) {
       rows = rows.filter(function (r) {
-        var blob = [r.pid, r.initials, r.exam, r.indication, r.gaLabel, serialKey(r), r.impression].join(" ").toLowerCase();
+        var blob = [r.name, r.pid, r.initials, r.exam, r.indication, r.gaLabel, serialKey(r), r.impression].join(" ").toLowerCase();
         return blob.indexOf(q) !== -1;
       });
     }
@@ -9389,7 +9387,7 @@
     var chart = (pid || folder) ? folderChartHtml(rows, pid || folder) : "";
     function visitBtn(r) {
       var name = (function () { var e = examById(r.exam); return e ? e.name : (r.exam || "exam"); })();
-      var sub = [r.initials, r.pid, r.gaLabel, serialKey(r), r.revision > 1 ? ("rev " + r.revision) : ""].filter(Boolean).join(" \u00b7 ");
+      var sub = [r.name, r.initials, r.pid, r.gaLabel, serialKey(r), r.revision > 1 ? ("rev " + r.revision) : ""].filter(Boolean).join(" \u00b7 ");
       var snip = r.impression ? String(r.impression).replace(/\s+/g, " ").slice(0, 110) : "";
       var del = r.live ? "" : "<button type='button' class='tl-delete' data-delete='" + fEsc(r.date) + "'>Remove from this device</button>";
       return "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><button type='button' class='exam-card' data-reopen='" + fEsc(r.date) + "' style='min-height:auto;width:100%'><strong>" + fEsc(name) + "</strong><span>" + fEsc(sub || "Tap to reopen") + "</span>" + (snip ? "<span class='tl-snippet'>" + fEsc(snip) + (r.impression.length > 110 ? "\u2026" : "") + "</span>" : "") + "</button>" + del + "</li>";
@@ -9403,19 +9401,19 @@
       var groups = [];
       var map = {};
       rows.forEach(function (r) {
-        var k = (r.pid || "").trim() || "(no folder ID)";
+        var k = (r.name || "").trim() || (r.pid || "").trim() || "(unnamed)";
         if (!map[k]) { map[k] = []; groups.push(k); }
         map[k].push(r);
       });
       groups.forEach(function (k) {
         var set = map[k];
         var last = set[set.length - 1];
-        var on = reportsFolderFilter === (k === "(no folder ID)" ? "" : k);
-        var label = k === "(no folder ID)" ? "No folder ID" : k;
-        var extra = [last.initials, set.length + (set.length === 1 ? " visit" : " visits"), serialKey(last)].filter(Boolean).join(" \u00b7 ");
+        var on = reportsFolderFilter === (k === "(unnamed)" ? "" : k);
+        var label = k === "(unnamed)" ? "Unnamed" : k;
+        var extra = [last.pid, last.initials, set.length + (set.length === 1 ? " visit" : " visits"), serialKey(last)].filter(Boolean).join(" \u00b7 ");
         list += '<div class="folder-group">';
-        list += '<button type="button" class="folder-head' + (on ? " on" : "") + '" data-folder="' + fEsc(k === "(no folder ID)" ? "" : k) + '"><span><strong>' + fEsc(label) + "</strong><em>" + fEsc(extra) + "</em></span></button>";
-        if (k !== "(no folder ID)") list += serialCompareHtml(k);
+        list += '<button type="button" class="folder-head' + (on ? " on" : "") + '" data-folder="' + fEsc(k === "(unnamed)" ? "" : k) + '"><span><strong>' + fEsc(label) + "</strong><em>" + fEsc(extra) + "</em></span></button>";
+        if (k !== "(unnamed)") list += serialCompareHtml(k);
         list += '<ul class="timeline">';
         set.forEach(function (r) { list += visitBtn(r); });
         list += "</ul></div>";
@@ -9505,7 +9503,7 @@
       if (!el || v == null || v === "") return;
       el.value = String(v);
     }
-    put("ex-pid", s.pid); put("ex-initials", s.initials); put("ex-indication", s.indication);
+    put("ex-name", s.name); put("ex-pid", s.pid); put("ex-initials", s.initials); put("ex-indication", s.indication);
     if (s.approach) put("ex-approach", s.approach);
     put("ex-fetuses", s.fetuses); put("ex-cardiac", s.cardiac); put("ex-presentation", s.presentation);
     put("ex-lie", s.lie); put("ex-move", s.move); put("ex-plac-os", s.placOs);
@@ -9877,7 +9875,7 @@
       device += '<div class="card-title">Recent</div><ul class="timeline">';
       recents.forEach(function (r) {
         var nm = (function () { var e = examById(r.exam); return e ? e.name : (r.exam || "exam"); })();
-        device += "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><button type='button' class='jump-miss' data-reopen='" + fEsc(r.date) + "'>" + fEsc(nm) + " · " + fEsc(r.gaLabel || r.pid || r.initials || "reopen") + (r.efw ? " · " + r.efw + " g" : "") + "</button></li>";
+        device += "<li><div class='tl-day'>" + fEsc((r.date || "").slice(0, 10)) + "</div><button type='button' class='jump-miss' data-reopen='" + fEsc(r.date) + "'>" + fEsc((r.name ? r.name + " · " : "") + nm) + " · " + fEsc(r.gaLabel || r.pid || "reopen") + (r.efw ? " · " + r.efw + " g" : "") + "</button></li>";
       });
       device += "</ul>";
     }
@@ -10150,8 +10148,11 @@
   }
   function priorFolderHtml() {
     var pid = (val("ex-pid") || "").trim();
-    if (!pid) return "";
-    var rows = loadExamStore().filter(function (r) { return r.pid === pid; }).sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
+    var pname = (val("ex-name") || "").trim();
+    if (!pid && !pname) return "";
+    var rows = loadExamStore().filter(function (r) {
+      return (pid && r.pid === pid) || (pname && (r.name || "") === pname);
+    }).sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
     if (!rows.length) return '<p class="note">No saved examination with this folder ID on this device.</p>';
     var last = rows[rows.length - 1];
     var name = (examById(last.exam) || {}).name || last.exam;
@@ -10298,7 +10299,7 @@
   }
   function wireExam() {
     buildMultiSlots();
-    ["ex-indication","ex-approach","ex-pid","ex-initials","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-plac-site","ex-plac-edge","ex-cord","ex-plac-shape","ex-cx","ex-fhr"].forEach(function (id) {
+    ["ex-name","ex-indication","ex-approach","ex-pid","ex-initials","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-plac-site","ex-plac-edge","ex-cord","ex-plac-shape","ex-cx","ex-fhr"].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
       el.addEventListener("change", renderExamWrap);
@@ -10579,7 +10580,7 @@
     if (fac.name) lines.push(fac.name);
     lines.push("Sonogen examination report");
     lines.push("Exam: " + ((examById(snap.exam) || {}).name || snap.exam || "Ad-hoc"));
-    if (snap.pid) lines.push("Folder: " + snap.pid + (snap.initials ? " · " + snap.initials : ""));
+    if (snap.name || snap.pid || snap.initials) lines.push("Patient: " + [snap.name, snap.pid, snap.initials].filter(Boolean).join(" · "));
     if (snap.examDate) lines.push("Examination date: " + snap.examDate);
     if (snap.age != null) lines.push("Age: " + snap.age + " years");
     if (snap.sex) lines.push("Sex: " + snap.sex);
