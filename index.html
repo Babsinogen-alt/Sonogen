@@ -237,6 +237,14 @@
   .note { font-size: 12.5px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
   .note.flag { color: var(--signal); }
 
+  .multi-scroll { overflow-x: auto; margin-top: 8px; }
+  .fetus-slot { border-left: 4px solid var(--line); }
+  .fetus-slot[data-fetus-index="0"] { border-left-color: #C45C4A; }
+  .fetus-slot[data-fetus-index="1"] { border-left-color: #355F6B; }
+  .fetus-slot[data-fetus-index="2"] { border-left-color: #1A2744; }
+  .fetus-slot[data-fetus-index="3"] { border-left-color: #8C6239; }
+  .fetus-live { margin-top: 8px; }
+  .fetus-live p { margin: 4px 0; }
   table.ref { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 6px; }
   table.ref th, table.ref td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); }
   table.ref th { color: var(--muted); font-weight: 600; font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -721,10 +729,10 @@
         <details class="card ob-only">
           <summary class="card-title">Obstetric context</summary>
           <div class="grid2">
-            <div class="field"><label>Fetuses</label><div class="row"><select id="ex-fetuses"><option value="Singleton">Singleton</option><option value="Twins">Twins</option><option value="Higher-order">Higher-order</option></select></div></div>
+            <div class="field"><label>Fetuses</label><div class="row"><select id="ex-fetuses"><option value="Singleton">Singleton</option><option value="Twins">Twins</option><option value="Triplets">Triplets</option><option value="Quadruplets">Quadruplets</option></select></div></div>
             <div class="field"><label>Cardiac activity</label><div class="row"><select id="ex-cardiac"><option value="">-</option><option value="present">Present</option><option value="absent">Absent</option></select></div></div>
           </div>
-          <div class="field"><label>Chorionicity (documentation only — not a score)</label><div class="row"><select id="ex-chorion"><option value="">Not documented</option><option value="DCDA">Dichorionic diamniotic</option><option value="MCDA">Monochorionic diamniotic</option><option value="MCMA">Monochorionic monoamniotic</option><option value="uncertain">Uncertain on this scan</option></select></div></div>
+          <div class="field"><label>Chorionicity (documentation only — not a score)</label><div class="row"><select id="ex-chorion"><option value="">Not documented</option><option value="DCDA">Dichorionic diamniotic</option><option value="MCDA">Monochorionic diamniotic</option><option value="MCMA">Monochorionic monoamniotic</option><option value="TCTA">Trichorionic triamniotic</option><option value="DCTA">Dichorionic triamniotic</option><option value="MCTA">Monochorionic triamniotic</option><option value="uncertain">Uncertain on this scan</option></select></div></div>
           <p class="note">Record lambda or T-sign from the earliest scan that shows the membrane. This field stores what you saw. It does not calculate chorionicity.</p>
           <div class="grid2">
             <div class="field"><label>Presentation</label><div class="row"><select id="ex-presentation"><option value="">-</option><option value="cephalic">Cephalic</option><option value="breech">Breech</option><option value="transverse">Transverse</option><option value="oblique">Oblique</option></select></div></div>
@@ -749,12 +757,26 @@
           </div>
           <div id="plac-out"></div>
         </details>
+        <div id="multi-mount-exam">
         <details class="card ob-only" id="multi-card">
-          <summary class="card-title">Twins and higher-order</summary>
-          <p class="subhead">Optional second and third fetus. Weight uses an entered gram value, or Hadlock from centimetre biometry already validated in this app. One EDD. Not a Quintero stage and not a laser decision.</p>
+          <summary class="card-title">Each embryo or fetus</summary>
+          <p class="subhead">Twins, triplets, or quadruplets. Enter each one here. One pregnancy EDD, from the larger living fetus. ART outranks ultrasound.</p>
+          <div class="grid2">
+            <div class="field"><label>Chorionicity (what you saw)</label><div class="row"><select id="multi-chorion"><option value="">Not documented</option><option value="DCDA">Dichorionic diamniotic</option><option value="MCDA">Monochorionic diamniotic</option><option value="MCMA">Monochorionic monoamniotic</option><option value="TCTA">Trichorionic triamniotic</option><option value="DCTA">Dichorionic triamniotic</option><option value="MCTA">Monochorionic triamniotic</option><option value="uncertain">Uncertain on this scan</option></select></div></div>
+            <div class="field" id="order-n-wrap" hidden>
+              <label>How many fetuses</label>
+              <div class="row"><select id="ex-order-n"><option value="3">3 — triplets</option><option value="4">4 — quadruplets</option></select></div>
+            </div>
+          </div>
+            <div class="field" id="mc-pair-wrap" hidden>
+              <label>Which two share one placenta</label>
+              <div class="row"><select id="multi-pair"><option value="">Not identified</option><option value="AB">Fetus A and Fetus B</option><option value="AC">Fetus A and Fetus C</option><option value="BC">Fetus B and Fetus C</option></select></div>
+            </div>
+          <button type="button" class="btn-ghost" id="multi-copy-a" style="width:auto">Copy the single boxes into Fetus A</button>
           <div id="multi-slots"></div>
           <div id="multi-out"></div>
         </details>
+        </div>
         <div class="card">
           <div class="card-title">Report</div>
           <p class="subhead">One written report. It is not repeated on this checklist.</p>
@@ -833,6 +855,9 @@
       <div>
         <div class="card">
           <div class="card-title">Head &amp; Body Measurements</div>
+          <div class="field"><label>Number of fetuses</label><div class="row"><select id="bio-order"><option value="1">Singleton</option><option value="2">Twins</option><option value="3">Triplets</option><option value="4">Quadruplets</option></select></div></div>
+          <p class="subhead" id="multi-measure-note" hidden>Enter each embryo or fetus below. One pregnancy EDD. Biometry on those cards is in centimetres. CRL is in millimetres.</p>
+          <div id="singleton-measures">
           <div class="unit-toggle" id="bio-unit-toggle">
             <button data-unit="cm" class="on">CM</button>
             <button data-unit="mm">MM</button>
@@ -849,6 +874,7 @@
             <div class="field"><label>AC *</label><div class="row"><input id="b-ac" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix" id="u3">cm</span></div></div>
             <div class="field"><label>FL *</label><div class="row"><input id="b-fl" type="number" inputMode="decimal" step="0.1" placeholder="—"><span class="suffix" id="u4">cm</span></div></div>
           </div>
+          </div>
           <div class="hairline">
             <label style="display:block;font-size:12.5px;color:var(--muted);margin-bottom:8px;">Established GA, if already known</label>
             <div class="grid2">
@@ -858,9 +884,11 @@
             <div class="field"><label>Reference population</label><div class="row"><select id="b-pop"><option value="NG">Nigeria / Africa</option><option value="US">United States</option><option value="INT">Other</option></select></div></div>
           </div>
         </div>
+        <div id="multi-mount-bio"></div>
       </div>
 
       <div>
+        <div class="card" id="twin-card" hidden></div>
         <div class="card" id="head-card"></div>
         <div class="card" id="efw-card"></div>
         <div class="card" id="ratio-card"></div>
@@ -885,8 +913,11 @@
         </div>
         <div class="card">
           <div class="card-title">First-Trimester Measurements</div>
+          <div id="singleton-crl-fields">
           <div class="field"><label>CRL (mm)</label><div class="row"><input id="d-crl" type="number" inputMode="decimal" step="0.1" placeholder="e.g. 52"><span class="suffix">mm</span></div></div>
           <div class="field"><label>Mean gestational sac diameter (mm) — used only if CRL isn't available</label><div class="row"><input id="d-msd" type="number" inputMode="decimal" step="0.1" placeholder="e.g. 18"><span class="suffix">mm</span></div></div>
+          </div>
+          <p class="note" id="multi-crl-note" hidden>Twins or a higher-order pregnancy: enter each CRL on the fetus cards. One EDD uses the larger living fetus. The single CRL box is not the due date.</p>
           <div class="hairline">
             <div class="field"><label>Scan date</label><div class="row"><input id="d-scandate" type="date"></div></div>
           </div>
@@ -932,8 +963,9 @@
           <label class="check-row"><input type="checkbox" id="d-x-skel"> Suspected skeletal dysplasia / familial short limbs — exclude FL</label>
           <label class="check-row"><input type="checkbox" id="d-x-cranial"> Hydrocephalus / ventriculomegaly / cranial anomaly — exclude raw BPD (HC used)</label>
           <label class="check-row"><input type="checkbox" id="d-x-hc"> Severe microcephaly or macrocephaly — exclude HC from dating</label>
-          <label class="check-row"><input type="checkbox" id="d-x-twins"> Twins / multiples — date from the larger fetus (enter that fetus here)</label>
+          <label class="check-row"><input type="checkbox" id="d-x-twins"> Twins or higher-order — one EDD from the larger living fetus. Enter each fetus in the cards below.</label>
         </div>
+        <div id="multi-mount-date"></div>
         <div class="card">
           <div class="card-title">Fetal Heart Rate</div>
           <div class="grid2">
@@ -944,6 +976,7 @@
         </div>
       </div>
       <div>
+        <div class="card" id="twin-date-card" hidden></div>
         <div class="card" id="edd-card"></div>
         <div class="card" id="ga-audit-card"></div>
         <div class="card" id="redate-card"></div>
@@ -1669,7 +1702,12 @@
           <li><strong>Carotid (SRU 2003).</strong> Grant EG et al., Radiology 2003;229:340-346. NASCET percent from ICA PSV: <125 cm/s = <50%; 125-230 = 50-69%; >230 = >=70% to near occlusion. EDV and ICA/CCA ratio check concordance. Near occlusion is qualitative. Not a CEA order.</li>
           <li><strong>Testicular volume.</strong> Lambert B, <em>J Urol</em> 1982 — ellipsoid L×W×H×0.71. Compare sides. Not a torsion or tumour diagnosis. The 0.52 ellipsoid under-reads testicular volume and is not used here.</li>
           <li><strong>PSA density.</strong> PSA (ng/mL) ÷ ellipsoid volume (cc). Benson et al., <em>J Urol</em> 1992, discussed about 0.15 ng/mL/cc. Not four official risk bands and not a cancer diagnosis.</li>
-          <li><strong>Twins — discordance and EDD.</strong> (larger − smaller) / larger. About 20% is an ACOG surveillance flag (Practice Bulletin 231). One EDD for the pregnancy. Discordance is not TTTS.</li>
+          <li><strong>Twins and higher-order — one EDD.</strong> ISUOG twin guideline, Khalil et al., <em>Ultrasound Obstet Gynecol</em> 2025;65:253–276: spontaneous twins are dated from the larger CRL before 14 weeks (ideally 45–84 mm, before 13+6). At or beyond 14 weeks, the head circumference of the larger twin is used. IVF uses embryo age and the transfer date. ACOG Committee Opinion 700 locks that ART date and does not publish a separate twin biometry equation, so this app does not invent one and does not average the fetuses. NICE NG137 estimates gestational age from the largest baby in twins and triplets. One EDD. A later difference is growth, not a new birthday. Higher-order pregnancies use the largest living fetus the same way. ISUOG has not published a separate quadruplet formula. If a CRL and a head circumference on the same form disagree by 10 days or more, and the head dates at or beyond 14 weeks, the head circumference is used. Set the number of fetuses on Measure. Each CRL, NT, heart rate, biometry, fluid pocket, and cord insertion is entered separately.</li>
+          <li><strong>CRL and NT discordance.</strong> (larger − smaller) / larger. CRL discordance ≥10%, or NT discordance ≥20%, should be discussed with a fetal-medicine expert (ISUOG 2025). Not a second EDD.</li>
+          <li><strong>Interval, each fetus.</strong> Follow-up examinations on the same folder are matched by letter (A, B, C, D), not by a typed name such as presenting. Centiles use the pregnancy age and the singleton Hadlock 1991 chart. A fall of 20 centile points is shown, as on a singleton. No gram-per-day rule is applied. It is not an FGR diagnosis and not a second EDD.</li>
+          <li><strong>EFW discordance.</strong> (larger − smaller) / larger. ISUOG 2025: about 20% marks higher risk of adverse outcome, and ≥25% is the referral threshold. Conventional selective growth restriction is one fetus with EFW below the 10th centile and discordance ≥25%. NICE NG137 uses the same 25% plus <10th pattern for referral in dichorionic twins and trichorionic triplets, and increases monitoring at 20% or if any baby is under the 10th. ACOG Practice Bulletin 231, as cited by ISUOG 2025, describes discordant growth across about 15–25% rather than one cutoff. The referral centile in this app stays the singleton Hadlock 1991 table. A dichorionic pregnancy also shows the NICHD dichorionic twin chart (Grantz et al., <em>AJOG</em> 2016; 10th, 25th, 50th, 75th, 90th, 15–38 weeks). That chart is a United States reference, not a monochorionic chart and not a Nigerian standard, and it does not replace the singleton 10th in the referral sentence. No monochorionic twin chart is loaded. Discordance is not TTTS and not a delivery order.</li>
+          <li><strong>Delphi selective growth.</strong> Khalil et al., <em>UOG</em> 2019: one fetus under the 3rd centile is a solitary criterion. Otherwise monochorionic pregnancies need two of EFW <10th, abdominal circumference <10th, discordance ≥25%, and UA-PI >95th in the smaller fetus. Dichorionic pregnancies need two of EFW <10th, discordance ≥25%, and UA-PI >95th. This app does not have an abdominal-circumference centile, so that item is not counted. UA-PI uses INTERGROWTH-21st (Drukker et al., <em>AJOG</em> 2020). Not a delivery time.</li>
+          <li><strong>Dichorionic triamniotic triplets.</strong> TTTS and TAPS can affect only the monochorionic pair. Until that pair is named, this app does not call either diagnosis for the whole pregnancy. After the pair is named, fluid and MCA-PSV are read on those two fetuses only.</li>
           <li><strong>TTTS fluid.</strong> Quintero et al., <em>J Perinatol</em> 1999: deepest pocket ≤2 cm and ≥8 cm at any gestation (North American / ACOG / SMFM pattern). ISUOG twin guideline (Khalil et al., <em>UOG</em> 2016) and Eurofetus: recipient ≥8 cm at or before 20 weeks and ≥10 cm after 20 weeks. This app states both. It does not assign a Quintero stage.</li>
           <li><strong>TAPS.</strong> Khalil et al., Delphi consensus, <em>UOG</em> 2020: MCA-PSV ≥1.5 MoM and ≤0.8 MoM, or an intertwin difference ≥1.0 MoM. An older >1.5 / <1.0 pair is not used as a diagnosis here. Not a haemoglobin.</li>
           <li><strong>Placenta and the os.</strong> RCOG Green-top 27a: low-lying if the leading edge is <20 mm from the internal os and not covering it. A third-trimester distance ≥20 mm often allows a vaginal-birth discussion. Not a caesarean order.</li>
@@ -1725,6 +1763,14 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.23.0</strong> (30 Oct 2026) — A saved follow-up compares each fetus by letter: weight, centile, AC, HC, FL, and Doppler. A 20-point centile fall is named on that fetus. It is not an FGR diagnosis. Twins, triplets, and quadruplets are chosen by those names on Measure and under Exam → Obstetric context.</li>
+        <li><strong>3.22.1</strong> (27 Oct 2026) — On a dichorionic pregnancy the weight card shows each fetus on the NICHD 2016 twin chart as well as the singleton centile, and draws the twin 10th, 50th, and 90th on the growth curve. The referral sentence is unchanged.</li>
+        <li><strong>3.22.0</strong> (27 Oct 2026) — Dichorionic triamniotic triplets: name the two fetuses that share a placenta, and TTTS or TAPS is read on that pair only. Each fetus has UA-PI, MCA-PI, CPR, ductus venosus, and a structure checklist. A dichorionic pregnancy also shows the NICHD 2016 twin chart beside the singleton centile. The referral rule still uses the singleton 10th.</li>
+        <li><strong>3.21.1</strong> (27 Oct 2026) — A blank twin card is no longer treated as a measured fetus, so the comparison asks for the missing one. Structure and cord insertion on each fetus are saved with the exam.</li>
+        <li><strong>3.21.0</strong> (26 Oct 2026) — Twins, triplets, and quadruplets: each fetus is measured on its own card, including structure and cord insertion. Comparison lists discordance, a small fetus, fluid, TAPS, and Doppler as deviations. One EDD stays on the larger living CRL before 14 weeks, or the larger head circumference at or beyond 14 weeks (ISUOG 2025). NICE NG137 uses the largest baby. ART still outranks both (ACOG Committee Opinion 700). A leftover CRL does not override a clearly later head circumference.</li>
+        <li><strong>3.20.0</strong> (25 Oct 2026) — Each embryo or fetus in a twin, triplet, or quadruplet pregnancy is measured and calculated on its own card. Comparison shows discordance, a small fetus, fluid, and TAPS. One EDD follows ISUOG 2025: the larger living CRL, or the larger head circumference from 14 weeks. NICE NG137 uses the largest baby in twins and triplets. ART still outranks both. A leftover singleton measurement is not the due date.</li>
+        <li><strong>3.19.0</strong> (24 Oct 2026) — Twins, triplets, and quadruplets are entered on Measure and on Dating, one card per fetus. Each CRL, biometry, weight, and centile is calculated separately and compared. One EDD follows ISUOG 2025 and NICE NG137: the larger living fetus. ART still outranks that date. A single unassigned CRL is not used as the due date.</li>
+        <li><strong>3.18.0</strong> (22 Oct 2026) — Twins and higher-order pregnancies take a separate CRL, NT, heart rate, and biometry for each fetus. One EDD follows ISUOG: larger living CRL, or the larger head circumference after 14 weeks. ART still outranks both. Discordance, selective-growth pattern, fluid, and TAPS are compared. Singleton dating is unchanged.</li>
         <li><strong>3.17.0</strong> (21 Oct 2026) — Nigeria uses the Hadlock mean as the age on the measurement screen, with the regression beside it and the EDD on the same card. How-to notes moved to References. Examinations save under the patient name.</li>
         <li><strong>3.16.0</strong> (20 Oct 2026) — Reference population chooses the biometric age. Nigeria / Africa uses the mean of the four Hadlock ages. The regression is comparison only. United States uses NICHD 2017. Formulas unchanged.</li>
         <li><strong>3.15.0</strong> (19 Oct 2026) — Hadlock 1984 is the default biometric age. NICHD 2017 stays available and is not averaged with it. The arithmetic mean of the four Hadlock ages is shown. Formulas unchanged.</li>
@@ -1763,7 +1809,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Sonogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Sonogen 3.17.0 · Clinical sonography companion. One menu. Formulas unchanged.</p>
+    <p class="note">Sonogen 3.23.0 · Clinical sonography companion. One menu. Singleton formulas unchanged.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -1931,15 +1977,316 @@
     return { grams: r.grams, how: r.label };
   }
 
-  function readFetusSlot(prefix, label) {
-    var w = fetusWeightFrom(num(val(prefix + "-efw")), num(val(prefix + "-bpd")), num(val(prefix + "-hc")), num(val(prefix + "-ac")), num(val(prefix + "-fl")));
-    var dvp = num(val(prefix + "-dvp"));
-    var mca = num(val(prefix + "-mca"));
+  function slotHasAnything(prefix) {
+    var keys = ["crl", "nt", "fhr", "bpd", "ofd", "hc", "ac", "fl", "efw", "dvp", "mca", "card", "pres", "label", "anat", "cord"];
+    for (var i = 0; i < keys.length; i++) {
+      var el = document.getElementById(prefix + "-" + keys[i]);
+      if (el && String(el.value || "").trim() !== "") return true;
+    }
+    return false;
+  }
+  function fetusNumber() {
+    var mode = val("ex-fetuses");
+    var bio = parseInt(val("bio-order") || "1", 10);
+    if (!(bio >= 1 && bio <= 4)) bio = 1;
+    var namedMulti = mode === "Twins" || mode === "Triplets" || mode === "Quadruplets" || mode === "Higher-order";
+    var explicitSingle = !namedMulti && !checked("d-x-twins") && bio <= 1;
+    if (explicitSingle) return 1;
+    var n = 1;
+    if (bio >= 2) n = bio;
+    if (mode === "Twins" || checked("d-x-twins")) n = Math.max(n, 2);
+    if (mode === "Triplets") n = Math.max(n, 3);
+    if (mode === "Quadruplets") n = Math.max(n, 4);
+    if (mode === "Higher-order") {
+      var k = parseInt(val("ex-order-n") || "3", 10);
+      n = Math.max(n, k === 4 ? 4 : 3);
+    }
+    if (slotHasAnything("twB")) n = Math.max(n, 2);
+    if (slotHasAnything("twC")) n = Math.max(n, 3);
+    if (slotHasAnything("twD")) n = Math.max(n, 4);
+    return n > 4 ? 4 : n;
+  }
+  function multiplesSelected() { return fetusNumber() >= 2; }
+
+  function selectMultipleDating(fetuses) {
+    var list = (fetuses || []).filter(Boolean);
+    var living = list.filter(function (f) { return f.living !== false && f.cardiac !== "absent"; });
+    var noLiving = list.length > 0 && living.length === 0;
+    function maxBy(arr, key) {
+      var best = null;
+      arr.forEach(function (f) {
+        var v = key(f);
+        if (v == null || !isFinite(v)) return;
+        if (!best || v > key(best)) best = f;
+      });
+      return best;
+    }
+    var withCrl = living.filter(function (f) { return f.crl != null && isFinite(f.crl) && f.crl > 0; });
+    var largestCrl = maxBy(withCrl, function (f) { return f.crl; });
+    var crlOverWindow = !!(largestCrl && largestCrl.crl > 84);
+    var largerCrl = null;
+    if (largestCrl && largestCrl.crl <= 84) {
+      largerCrl = largestCrl;
+      if (largerCrl.crlDays == null || !isFinite(largerCrl.crlDays)) {
+        largerCrl = {
+          id: largerCrl.id, crl: largerCrl.crl, crlDays: gaFromCRLmm(largerCrl.crl),
+          hc: largerCrl.hc, hcWeeks: largerCrl.hcWeeks, living: true
+        };
+      }
+    }
+    var withHc = living.filter(function (f) { return f.hc != null && isFinite(f.hc) && f.hc > 0; });
+    var largerHc = maxBy(withHc, function (f) { return f.hc; });
+    if (largerHc && (largerHc.hcWeeks == null || !isFinite(largerHc.hcWeeks))) {
+      var weeks = gaHC(largerHc.hc);
+      largerHc = { id: largerHc.id, hc: largerHc.hc, hcWeeks: weeks, crl: largerHc.crl, living: true };
+    }
+    var crlHeld = false;
+    if (largerCrl && largerHc && largerHc.hcWeeks != null && isFinite(largerHc.hcWeeks) && largerHc.hcWeeks >= 14 && largerCrl.crlDays != null && isFinite(largerCrl.crlDays)) {
+      if ((largerHc.hcWeeks - largerCrl.crlDays / 7) >= (10 / 7)) {
+        crlHeld = true;
+        largerCrl = null;
+      }
+    }
+    return { largerCrl: largerCrl, largerHc: largerHc, crlOverWindow: crlOverWindow, crlHeld: crlHeld, noLiving: noLiving, count: list.length };
+  }
+
+  function syncFetusDerivedHC(prefix) {
+    var hcEl = document.getElementById(prefix + "-hc");
+    if (!hcEl) return;
+    var derived = calcHC(num(val(prefix + "-bpd")), num(val(prefix + "-ofd")));
+    if (hcEl.getAttribute("data-auto") !== "1" && String(hcEl.value || "").trim() !== "") return;
+    if (derived == null) {
+      if (hcEl.getAttribute("data-auto") === "1") { hcEl.value = ""; hcEl.removeAttribute("data-auto"); }
+      return;
+    }
+    var text = derived.toFixed(1);
+    if (hcEl.value !== text) hcEl.value = text;
+    hcEl.setAttribute("data-auto", "1");
+  }
+  function readOneFetus(i) {
+    var prefixes = ["twA", "twB", "twC", "twD"];
+    var labels = ["Fetus A", "Fetus B", "Fetus C", "Fetus D"];
+    var prefix = prefixes[i];
+    var label = labels[i];
+    if (!prefix) return null;
+    syncFetusDerivedHC(prefix);
+    function slotNum(suffix) {
+      var el = document.getElementById(prefix + "-" + suffix);
+      if (!el) return null;
+      return num(el.value);
+    }
+    var crl = slotNum("crl");
+    var nt = slotNum("nt");
+    var fhr = slotNum("fhr");
+    var bpd = slotNum("bpd");
+    var ofd = slotNum("ofd");
+    var hc = slotNum("hc");
+    var ac = slotNum("ac");
+    var fl = slotNum("fl");
+    var cardiac = val(prefix + "-card") || "";
+    var pres = val(prefix + "-pres") || "";
+    var named = (val(prefix + "-label") || "").trim();
+    if (named) label = named;
+    if (hc == null && bpd != null && ofd != null) hc = calcHC(bpd, ofd);
+    var gramsIn = slotNum("efw");
+    var w = fetusWeightFrom(gramsIn, bpd, hc, ac, fl);
+    var dvp = slotNum("dvp");
+    var mca = slotNum("mca");
     var bladder = val(prefix + "-blad") || "";
     var ua = val(prefix + "-ua") || "";
-    var any = !!w || dvp != null || mca != null || (bladder && bladder !== "not assessed") || (ua && ua !== "not assessed");
+    var anatomy = val(prefix + "-anat") || "";
+    var cordIns = val(prefix + "-cord") || "";
+    var uapi = slotNum("uapi");
+    var mcapi = slotNum("mcapi");
+    var dvpi = slotNum("dvpi");
+    var dva = val(prefix + "-dva") || "";
+    var atrium = slotNum("atr");
+    var cist = slotNum("cm");
+    var nf = slotNum("nf");
+    var foot = slotNum("foot");
+    var pelvisMm = slotNum("pelvis");
+    var nasal = val(prefix + "-nasal") || "";
+    var heart = val(prefix + "-heart") || "";
+    var wall = val(prefix + "-wall") || "";
+    var stomach = val(prefix + "-stomach") || "";
+    var kidneys = val(prefix + "-kidneys") || "";
+    var pelvisSide = val(prefix + "-pelside") || "";
+    var limbs = val(prefix + "-limbs") || "";
+    var cistOblit = checked(prefix + "-cmob");
+    var lemon = checked(prefix + "-lemon");
+    var banana = checked(prefix + "-banana");
+    var spine = checked(prefix + "-spine");
+    var cleft = checked(prefix + "-cleft");
+    var bow = checked(prefix + "-bow");
+    var fx = checked(prefix + "-fx");
+    var mineral = checked(prefix + "-mineral");
+    var own = crl != null || nt != null || fhr != null || bpd != null || ofd != null || hc != null || ac != null || fl != null || cardiac !== "" || pres !== "" || named !== "" || anatomy !== "" || cordIns !== "" || uapi != null || mcapi != null || dvpi != null || dva !== "" || atrium != null || cist != null || nf != null || foot != null || pelvisMm != null || nasal !== "" || heart !== "" || wall !== "" || stomach !== "" || kidneys !== "" || limbs !== "" || cistOblit || lemon || banana || spine || cleft || bow || fx || mineral;
+    var crlDays = (crl != null && crl > 0) ? gaFromCRLmm(crl) : null;
+    var hcWeeks = (hc != null && hc > 0) ? gaHC(hc) : null;
+    var gaBpd = (bpd != null && isFinite(gaBPD(bpd))) ? gaBPD(bpd) : null;
+    var gaHcW = (hc != null && isFinite(gaHC(hc))) ? gaHC(hc) : null;
+    var gaAc = (ac != null && isFinite(gaAC(ac))) ? gaAC(ac) : null;
+    var gaFl = (fl != null && isFinite(gaFL(fl))) ? gaFL(fl) : null;
+    var ages = [gaBpd, gaHcW, gaAc, gaFl].filter(function (v) { return v != null; });
+    var meanWeeks = ages.length ? ages.reduce(function (s, v) { return s + v; }, 0) / ages.length : null;
+    var living = cardiac !== "absent";
+    var any = own || !!w || dvp != null || mca != null || crl != null || bpd != null || hc != null || ac != null || fl != null || (bladder && bladder !== "not assessed") || (ua && ua !== "not assessed");
     if (!any) return null;
-    return { id: label, grams: w ? w.grams : null, how: w ? w.how : "", dvp: dvp, mca: mca, bladder: bladder, ua: ua };
+    return {
+      id: label, index: i, prefix: prefix,
+      crl: crl, crlDays: crlDays, nt: nt, fhr: fhr, cardiac: cardiac, presentation: pres,
+      bpd: bpd, ofd: ofd, hc: hc, ac: ac, fl: fl,
+      grams: w ? w.grams : null, how: w ? w.how : "",
+      hcWeeks: hcWeeks, meanWeeks: meanWeeks,
+      gaBpd: gaBpd, gaHc: gaHcW, gaAc: gaAc, gaFl: gaFl,
+      dvp: dvp, mca: mca, bladder: bladder, ua: ua, anatomy: anatomy, cord: cordIns,
+      uapi: uapi, mcapi: mcapi, dvpi: dvpi, dva: dva, cpr: (uapi != null && mcapi != null && uapi > 0) ? mcapi / uapi : null,
+      atrium: atrium, cist: cist, cistOblit: cistOblit, lemon: lemon, banana: banana, spine: spine,
+      nasal: nasal, nf: nf, cleft: cleft, heart: heart, wall: wall, stomach: stomach, kidneys: kidneys,
+      pelvis: pelvisMm, pelvisSide: pelvisSide, limbs: limbs, foot: foot, bow: bow, fx: fx, mineral: mineral,
+      pairKey: ["A", "B", "C", "D"][i],
+      living: living
+    };
+  }
+
+  function readFetusSlot(prefix, label) {
+    var idx = { twA: 0, twB: 1, twC: 2, twD: 3 }[prefix];
+    if (idx == null) return null;
+    var count = fetusNumber();
+    if (idx >= count && !multiplesSelected()) return null;
+    if (idx >= count) return null;
+    return readOneFetus(idx);
+  }
+
+  function multipleDatingChoice() {
+    if (!multiplesSelected()) return null;
+    var n = fetusNumber();
+    var fetuses = [];
+    for (var i = 0; i < n; i++) {
+      var f = readOneFetus(i);
+      if (f) fetuses.push(f);
+    }
+    var picked = selectMultipleDating(fetuses);
+    picked.fetuses = fetuses;
+    return picked;
+  }
+
+  function nichdDcTwinCols(gaWeeks) {
+    var table = {
+      15: [97.0, 103.7, 111.7, 120.3, 128.6],
+      16: [122.6, 131.1, 141.2, 152.1, 162.6],
+      17: [153.7, 164.4, 177.1, 190.7, 204.0],
+      18: [190.6, 203.9, 219.7, 236.7, 253.2],
+      19: [233.8, 250.2, 269.7, 290.7, 311.0],
+      20: [283.9, 303.8, 327.6, 353.2, 378.0],
+      21: [341.2, 365.4, 394.1, 425.2, 455.2],
+      22: [406.4, 435.4, 469.9, 507.3, 543.4],
+      23: [479.8, 514.3, 555.6, 600.1, 643.3],
+      24: [561.9, 602.8, 651.7, 704.5, 755.8],
+      25: [653.0, 701.1, 758.7, 821.1, 881.6],
+      26: [753.0, 809.3, 876.9, 950.1, 1021.2],
+      27: [861.8, 927.5, 1006.2, 1091.7, 1174.8],
+      28: [979.1, 1055.1, 1146.6, 1245.9, 1342.7],
+      29: [1104.2, 1191.9, 1297.5, 1412.4, 1524.6],
+      30: [1236.4, 1337.0, 1458.4, 1590.8, 1720.2],
+      31: [1374.7, 1489.6, 1628.5, 1780.4, 1929.2],
+      32: [1517.8, 1648.4, 1806.7, 1980.2, 2150.6],
+      33: [1664.2, 1812.0, 1991.6, 2189.1, 2383.5],
+      34: [1812.3, 1978.8, 2181.8, 2405.7, 2626.7],
+      35: [1960.3, 2147.1, 2375.5, 2628.3, 2878.6],
+      36: [2106.4, 2314.9, 2570.9, 2855.1, 3137.8],
+      37: [2248.1, 2480.0, 2765.9, 3084.7, 3402.9],
+      38: [2382.5, 2639.8, 2958.4, 3315.5, 3673.5]
+    };
+    if (gaWeeks == null || !isFinite(gaWeeks) || gaWeeks < 15 || gaWeeks > 38) return null;
+    var lo = Math.floor(gaWeeks);
+    var hi = Math.min(38, lo + 1);
+    var frac = gaWeeks - lo;
+    var a = table[lo], b = table[hi];
+    if (!a || !b) return null;
+    return a.map(function (v, i) { return lo === hi ? v : v + (b[i] - v) * frac; });
+  }
+
+  function nichdDcTwinBand(gaWeeks, grams) {
+    if (grams == null || !isFinite(grams)) return null;
+    var cols = nichdDcTwinCols(gaWeeks);
+    if (!cols) return null;
+    var names = ["10th", "25th", "50th", "75th", "90th"];
+    var i;
+    for (i = 0; i < cols.length; i++) {
+      if (Math.abs(grams - cols[i]) <= Math.max(1, cols[i] * 0.002)) return { label: "at the " + names[i], below10: false, above90: false };
+    }
+    if (grams < cols[0]) return { label: "below the 10th", below10: true, above90: false };
+    if (grams > cols[4]) return { label: "above the 90th", below10: false, above90: true };
+    for (i = 0; i < cols.length - 1; i++) {
+      if (grams < cols[i + 1]) return { label: "between the " + names[i] + " and the " + names[i + 1], below10: false, above90: false };
+    }
+    return { label: "at the 90th", below10: false, above90: false };
+  }
+
+  function mcPairFetuses(list, code) {
+    if (!code || String(code).length < 2) return null;
+    var letters = String(code).toUpperCase();
+    function findLetter(letter) {
+      var full = "Fetus " + letter;
+      var found = null;
+      (list || []).forEach(function (f) {
+        if (!f || found) return;
+        if (f.pairKey === letter || f.id === full || f.id === letter) found = f;
+      });
+      return found;
+    }
+    var left = findLetter(letters.charAt(0));
+    var right = findLetter(letters.charAt(1));
+    if (!left || !right || left === right) return null;
+    return [left, right];
+  }
+
+  function fetusStructureNotes(f, gaW) {
+    var notes = [];
+    function add(level, text) { notes.push({ level: level, text: f.id + ": " + text }); }
+    if (f.atrium != null && isFinite(f.atrium)) {
+      var vm = classifyVentriculomegaly(f.atrium);
+      if (vm.cls !== "ok") add(vm.cls === "danger" ? "danger" : "warn", "atrium " + f.atrium.toFixed(1) + " mm — " + vm.label + ". Not a complete brain report.");
+    }
+    if (f.cistOblit) add("danger", "cisterna magna obliterated or effaced. Correlate with the cerebellum and the spine.");
+    else if (f.cist != null && f.cist > 10) add("warn", "cisterna magna " + f.cist.toFixed(1) + " mm is above 10 mm. Not a Dandy-Walker diagnosis from depth alone.");
+    if (f.banana || f.lemon || f.spine) {
+      var parts = [];
+      if (f.banana) parts.push("banana sign");
+      if (f.lemon) parts.push("lemon sign");
+      if (f.spine) parts.push("spinal defect");
+      add("danger", parts.join(" + ") + ". Pattern associated with Chiari II and an open spinal defect. Not a complete spine report.");
+    }
+    if (f.nasal === "absent" || f.nasal === "hypoplastic") add("warn", "nasal bone " + f.nasal + ". A marker, not a diagnosis.");
+    if (f.nf != null && isFinite(f.nf) && f.nf >= 6) {
+      var nfWhen = (gaW != null && (gaW < 15 || gaW > 24)) ? " The 6 mm rule is used at about 15–20 weeks." : "";
+      add("warn", "nuchal fold " + f.nf.toFixed(1) + " mm is at or above 6 mm." + nfWhen);
+    }
+    if (f.cleft) add("warn", "cleft lip or palate suspected on the views obtained.");
+    if (f.heart === "abnormal") add("warn", "four-chamber view looks abnormal. Not a complete fetal echocardiogram.");
+    else if (f.heart === "not seen") add("warn", "four-chamber view not seen.");
+    if (f.wall === "defect") add("danger", "abdominal-wall defect suspected. This does not distinguish gastroschisis from omphalocele.");
+    if (f.stomach === "not seen") add("warn", "stomach bubble not seen on this view. One scan does not diagnose esophageal atresia.");
+    if (f.kidneys === "both absent") add("danger", "neither kidney seen on this view.");
+    else if (f.kidneys === "one absent") add("warn", "one kidney not seen on this view.");
+    if (f.pelvis != null && isFinite(f.pelvis)) {
+      if (gaW == null) add("warn", "renal pelvis " + f.pelvis.toFixed(1) + " mm. The pregnancy age is needed before the cutoff is used.");
+      else {
+        var pUpper = renalPelvisUpper(gaW);
+        var side = f.pelvisSide === "bilateral" ? "Bilateral renal pelvis" : "Renal pelvis";
+        if (pUpper == null) add("warn", side + " " + f.pelvis.toFixed(1) + " mm. The cutoff used here stops at 30 weeks.");
+        else if (f.pelvis > pUpper) add("warn", side + " " + f.pelvis.toFixed(1) + " mm is above " + pUpper + " mm at this age.");
+      }
+    }
+    if (f.limbs === "abnormal") add("warn", "a limb looks short or abnormal. Not a skeletal-dysplasia diagnosis from this note alone.");
+    if (f.fl != null && f.foot != null && f.foot > 0 && (f.fl / f.foot) < 0.87) add("danger", "femur-to-foot ratio is under 0.87. That favours a skeletal dysplasia over isolated growth restriction. Not a named dysplasia.");
+    var bone = [];
+    if (f.bow) bone.push("bowing");
+    if (f.fx) bone.push("fracture");
+    if (f.mineral) bone.push("reduced mineralisation");
+    if (bone.length) add("danger", bone.join(", ") + " on this fetus. Not a named skeletal dysplasia.");
+    return notes;
   }
 
   function multipleSurveillance(opts) {
@@ -1948,72 +2295,445 @@
     var chorion = opts.chorion || "";
     var gaW = opts.gaDays != null ? opts.gaDays / 7 : null;
     var lines = [];
-    var flags = { screened: false, discordance: null, quintero: false, isuogFluid: null, taps: false };
-    if (!fetuses.length) return { lines: lines, flags: flags };
+    var reportBits = [];
+    var flags = { screened: false, discordance: null, crlDiscordance: null, quintero: false, isuogFluid: null, taps: false, sfgr: false, below10: false };
+    var deviations = [];
+    function deviate(level, text) { deviations.push({ level: level, text: text }); }
+    if (!fetuses.length) return { lines: lines, flags: flags, html: "", fetuses: [] };
     flags.screened = true;
-    lines.push("One EDD belongs to the pregnancy. Do not give the smaller fetus a separate due date.");
-    var weights = fetuses.filter(function (f) { return f.grams != null && f.grams > 0; });
+    function discOf(hi, lo) { return (hi - lo) / hi * 100; }
+    function maxMin(arr, key) {
+      var hi = arr[0], lo = arr[0];
+      arr.forEach(function (f) {
+        if (key(f) > key(hi)) hi = f;
+        if (key(f) < key(lo)) lo = f;
+      });
+      return { hi: hi, lo: lo };
+    }
+    function fmtMeasure(n) {
+      if (n == null || !isFinite(n)) return "—";
+      var r = Math.round(n * 10) / 10;
+      return Math.abs(r - Math.round(r)) < 0.001 ? String(Math.round(r)) : r.toFixed(1);
+    }
+    var living = fetuses.filter(function (f) { return f.living !== false && f.cardiac !== "absent"; });
+    var dead = fetuses.filter(function (f) { return f.cardiac === "absent" || f.living === false; });
+    lines.push("One EDD. ISUOG 2025 dates a spontaneous pregnancy from the larger living CRL (best at 45–84 mm, before 14 weeks), then from the larger head circumference. Not the smaller fetus and not the average. NICE NG137 uses the largest baby in twins and triplets. IVF embryo age and the transfer date outrank every fetus (ISUOG 2025 and ACOG Committee Opinion 700).");
+    if (fetuses.length >= 3) lines.push("Higher-order pregnancy: NICE NG137 dates triplets from the largest baby. ISUOG has not published a separate quadruplet formula, so the same largest living fetus is used. Discordance is (largest − smallest) / largest.");
+    if (dead.length && living.length) lines.push(dead.map(function (f) { return f.id; }).join(", ") + " has no cardiac activity. Dating uses the larger living fetus only.");
+    else if (dead.length && !living.length) lines.push("No living fetus is recorded. Do not assign an EDD from these measurements.");
+    if (dead.length) deviate("danger", dead.map(function (f) { return f.id; }).join(", ") + " has no cardiac activity. Excluded from the due date.");
+    if (opts.expected && fetuses.length < opts.expected) deviate("warn", "Measurements are in for " + fetuses.length + " of " + opts.expected + ". Enter every embryo or fetus before treating the comparison as complete.");
+
+    var crlPool = living.filter(function (f) { return f.crl != null && f.crl > 0; });
+    if (crlPool.length >= 2) {
+      var cr = maxMin(crlPool, function (f) { return f.crl; });
+      var crlDisc = discOf(cr.hi.crl, cr.lo.crl);
+      flags.crlDiscordance = crlDisc;
+      var crlLine = "CRL discordance " + crlDisc.toFixed(1) + "% = (" + cr.hi.id + " " + fmtMeasure(cr.hi.crl) + " mm − " + cr.lo.id + " " + fmtMeasure(cr.lo.crl) + " mm) / larger. ";
+      if (crlDisc >= 10) crlLine += "At or above 10%. ISUOG 2025: discuss with a fetal-medicine expert. Not a second EDD.";
+      else crlLine += "Below 10%. Not a second EDD.";
+      lines.push(crlLine);
+      if (crlDisc >= 10) deviate("warn", "CRL discordance " + crlDisc.toFixed(1) + "% (" + cr.lo.id + " smaller than " + cr.hi.id + "). At or above 10%. ISUOG 2025: discuss with a fetal-medicine expert. Not a second EDD.");
+      if (crlPool.length >= 3) {
+        lines.push("Each CRL against " + cr.hi.id + ": " + crlPool.filter(function (f) { return f !== cr.hi; }).map(function (f) {
+          return f.id + " " + discOf(cr.hi.crl, f.crl).toFixed(1) + "%";
+        }).join(", ") + ".");
+      }
+    } else if (crlPool.length === 1) lines.push("Only " + crlPool[0].id + " has a CRL. Comparison needs the other fetus.");
+
+    var ntPool = living.filter(function (f) { return f.nt != null && isFinite(f.nt); });
+    if (ntPool.length >= 2) {
+      var nr = maxMin(ntPool, function (f) { return f.nt; });
+      var ntDisc = nr.hi.nt > 0 ? discOf(nr.hi.nt, nr.lo.nt) : 0;
+      var ntLine = "NT discordance " + ntDisc.toFixed(1) + "% (" + nr.hi.id + " " + fmtMeasure(nr.hi.nt) + " mm, " + nr.lo.id + " " + fmtMeasure(nr.lo.nt) + " mm). ";
+      if (ntDisc >= 20) ntLine += "At or above 20%. ISUOG 2025: discuss with a fetal-medicine expert. Not a risk calculation.";
+      else ntLine += "Below 20%.";
+      lines.push(ntLine);
+      if (ntDisc >= 20) deviate("warn", "NT discordance " + ntDisc.toFixed(1) + "% (" + nr.hi.id + " " + fmtMeasure(nr.hi.nt) + " mm, " + nr.lo.id + " " + fmtMeasure(nr.lo.nt) + " mm). At or above 20%. ISUOG 2025: discuss with a fetal-medicine expert.");
+    }
+    ntPool.forEach(function (f) {
+      if (f.nt >= 3.5) lines.push(f.id + " NT " + fmtMeasure(f.nt) + " mm is at or above the 3.5 mm flag used in this app. Specialist centres use a CRL-specific centile.");
+      if (f.nt >= 3.5) deviate("warn", f.id + " NT " + fmtMeasure(f.nt) + " mm is at or above 3.5 mm. Not a risk calculation.");
+    });
+
+    var weights = living.filter(function (f) { return f.grams != null && f.grams > 0; });
+    var pctById = {};
+    if (gaW != null) {
+      weights.forEach(function (f) {
+        var pct = null;
+        try { pct = lookupPercentile(gaW, f.grams); } catch (ePct) { pct = null; }
+        if (pct && !pct.outOfRange) pctById[f.id] = pct.percentile;
+      });
+    }
     if (weights.length >= 2) {
-      var hi = weights[0], lo = weights[0];
-      weights.forEach(function (f) { if (f.grams > hi.grams) hi = f; if (f.grams < lo.grams) lo = f; });
-      var disc = (hi.grams - lo.grams) / hi.grams * 100;
+      var wr = maxMin(weights, function (f) { return f.grams; });
+      var disc = discOf(wr.hi.grams, wr.lo.grams);
       flags.discordance = disc;
-      var discLine = "EFW discordance " + disc.toFixed(1) + "% = (larger \u2212 smaller) / larger. ";
-      if (disc >= 25 && (chorion === "MCDA" || chorion === "MCMA")) discLine += "At or above 25% in a monochorionic pregnancy this raises selective growth-restriction concern. It does not diagnose TTTS.";
-      else if (disc >= 20) discLine += "At or above 20%, a commonly used ACOG surveillance flag. Not TTTS and not a new EDD.";
-      else discLine += "Below 20%. Still follow the local multiple-pregnancy pathway.";
+      var discLine = "EFW discordance " + disc.toFixed(1) + "% = (" + wr.hi.id + " " + Math.round(wr.hi.grams) + " g − " + wr.lo.id + " " + Math.round(wr.lo.grams) + " g) / larger. ";
+      if (disc >= 25) discLine += "At or above 25%: ISUOG 2025 referral threshold. NICE NG137 refers dichorionic twins and trichorionic triplets when an EFW is also under the 10th centile. Not TTTS and not a delivery decision.";
+      else if (disc >= 20) discLine += "At or above 20%: ISUOG 2025 higher-risk band, and a NICE NG137 reason for closer monitoring in dichorionic twins and trichorionic triplets. Below the 25% referral threshold. Not TTTS and not a new EDD.";
+      else if (disc >= 15) discLine += "15–20%. ACOG describes discordant twin growth across about 15–25% (Practice Bulletin 231, as cited by ISUOG 2025). Below the ISUOG 20% band. Not a new EDD.";
+      else discLine += "Below 15%. Not TTTS.";
       lines.push(discLine);
-      weights.forEach(function (f) { lines.push(f.id + " weight about " + Math.round(f.grams) + " g (" + f.how + ")."); });
+      if (disc >= 25) deviate("danger", "EFW discordance " + disc.toFixed(1) + "% (" + wr.lo.id + " " + Math.round(wr.lo.grams) + " g vs " + wr.hi.id + " " + Math.round(wr.hi.grams) + " g). At or above 25%: ISUOG 2025 referral threshold. Not TTTS and not a delivery decision.");
+      else if (disc >= 20) deviate("warn", "EFW discordance " + disc.toFixed(1) + "% (" + wr.lo.id + " " + Math.round(wr.lo.grams) + " g vs " + wr.hi.id + " " + Math.round(wr.hi.grams) + " g). At or above 20%: ISUOG 2025 higher-risk band. Below the 25% referral threshold.");
+      else if (disc >= 15) deviate("warn", "EFW discordance " + disc.toFixed(1) + "%. ACOG describes discordant growth across about 15–25% (Practice Bulletin 231, as cited by ISUOG 2025). Below the ISUOG 20% band. Not a new EDD.");
+      if (weights.length >= 3) {
+        lines.push("Each weight against " + wr.hi.id + ": " + weights.filter(function (f) { return f !== wr.hi; }).map(function (f) {
+          return f.id + " " + discOf(wr.hi.grams, f.grams).toFixed(1) + "%";
+        }).join(", ") + ".");
+      }
+      var small = weights.filter(function (f) { return pctById[f.id] != null && pctById[f.id] < 10; });
+      if (small.length) flags.below10 = true;
+      if (small.length && disc >= 25) {
+        flags.sfgr = true;
+        lines.push("Conventional ISUOG selective-growth pattern: " + small.map(function (f) { return f.id; }).join(", ") + " under the 10th centile on the singleton chart, with EFW discordance ≥25%. Not a Quintero stage and not a delivery time.");
+        deviate("danger", "Selective-growth pattern: " + small.map(function (f) { return f.id; }).join(", ") + " under the 10th centile, with EFW discordance at or above 25%. Not a delivery time.");
+      } else if (small.length) {
+        lines.push(small.map(function (f) { return f.id + " (" + ordinal(pctById[f.id]) + (pctById[f.id] < 3 ? ", below the 3rd" : "") + ")"; }).join(", ") + " is under the 10th centile on the singleton Hadlock chart, not a twin chart. Conventional ISUOG selective growth restriction also requires discordance ≥25%. Discordance here is " + disc.toFixed(1) + "%.");
+        deviate("warn", small.map(function (f) { return f.id; }).join(", ") + " is under the 10th centile on the singleton chart. Discordance is " + disc.toFixed(1) + "%, so the selective-growth referral (also needs ≥25%) is not met.");
+        if (chorion === "DCDA" || chorion === "TCTA" || chorion === "") lines.push("NICE NG137 increases monitoring in dichorionic twins and trichorionic triplets when any EFW is below the 10th centile. That alone is not the selective-growth referral, which also needs discordance ≥25%.");
+      }
+      if (gaW == null) lines.push("Centiles need the pregnancy gestational age. They were not invented from each fetus's size.");
+      else if (gaW < 24 || gaW > 41) lines.push("The singleton weight chart used here covers 24–41 weeks. Centiles were not forced outside that range.");
+      else lines.push("Centiles use the singleton Hadlock 1991 chart against the one pregnancy age, not a twin chart and not each fetus's own size age.");
+      if (gaW != null && gaW >= 24 && gaW <= 41 && (chorion === "MCDA" || chorion === "MCMA" || chorion === "MCTA" || chorion === "DCDA" || chorion === "TCTA" || chorion === "DCTA")) {
+        var p95ua = null;
+        try { p95ua = uaPiFromZ(1.64485, gaW); } catch (eUa95) { p95ua = null; }
+        var smallF = wr.lo;
+        var uaHigh = !!(smallF.uapi != null && p95ua != null && gaW <= 40 && smallF.uapi > p95ua && smallF.ua !== "AEDF" && smallF.ua !== "REDF");
+        var eBelow10 = pctById[smallF.id] != null && pctById[smallF.id] < 10;
+        var eBelow3 = pctById[smallF.id] != null && pctById[smallF.id] < 3;
+        var bitsD = [];
+        if (eBelow10) bitsD.push("EFW of " + smallF.id + " under the 10th on the singleton chart");
+        if (disc >= 25) bitsD.push("discordance at or above 25%");
+        if (uaHigh) bitsD.push("UA-PI of " + smallF.id + " above the 95th");
+        var mcDelphi = chorion === "MCDA" || chorion === "MCMA" || chorion === "MCTA";
+        if (eBelow3) {
+          flags.delphiSfgr = true;
+          lines.push("Delphi 2019 solitary selective-growth criterion: " + smallF.id + " is under the 3rd centile on the singleton chart. Abdominal-circumference centile was not counted. Not a delivery time.");
+          deviate("danger", "Delphi solitary criterion: " + smallF.id + " is under the 3rd centile on the singleton chart. Not a delivery time.");
+        } else if (bitsD.length >= 2) {
+          flags.delphiSfgr = true;
+          lines.push("Delphi 2019 selective-growth pattern (" + (mcDelphi ? "monochorionic" : "dichorionic") + "): " + bitsD.join("; ") + ". Abdominal-circumference centile was not available, so it was not counted. Not a delivery time.");
+          deviate("warn", "Delphi 2019 selective-growth pattern: " + bitsD.join("; ") + ". Not a delivery time.");
+        } else if (mcDelphi && bitsD.length === 1) lines.push("Delphi selective growth is not met on the items available. Abdominal-circumference centile was not counted.");
+      }
     } else if (weights.length === 1) lines.push("Only one fetal weight is entered. Discordance needs at least two.");
-    var withDvp = fetuses.filter(function (f) { return f.dvp != null; });
-    if (withDvp.length >= 2) {
-      var minD = withDvp[0], maxD = withDvp[0];
-      withDvp.forEach(function (f) { if (f.dvp < minD.dvp) minD = f; if (f.dvp > maxD.dvp) maxD = f; });
+
+    var dcChart = chorion === "DCDA";
+    var mcOnly = chorion === "MCDA" || chorion === "MCMA" || chorion === "MCTA";
+    var triplet = chorion === "TCTA" || chorion === "DCTA";
+    if (dcChart && weights.length) {
+      if (gaW == null || gaW < 15 || gaW > 38) lines.push("The NICHD dichorionic twin chart loaded here covers 15–38 weeks. It was not applied outside that range. The singleton chart is unchanged.");
+      else {
+        lines.push("NICHD dichorionic twin chart (Grantz et al., AJOG 2016), a United States reference. Not a monochorionic chart, not a triplet chart, and not a Nigerian standard. The selective-growth referral still uses the singleton Hadlock 10th plus discordance of at least 25%.");
+        weights.forEach(function (f) {
+          var band = nichdDcTwinBand(gaW, f.grams);
+          if (!band) return;
+          f.twinBand = band.label;
+          var singleBit = pctById[f.id] != null ? ", and " + ordinal(pctById[f.id]) + " on the singleton chart" : "";
+          lines.push(f.id + " is " + band.label + " on that dichorionic twin chart" + singleBit + ".");
+          if (band.below10 && pctById[f.id] != null && pctById[f.id] >= 10) lines.push(f.id + " is below the 10th on the twin chart but not on the singleton chart. The referral rule follows the singleton 10th.");
+          if (!band.below10 && pctById[f.id] != null && pctById[f.id] < 10) lines.push(f.id + " is under the 10th on the singleton chart but not below the 10th on the dichorionic twin chart. Discordance and the singleton 10th still drive the selective-growth sentence.");
+        });
+      }
+    } else if (mcOnly && weights.length) lines.push("No monochorionic twin chart is loaded. Centiles stay on the singleton Hadlock chart. Discordance remains the comparison.");
+    else if (triplet && weights.length) lines.push("Triplet centiles stay on the singleton Hadlock chart. The NICHD table is a dichorionic twin reference, so it is not applied to three fetuses.");
+    else if (!chorion && weights.length >= 2 && fetuses.length === 2) lines.push("Set chorionicity to dichorionic to show the NICHD twin chart. Until then only the singleton chart is used.");
+
+    fetuses.forEach(function (f) {
+      var bits = [f.id];
+      if (f.cardiac === "absent") bits.push("no cardiac activity");
+      else if (f.cardiac === "present") bits.push("cardiac activity present");
+      if (f.crl != null) bits.push("CRL " + fmtMeasure(f.crl) + " mm" + (f.crlDays != null ? " (" + wdWords(f.crlDays / 7) + ", not an EDD)" : ""));
+      if (f.nt != null) bits.push("NT " + fmtMeasure(f.nt) + " mm");
+      if (f.fhr != null) bits.push("FHR " + Math.round(f.fhr) + " bpm");
+      if (f.presentation) bits.push(f.presentation);
+      if (f.bpd != null) bits.push("BPD " + fmtMeasure(f.bpd) + " cm");
+      if (f.hc != null) bits.push("HC " + fmtMeasure(f.hc) + " cm");
+      if (f.ac != null) bits.push("AC " + fmtMeasure(f.ac) + " cm");
+      if (f.fl != null) bits.push("FL " + fmtMeasure(f.fl) + " cm");
+      if (f.grams != null) bits.push("EFW " + Math.round(f.grams) + " g" + (f.how ? " (" + f.how + ")" : ""));
+      if (pctById[f.id] != null) bits.push(Math.round(pctById[f.id]) + "th centile");
+      if (f.meanWeeks != null) bits.push("size age " + wdWords(f.meanWeeks) + " (not an EDD)");
+      if (f.dvp != null) bits.push("deepest pocket " + fmtMeasure(f.dvp) + " cm");
+      lines.push(bits.join(" · ") + ".");
+      if (f.bpd != null && f.bpd > 15) lines.push(f.id + " BPD is above 15 cm. The box is centimetres. The value was not converted.");
+      if (f.hc != null && f.hc > 50) lines.push(f.id + " HC is above 50 cm. The box is centimetres. The value was not converted.");
+      if (f.fl != null && f.ac != null && f.ac > 0 && (f.fl / f.ac) < 0.16) {
+        lines.push(f.id + " FL/AC is under 0.16 (Hadlock AJR 1983 screen). The femur was not removed from the weight.");
+        deviate("warn", f.id + " FL/AC is under 0.16. Skeletal-dysplasia screen. The femur was not removed from the weight.");
+      }
+      if (f.bpd != null && f.ofd != null && f.ofd > 0) {
+        var ciF = (f.bpd / f.ofd) * 100;
+        if (ciF < 74 || ciF > 83) lines.push(f.id + " cephalic index " + ciF.toFixed(1) + "% is outside 74–83 (" + (ciF < 74 ? "dolichocephaly" : "brachycephaly") + "). Head shape is not a second EDD.");
+      }
+      var gAges = [f.gaBpd, f.gaHc, f.gaAc, f.gaFl].filter(function (v) { return v != null && isFinite(v); });
+      if (gAges.length >= 2) {
+        var spreadIn = Math.max.apply(null, gAges) - Math.min.apply(null, gAges);
+        if (spreadIn > 2) lines.push(f.id + " own measurements differ by " + spreadIn.toFixed(1) + " weeks. Check technique and asymmetric growth. That spread is not a second EDD.");
+      }
+      if (gaW != null && f.meanWeeks != null && isFinite(f.meanWeeks)) {
+        var behind = Math.round((f.meanWeeks - gaW) * 7);
+        if (Math.abs(behind) >= 14) {
+          lines.push(f.id + " is " + Math.abs(behind) + " days " + (behind < 0 ? "smaller" : "larger") + " than the pregnancy age. Growth difference, not a new EDD.");
+          deviate("warn", f.id + " is " + Math.abs(behind) + " days " + (behind < 0 ? "smaller" : "larger") + " than the pregnancy age. Not a new EDD.");
+        }
+      }
+      if (f.anatomy === "anomaly suspected") {
+        lines.push(f.id + ": anomaly suspected on the views obtained. This is a per-fetus note, not a complete anomaly report.");
+        deviate("warn", f.id + ": anomaly suspected on the views obtained.");
+      } else if (f.anatomy === "incomplete") lines.push(f.id + ": anatomy views incomplete.");
+      if (f.cord === "velamentous") {
+        lines.push(f.id + ": velamentous cord insertion. That neither confirms nor excludes vasa previa.");
+        deviate("warn", f.id + ": velamentous cord insertion. Not a vasa previa diagnosis.");
+      } else if (f.cord === "marginal") lines.push(f.id + ": marginal cord insertion.");
+      if (f.fhr != null && gaW != null) {
+        if (gaW >= 6 && gaW <= 8) {
+          var cutF = fhrEarlyBradycardiaCutoff(gaW);
+          if (cutF != null && f.fhr < cutF) {
+            lines.push(f.id + " heart rate " + Math.round(f.fhr) + " bpm is below the Doubilet and Benson early cutoff (about " + cutF + " bpm).");
+            deviate("warn", f.id + " heart rate " + Math.round(f.fhr) + " bpm is below the early cutoff.");
+          }
+        } else if (gaW >= 14 && f.fhr < 110) {
+          lines.push(f.id + " heart rate " + Math.round(f.fhr) + " bpm is below 110. Bradycardia at this age. Not a second EDD.");
+          deviate("warn", f.id + " heart rate " + Math.round(f.fhr) + " bpm is below 110.");
+        } else if (gaW >= 14 && f.fhr > 160) {
+          lines.push(f.id + " heart rate " + Math.round(f.fhr) + " bpm is above 160.");
+          deviate("warn", f.id + " heart rate " + Math.round(f.fhr) + " bpm is above 160.");
+        } else if (gaW > 8 && gaW < 14) {
+          var expF = fhrExpected(gaW);
+          if (f.fhr < expF.lo - 5 || f.fhr > expF.hi + 5) lines.push(f.id + " heart rate " + Math.round(f.fhr) + " bpm is outside the expected band for this age (" + Math.round(expF.lo) + "–" + Math.round(expF.hi) + " bpm).");
+        }
+      }
+      if (f.uapi != null && gaW != null && gaW >= 24 && gaW <= 40 && f.ua !== "AEDF" && f.ua !== "REDF") {
+        var p95f = null;
+        try { p95f = uaPiFromZ(1.64485, gaW); } catch (ePi) { p95f = null; }
+        if (p95f != null && f.uapi > p95f) {
+          lines.push(f.id + " UA-PI " + f.uapi.toFixed(2) + " is above the 95th centile (INTERGROWTH-21st, about " + p95f.toFixed(2) + " at this age). Absent or reversed flow still outranks the number. Not a delivery time.");
+          deviate("warn", f.id + " UA-PI " + f.uapi.toFixed(2) + " is above the 95th. Not a delivery time.");
+        }
+      }
+      if ((f.cpr == null || !isFinite(f.cpr)) && f.uapi != null && f.mcapi != null && f.uapi > 0) f.cpr = f.mcapi / f.uapi;
+      if (f.cpr != null && isFinite(f.cpr)) {
+        lines.push(f.id + " CPR " + f.cpr.toFixed(2) + " = MCA-PI " + f.mcapi.toFixed(2) + " / UA-PI " + f.uapi.toFixed(2) + ".");
+        if (f.cpr < 1) {
+          lines.push(f.id + " CPR is below 1.0. Qualitative brain-sparing flag. Not a delivery order.");
+          deviate("warn", f.id + " CPR " + f.cpr.toFixed(2) + " is below 1.0. Brain-sparing flag. Not a delivery order.");
+        }
+      }
+      if (f.dva === "reversed") {
+        lines.push(f.id + ": reversed ductus venosus a-wave. Urgent review. Not a stage and not a delivery time.");
+        deviate("danger", f.id + ": reversed ductus venosus a-wave. Urgent review. Not a delivery time.");
+      } else if (f.dva === "absent") {
+        lines.push(f.id + ": absent ductus venosus a-wave. Urgent review. Not a stage and not a delivery time.");
+        deviate("danger", f.id + ": absent ductus venosus a-wave. Urgent review. Not a delivery time.");
+      }
+      if (f.dvpi != null && gaW != null) lines.push(f.id + " DV-PI " + f.dvpi.toFixed(2) + ". The mean line used here is about " + dvPiExpected(gaW).toFixed(2) + " (21–40 weeks). A mean is not a 95th-centile cutoff, so the number alone is not called abnormal.");
+      fetusStructureNotes(f, gaW).forEach(function (n) {
+        lines.push(n.text);
+        deviate(n.level, n.text);
+      });
+    });
+    function describeDiff(name, key, unit) {
+      var pool = living.filter(function (f) { return f[key] != null && isFinite(f[key]) && f[key] > 0; });
+      if (pool.length < 2) return;
+      var pair = maxMin(pool, function (f) { return f[key]; });
+      var gap = discOf(pair.hi[key], pair.lo[key]);
+      var sentence = name + " difference " + gap.toFixed(1) + "% (" + pair.hi.id + " " + fmtMeasure(pair.hi[key]) + " " + unit + ", " + pair.lo.id + " " + fmtMeasure(pair.lo[key]) + " " + unit + "). Descriptive size difference. ISUOG and NICE use EFW discordance, not this percentage, as the referral threshold.";
+      if (gap >= 20) sentence += " The gap is large enough to read with the weight discordance.";
+      lines.push(sentence);
+    }
+    describeDiff("BPD", "bpd", "cm");
+    describeDiff("HC", "hc", "cm");
+    describeDiff("AC", "ac", "cm");
+    describeDiff("FL", "fl", "cm");
+    var sized = living.filter(function (f) { return f.meanWeeks != null && isFinite(f.meanWeeks); });
+    if (sized.length >= 2) {
+      var sr = maxMin(sized, function (f) { return f.meanWeeks; });
+      var spread = sr.hi.meanWeeks - sr.lo.meanWeeks;
+      if (spread > 2) {
+        lines.push("Size ages differ by " + spread.toFixed(1) + " weeks (" + sr.hi.id + " larger, " + sr.lo.id + " smaller). That is a growth difference, not two due dates.");
+        deviate("warn", "Size ages differ by " + spread.toFixed(1) + " weeks (" + sr.hi.id + " larger, " + sr.lo.id + " smaller). Not two due dates.");
+      }
+    }
+
+    function applyFluid(group, who, enable) {
+      var pockets = group.filter(function (f) { return f.dvp != null; });
+      if (pockets.length < 2) {
+        if (enable) lines.push(who + " needs a deepest pocket on each of those fetuses before the fluid pattern is read.");
+        return;
+      }
+      var minD = pockets[0], maxD = pockets[0];
+      pockets.forEach(function (f) { if (f.dvp < minD.dvp) minD = f; if (f.dvp > maxD.dvp) maxD = f; });
       var oligo = minD.dvp <= 2;
       var poly8 = maxD.dvp >= 8;
       var poly10 = maxD.dvp >= 10;
       var quintero = oligo && poly8;
-      flags.quintero = quintero;
       var after20 = gaW != null && gaW >= 20;
       var isuog = gaW == null ? null : (after20 ? (oligo && poly10) : (oligo && poly8));
-      flags.isuogFluid = isuog;
-      if (chorion === "DCDA") {
-        lines.push("Deepest pockets " + minD.dvp.toFixed(1) + " cm and " + maxD.dvp.toFixed(1) + " cm. TTTS is a monochorionic diagnosis. Do not call a dichorionic fluid difference TTTS.");
-      } else if (chorion === "MCMA") {
-        lines.push("A monoamniotic pregnancy has one sac, so a two-pocket TTTS fluid rule does not apply. Cord entanglement is the separate concern.");
-      } else {
-        var who = chorion === "MCDA" ? "MCDA" : "chorionicity not confirmed as MCDA";
-        lines.push("Deepest pockets " + minD.dvp.toFixed(1) + " cm and " + maxD.dvp.toFixed(1) + " cm (" + who + ").");
-        lines.push(quintero
-          ? "Quintero fluid pattern is met: one pocket \u22642 cm and the other \u22658 cm at any gestation (Quintero 1999; North American ACOG/SMFM pattern). This app does not assign a Quintero stage."
-          : "Quintero fluid pattern is not met (needs \u22642 cm and \u22658 cm).");
-        if (gaW == null) lines.push("ISUOG/Eurofetus uses \u22658 cm for the recipient at or before 20 weeks and \u226510 cm after 20 weeks. Enter dating before that rule is applied.");
-        else if (isuog) lines.push("ISUOG/Eurofetus fluid pattern is also met (" + (after20 ? "after 20 weeks, recipient \u226510 cm" : "before 20 weeks, recipient \u22658 cm") + "). Still not a stage or a laser decision.");
-        else if (quintero && after20) lines.push("After 20 weeks the ISUOG/Eurofetus recipient threshold is \u226510 cm, which is not met. Quintero/North American \u22658 cm is met. Say which definition you are using.");
-        else lines.push("ISUOG/Eurofetus fluid pattern is not met at this gestation.");
-        if (quintero && fetuses.some(function (f) { return f.bladder === "not visible"; })) lines.push("A bladder is recorded as not visible. That finding belongs in specialist staging. This app does not stage TTTS.");
+      if (!enable) {
+        lines.push("Deepest pockets " + minD.dvp.toFixed(1) + " cm and " + maxD.dvp.toFixed(1) + " cm. " + who);
+        return;
       }
+      flags.quintero = quintero;
+      flags.isuogFluid = isuog;
+      lines.push("Deepest pockets " + minD.dvp.toFixed(1) + " cm and " + maxD.dvp.toFixed(1) + " cm (" + who + ").");
+      lines.push(quintero
+        ? "Quintero fluid pattern is met: one pocket ≤2 cm and the other ≥8 cm at any gestation (Quintero 1999; North American ACOG/SMFM pattern). This app does not assign a Quintero stage."
+        : "Quintero fluid pattern is not met (needs ≤2 cm and ≥8 cm).");
+      if (quintero) deviate("danger", "Quintero fluid pattern is met (≤2 cm and ≥8 cm). This app does not assign a stage.");
+      if (gaW == null) lines.push("ISUOG/Eurofetus uses ≥8 cm for the recipient at or before 20 weeks and ≥10 cm after 20 weeks. Enter dating before that rule is applied.");
+      else if (isuog) {
+        lines.push("ISUOG/Eurofetus fluid pattern is also met (" + (after20 ? "after 20 weeks, recipient ≥10 cm" : "before 20 weeks, recipient ≥8 cm") + "). Still not a stage or a laser decision.");
+        deviate("danger", "ISUOG/Eurofetus fluid pattern is met. Still not a stage or a laser decision.");
+      }
+      else if (quintero && after20) lines.push("After 20 weeks the ISUOG/Eurofetus recipient threshold is ≥10 cm, which is not met. Quintero/North American ≥8 cm is met. Say which definition you are using.");
+      else lines.push("ISUOG/Eurofetus fluid pattern is not met at this gestation.");
+      if (quintero && group.some(function (f) { return f.bladder === "not visible"; })) lines.push("A bladder is recorded as not visible. That finding belongs in specialist staging. This app does not stage TTTS.");
     }
-    var withM = fetuses.filter(function (f) { return f.mca != null; });
-    if (withM.length >= 2 && chorion === "DCDA") {
-      lines.push("MCA-PSV values are recorded. TAPS is not a dichorionic diagnosis.");
-    } else if (withM.length >= 2) {
-      var hiM = withM[0], loM = withM[0];
-      withM.forEach(function (f) { if (f.mca > hiM.mca) hiM = f; if (f.mca < loM.mca) loM = f; });
+    function applyTaps(group) {
+      var measured = group.filter(function (f) { return f.mca != null; });
+      if (measured.length < 2) {
+        if (measured.length === 1) lines.push("TAPS needs an MCA-PSV on both fetuses in this comparison. Only " + measured[0].id + " has one.");
+        return;
+      }
+      var hiM = measured[0], loM = measured[0];
+      measured.forEach(function (f) { if (f.mca > hiM.mca) hiM = f; if (f.mca < loM.mca) loM = f; });
       var delta = hiM.mca - loM.mca;
-      var delphi = (hiM.mca >= 1.5 && loM.mca <= 0.8) || delta >= 1;
-      flags.taps = delphi;
+      var tapsHit = (hiM.mca >= 1.5 && loM.mca <= 0.8) || delta >= 1;
+      flags.taps = tapsHit;
       lines.push("MCA-PSV " + hiM.mca.toFixed(2) + " and " + loM.mca.toFixed(2) + " MoM (difference " + delta.toFixed(2) + ").");
-      lines.push(delphi
-        ? "Meets the 2020 Delphi antenatal TAPS pattern (Khalil et al., UOG): \u22651.5 MoM and \u22640.8 MoM, or a difference \u22651.0 MoM. Not a haemoglobin and not a treatment order."
-        : "Does not meet the 2020 Delphi TAPS pattern (\u22651.5 with \u22640.8 MoM, or a difference \u22651.0 MoM). An older >1.5 and <1.0 pair is not used as a diagnosis here.");
-      if (chorion !== "MCDA" && chorion !== "MCMA") lines.push("TAPS is a monochorionic condition. Confirm chorionicity before using this pattern.");
+      lines.push(tapsHit
+        ? "Meets the 2020 Delphi antenatal TAPS pattern (Khalil et al., UOG): ≥1.5 MoM and ≤0.8 MoM, or a difference ≥1.0 MoM. Not a haemoglobin and not a treatment order."
+        : "Does not meet the 2020 Delphi TAPS pattern (≥1.5 with ≤0.8 MoM, or a difference ≥1.0 MoM). An older >1.5 and <1.0 pair is not used as a diagnosis here.");
+      if (tapsHit) deviate("danger", "Delphi TAPS pattern is met (" + hiM.id + " " + hiM.mca.toFixed(2) + " MoM, " + loM.id + " " + loM.mca.toFixed(2) + " MoM). Not a haemoglobin.");
+    }
+    var pairNamed = chorion === "DCTA" ? mcPairFetuses(fetuses, opts.mcPair) : null;
+    if (chorion === "DCDA" || chorion === "TCTA") {
+      applyFluid(fetuses, chorion === "TCTA" ? "Trichorionic triamniotic triplets are not a TTTS pregnancy." : "TTTS is a monochorionic diagnosis. Do not call a dichorionic fluid difference TTTS.", false);
+      if (fetuses.filter(function (f) { return f.mca != null; }).length >= 2) lines.push("MCA-PSV values are recorded. " + (chorion === "TCTA" ? "TAPS is not a trichorionic diagnosis." : "TAPS is not a dichorionic diagnosis."));
+    } else if (chorion === "MCMA") {
+      if (fetuses.filter(function (f) { return f.dvp != null; }).length >= 2) lines.push("A monoamniotic pregnancy has one sac, so a two-pocket TTTS fluid rule does not apply. Cord entanglement is the separate concern.");
+      applyTaps(fetuses);
+    } else if (chorion === "DCTA") {
+      if (!pairNamed) {
+        applyFluid(fetuses, "Dichorionic triamniotic triplets can hide one monochorionic pair. This app does not know which two fetuses share a placenta, so it does not call TTTS for the whole pregnancy.", false);
+        if (fetuses.filter(function (f) { return f.mca != null; }).length >= 2) lines.push("MCA-PSV values are recorded. TAPS can affect only a monochorionic pair. This app does not know which two triplets share a placenta.");
+      } else {
+        lines.push("The monochorionic pair is " + pairNamed[0].id + " and " + pairNamed[1].id + ". TTTS and TAPS are read on that pair only. The other fetus is not part of that diagnosis.");
+        applyFluid(pairNamed, "monochorionic pair", true);
+        applyTaps(pairNamed);
+      }
+    } else {
+      var whoFluid = chorion === "MCDA" ? "MCDA" : (chorion === "MCTA" ? "monochorionic triamniotic" : "chorionicity not confirmed as MCDA");
+      applyFluid(fetuses, whoFluid, true);
+      applyTaps(fetuses);
+      if (fetuses.filter(function (f) { return f.mca != null; }).length >= 2 && chorion !== "MCDA" && chorion !== "MCMA") lines.push("TAPS is a monochorionic condition. Confirm chorionicity before using this pattern.");
     }
     fetuses.forEach(function (f) {
-      if (f.ua === "REDF") lines.push(f.id + ": reversed umbilical artery end-diastolic flow. Urgent review. This does not stage TTTS and does not time delivery.");
-      else if (f.ua === "AEDF") lines.push(f.id + ": absent umbilical artery end-diastolic flow. Urgent review. This does not stage TTTS.");
+      if (f.ua === "REDF") {
+        lines.push(f.id + ": reversed umbilical artery end-diastolic flow. Urgent review. This does not stage TTTS and does not time delivery.");
+        deviate("danger", f.id + ": reversed umbilical artery end-diastolic flow. Urgent review. Not a delivery time.");
+      } else if (f.ua === "AEDF") {
+        lines.push(f.id + ": absent umbilical artery end-diastolic flow. Urgent review. This does not stage TTTS.");
+        deviate("danger", f.id + ": absent umbilical artery end-diastolic flow. Urgent review.");
+      } else if (f.ua === "iAEDF") {
+        var mc = chorion === "MCDA" || chorion === "MCMA";
+        lines.push(f.id + ": intermittent absent umbilical end-diastolic flow. " + (mc ? "In monochorionic selective growth restriction this is the Gratacós type III Doppler pattern. " : "") + "This app does not assign a stage and does not time delivery.");
+        deviate("warn", f.id + ": intermittent absent umbilical end-diastolic flow. Not a stage and not a delivery time.");
+      }
     });
-    return { lines: lines, flags: flags };
+
+    var html = "";
+    var impressionBits = [];
+    if (fetuses.length) {
+      var pickedDate = null;
+      try { pickedDate = selectMultipleDating(fetuses); } catch (ePick) { pickedDate = null; }
+      if (pickedDate && pickedDate.crlHeld) deviate("warn", "A CRL is still entered, but a head circumference is at least 10 days later and at or beyond 14 weeks. The EDD uses the larger head circumference (ISUOG 2025).");
+      var who = opts.multiWho || "";
+      var eddBit = opts.edd ? (" EDD " + opts.edd + ".") : "";
+      var gaBit = opts.gaLabel ? (" GA " + opts.gaLabel + ".") : "";
+      var crlWho = who || (pickedDate && pickedDate.largerCrl ? pickedDate.largerCrl.id : "");
+      var hcWho = who || (pickedDate && pickedDate.largerHc ? pickedDate.largerHc.id : "");
+      var eddSentence = "";
+      if (opts.method === "art" || opts.method === "prior_art") eddSentence = "One pregnancy EDD from the embryo age and the transfer date." + eddBit + gaBit + " ISUOG 2025 and ACOG Committee Opinion 700. No fetus replaces that date.";
+      else if (opts.method === "prior_crl") eddSentence = "One pregnancy EDD from the earlier first-trimester date." + eddBit + gaBit + " Later size is growth, not a new birthday.";
+      else if (opts.method === "crl" || (pickedDate && pickedDate.largerCrl)) eddSentence = "One pregnancy EDD from the larger living CRL" + (crlWho ? " (" + crlWho + ")" : "") + "." + eddBit + gaBit + " ISUOG 2025 before 14 weeks. NICE NG137 uses the largest baby in twins and triplets. Not the smaller fetus and not an average.";
+      else if (opts.method === "hc_larger" || (pickedDate && !pickedDate.largerCrl && pickedDate.largerHc)) eddSentence = "One pregnancy EDD from the larger head circumference" + (hcWho ? " (" + hcWho + ")" : "") + "." + eddBit + gaBit + " ISUOG 2025 at or beyond 14 weeks. NICE NG137 uses the largest baby. Not the smaller fetus.";
+      else if (lines.length) eddSentence = lines[0];
+      if (eddSentence) {
+        impressionBits.push(eddSentence);
+        html += '<p class="note"><strong>' + fEsc(eddSentence) + "</strong></p>";
+      }
+      if (deviations.length) html += deviations.map(function (d) { return '<div class="badge ' + (d.level === "danger" ? "danger" : "warn") + '">' + fEsc(d.text) + "</div>"; }).join("");
+      else html += '<div class="badge ok">No discordance, fluid, or TAPS threshold is met on the numbers entered.</div>';
+      html += '<div class="multi-scroll"><table class="ref"><tr><th></th>';
+      fetuses.forEach(function (f) { html += "<th>" + fEsc(f.id) + "</th>"; });
+      html += "</tr>";
+      function row(name, fn) {
+        html += "<tr><td>" + name + "</td>";
+        fetuses.forEach(function (f) { html += '<td class="num">' + fn(f) + "</td>"; });
+        html += "</tr>";
+      }
+      row("Dates the pregnancy", function (f) {
+        if (!pickedDate) return "—";
+        if (pickedDate.largerCrl && pickedDate.largerCrl.id === f.id) return "Larger CRL";
+        if (!pickedDate.largerCrl && pickedDate.largerHc && pickedDate.largerHc.id === f.id) return "Larger HC";
+        return "—";
+      });
+      row("CRL", function (f) { return f.crl != null ? fmtMeasure(f.crl) + " mm" : "—"; });
+      row("CRL age", function (f) { return f.crlDays != null ? fEsc(wdWords(f.crlDays / 7)) : "—"; });
+      row("NT", function (f) { return f.nt != null ? fmtMeasure(f.nt) + " mm" : "—"; });
+      row("FHR", function (f) { return f.fhr != null ? Math.round(f.fhr) + "" : "—"; });
+      row("BPD", function (f) { return f.bpd != null ? fmtMeasure(f.bpd) : "—"; });
+      row("HC", function (f) { return f.hc != null ? fmtMeasure(f.hc) : "—"; });
+      row("AC", function (f) { return f.ac != null ? fmtMeasure(f.ac) : "—"; });
+      row("FL", function (f) { return f.fl != null ? fmtMeasure(f.fl) : "—"; });
+      row("EFW", function (f) { return f.grams != null ? Math.round(f.grams).toLocaleString() + " g" : "—"; });
+      row("Centile", function (f) { return pctById[f.id] != null ? ordinal(pctById[f.id]) : "—"; });
+      row("DC twin chart", function (f) { return f.twinBand ? fEsc(f.twinBand) : "—"; });
+      row("UA-PI", function (f) { return f.uapi != null ? f.uapi.toFixed(2) : "—"; });
+      row("CPR", function (f) { return f.cpr != null && isFinite(f.cpr) ? f.cpr.toFixed(2) : "—"; });
+      row("DV a-wave", function (f) { return f.dva ? fEsc(f.dva) : "—"; });
+      row("Atrium", function (f) { return f.atrium != null ? fmtMeasure(f.atrium) + " mm" : "—"; });
+      row("Hadlock mean", function (f) { return f.meanWeeks != null ? fEsc(wdWords(f.meanWeeks)) : "—"; });
+      row("vs pregnancy", function (f) {
+        if (gaW == null || f.meanWeeks == null) return "—";
+        var dlt = Math.round((f.meanWeeks - gaW) * 7);
+        return (dlt > 0 ? "+" : "") + dlt + " d";
+      });
+      row("BPD age", function (f) { return f.gaBpd != null ? fEsc(wdWords(f.gaBpd)) : "—"; });
+      row("HC age", function (f) { return f.gaHc != null ? fEsc(wdWords(f.gaHc)) : "—"; });
+      row("AC age", function (f) { return f.gaAc != null ? fEsc(wdWords(f.gaAc)) : "—"; });
+      row("FL age", function (f) { return f.gaFl != null ? fEsc(wdWords(f.gaFl)) : "—"; });
+      row("Structure", function (f) { return f.anatomy ? fEsc(f.anatomy) : "—"; });
+      row("Cord", function (f) { return f.cord ? fEsc(f.cord) : "—"; });
+      html += "</table></div>";
+      function forScreen(l) {
+        if (l.indexOf(" · ") !== -1) return false;
+        if (/^BPD difference|^HC difference|^AC difference|^FL difference/.test(l) && l.indexOf("large enough") === -1) return false;
+        if (/^Centiles /.test(l)) return false;
+        return true;
+      }
+      var screenLines = lines.filter(forScreen);
+      if (eddSentence) screenLines = screenLines.filter(function (l) { return l !== lines[0]; });
+      reportBits = [];
+      if (lines.length) reportBits.push(lines[0]);
+      lines.forEach(function (l) {
+        if (l === lines[0]) return;
+        if (l.indexOf(" · ") !== -1 || /^Centiles use the singleton/.test(l)) reportBits.push(l);
+        else if (forScreen(l) && !/^BPD difference|^HC difference|^AC difference|^FL difference/.test(l)) reportBits.push(l);
+      });
+      lines.forEach(function (l) {
+        if (l.indexOf(" · ") !== -1) impressionBits.push(l);
+      });
+      deviations.forEach(function (d) { impressionBits.push(d.text); });
+      html += screenLines.map(function (l) { return '<p class="note">' + fEsc(l) + "</p>"; }).join("");
+      html += '<p class="note">The centile row is the singleton Hadlock 1991 chart. On a dichorionic pregnancy the twin-chart row is the NICHD 2016 dichorionic reference (Grantz). Neither is a Nigerian twin chart. No monochorionic twin chart is loaded.</p>';
+    }
+    return { lines: lines, flags: flags, html: html, fetuses: fetuses, reportBits: reportBits, impressionBits: impressionBits, deviations: deviations };
   }
 
   function placentaContext(o) {
@@ -2122,14 +2842,15 @@
   function establishedDatingAnchor() {
     var G = {};
     try { G = assignGestationalAge() || {}; } catch (e) { G = {}; }
-    var independent = { art: 1, prior_art: 1, crl: 1, prior_crl: 1, lmp: 1, msd: 1 };
+    var independent = { art: 1, prior_art: 1, crl: 1, prior_crl: 1, lmp: 1, msd: 1, hc_larger: 1 };
     var names = {
       art: "Assisted reproduction",
       prior_art: "Locked prior ART estimated date of delivery",
       crl: "First-trimester crown-rump length",
       prior_crl: "Locked prior CRL estimated date of delivery",
       lmp: "Last menstrual period (cycle-adjusted)",
-      msd: "Mean sac diameter only"
+      msd: "Mean sac diameter only",
+      hc_larger: "Head circumference of the larger fetus (ISUOG)"
     };
     var manualW = num(val("b-estwk"));
     var manualDays = manualW != null ? manualW * 7 + (num(val("b-estd")) || 0) : null;
@@ -2315,6 +3036,7 @@
   }
   function biometricAgeSentence() {
     try {
+      if (typeof fetusNumber === "function" && fetusNumber() >= 2) return "";
       var bpd = toCmB("b-bpd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
       var hc = resolveHC().cm;
       var pack = biometricAgePack(bpd, hc, ac, fl);
@@ -2358,11 +3080,13 @@
     var exclBPD = checked("d-x-cranial");
     var exclHC = checked("d-x-hc");
     var twins = checked("d-x-twins");
-    var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+    var multiMode = false;
+    try { multiMode = fetusNumber() >= 2; } catch (eMul) { multiMode = false; }
+    var bpd = multiMode ? null : toCmB("b-bpd"), ofd = multiMode ? null : toCmB("b-ofd"), ac = multiMode ? null : toCmB("b-ac"), fl = multiMode ? null : toCmB("b-fl");
     var ci = calcCI(bpd, ofd);
     syncDerivedHC();
     var H = resolveHC();
-    var hc = H.cm;
+    var hc = multiMode ? null : H.cm;
     var cbpd = calcCorrectedBPD(bpd, ofd);
     var ciAbn = ci != null && (ci < 74 || ci > 83);
     var warnings = [], flags = [], used = [], excluded = [], reasons = [];
@@ -2418,8 +3142,31 @@
     }
     var crlDays = crl != null ? gaFromCRLmm(crl) : null;
     var crlEDD = crlDays != null ? addDays(scan, 280 - crlDays) : null;
-    if (crl != null && crl > 84) warnings.push("CRL " + crl + " mm is above the usual 45\u201384 mm (11+0\u201313+6) window. Prefer biometry if this is a second-trimester scan; do not treat it as an NT.");
-    if (crl != null && crl < 5) warnings.push("CRL <5 mm is very early; MSD or a short-interval repeat is often more informative.");
+    var multiDate = null;
+    if (multiMode) {
+      var strayCrl = crl;
+      crl = null;
+      crlDays = null;
+      crlEDD = null;
+      try { multiDate = multipleDatingChoice(); } catch (eMd) { multiDate = null; }
+      if (multiDate && multiDate.largerCrl && multiDate.largerCrl.crlDays != null) {
+        crl = multiDate.largerCrl.crl;
+        crlDays = multiDate.largerCrl.crlDays;
+        crlEDD = addDays(scan, 280 - crlDays);
+        warnings.push("Multiples: one EDD from " + multiDate.largerCrl.id + ", CRL " + (Math.round(crl * 10) / 10) + " mm (larger living fetus, ISUOG 2025 and NICE NG137). The smaller CRL is not a second due date.");
+        if (crl < 45) warnings.push("That CRL is under 45 mm, before the 45\u201384 mm window ISUOG prefers.");
+      } else if (multiDate && multiDate.crlOverWindow) {
+        warnings.push("The larger fetus CRL is above 84 mm. ISUOG then dates from the head circumference of the larger fetus, not from a smaller co-twin.");
+      } else if (multiDate && multiDate.crlHeld) {
+        warnings.push("A fetus CRL is entered, but a head circumference dates at least 10 days later and at or beyond 14 weeks. ISUOG 2025 uses the larger head circumference for the EDD. That CRL is comparison only, not a second due date.");
+      } else if (multiDate && multiDate.noLiving) {
+        warnings.push("No living fetus is recorded, so no EDD was taken from a CRL.");
+      } else if (strayCrl != null) {
+        warnings.push("The single CRL box was not used. In a multiple pregnancy enter each fetus. ISUOG 2025 and NICE NG137 date from the larger living fetus.");
+      }
+    }
+    if (!multiMode && crl != null && crl > 84) warnings.push("CRL " + crl + " mm is above the usual 45\u201384 mm (11+0\u201313+6) window. Prefer biometry if this is a second-trimester scan; do not treat it as an NT.");
+    if (!multiMode && crl != null && crl < 5) warnings.push("CRL <5 mm is very early; MSD or a short-interval repeat is often more informative.");
     var msdDays = (crl == null && msd != null) ? gaFromMSDmm(msd) : null;
     var msdEDD = msdDays != null ? addDays(scan, 280 - msdDays) : null;
     var popId = "NG";
@@ -2461,13 +3208,25 @@
       usIsCRL = true;
       locked = !!lockBox;
       if (lockBox) warnings.push("This CRL EDD is locked on this device.");
+      else if (multiMode) warnings.push("This is the larger living fetus (ISUOG). Lock it so a later growth scan cannot overwrite it.");
       else warnings.push("First-trimester CRL is the preferred dating method. Lock it so later growth scans cannot overwrite it.");
-    } else if (msdDays != null) {
+    } else if (multiMode && multiDate && multiDate.largerHc && multiDate.largerHc.hcWeeks != null && isFinite(multiDate.largerHc.hcWeeks)) {
+      preferredDays = multiDate.largerHc.hcWeeks * 7;
+      preferredEDD = addDays(scan, 280 - preferredDays);
+      method = "hc_larger";
+      warnings.push("No first-trimester CRL. One EDD from " + multiDate.largerHc.id + " HC " + (Math.round(multiDate.largerHc.hc * 10) / 10) + " cm (Hadlock 1984). ISUOG 2025 uses the larger fetus head circumference at or after 14 weeks. The smaller fetus does not get a due date.");
+      if (multiDate.largerHc.meanWeeks != null && isFinite(multiDate.largerHc.meanWeeks)) {
+        var meanGap = Math.round(multiDate.largerHc.meanWeeks * 7) - Math.round(preferredDays);
+        warnings.push("Hadlock mean of " + multiDate.largerHc.id + " is " + wdWords(multiDate.largerHc.meanWeeks) + " (" + (meanGap > 0 ? "+" : "") + meanGap + " days versus this HC date). The EDD stays on the head circumference. ACOG Committee Opinion 700 and NICE NG137 also use the largest fetus, not the smaller one.");
+      }
+      if (multiDate.largerHc.hcWeeks < 14) warnings.push("That HC age is under 14 weeks. A CRL of the larger fetus is the better dating measurement.");
+      if (preferredDays / 7 >= 28) warnings.push("Do not redate from a third-trimester measurement alone. Accuracy about \u00b13 weeks. EDD provisional. Do not redate a possibly growth-restricted fetus.");
+    } else if (msdDays != null && !multiMode) {
       preferredDays = msdDays;
       preferredEDD = msdEDD;
       method = "msd";
       warnings.push("MSD dating is low accuracy (\u00b11\u20132 weeks). Confirm with CRL.");
-    } else if (bioDays != null) {
+    } else if (bioDays != null && !multiMode) {
       preferredDays = bioDays;
       preferredEDD = addDays(scan, 280 - bioDays);
       method = "composite";
@@ -2475,6 +3234,14 @@
       else if (preferredDays / 7 >= 22) warnings.push("No first-trimester CRL. Biometric age at 22\u201327+6: about \u00b110\u201314 days.");
       else warnings.push("No first-trimester CRL. Biometric age at 14\u201321+6: about \u00b17\u201310 days.");
       if (used.length === 1) warnings.push("Only one measurement. Add the others before relying on this age.");
+    } else if (multiMode) {
+      warnings.push("Multiples need the larger CRL, or the larger head circumference once CRL dating is no longer available. One fetus on the measurement screen was not turned into the pregnancy EDD.");
+      if (lmpDays != null) {
+        preferredDays = lmpDays;
+        preferredEDD = lmpEDD;
+        method = "lmp";
+        warnings.push("Ultrasound dating not yet available. LMP EDD is provisional, especially if cycles are irregular.");
+      }
     } else if (lmpDays != null) {
       preferredDays = lmpDays;
       preferredEDD = lmpEDD;
@@ -2486,7 +3253,7 @@
     if (priorEdd && priorSrc === "lmp" && (crlDays != null || bioDays != null)) {
       warnings.push("A prior LMP-only EDD does not outrank a valid ultrasound date (ACOG 700).");
     }
-    if (locked && bioDays != null && preferredDays != null && method !== "composite") {
+    if (!multiMode && locked && bioDays != null && preferredDays != null && method !== "composite") {
       var gap = Math.abs(bioDays - preferredDays);
       if (preferredDays / 7 >= 28 && gap > 21) flags.push("This scan's biometry is " + Math.round(gap) + " days from the locked EDD. Growth restriction or macrosomia \u2014 do not change the EDD.");
       else if (preferredDays / 7 >= 14 && gap > 14) flags.push("This scan's biometry is " + Math.round(gap) + " days from the locked EDD. Treat as growth, not a new due date.");
@@ -2502,6 +3269,9 @@
       artDays: artDays, artEDD: artEDD,
       crlDays: crlDays, crlEDD: crlEDD, msdDays: msdDays, msdEDD: msdEDD,
       bioDays: bioDays, bioLabel: bioLabel,
+      multiMode: multiMode,
+      multiWho: (method === "hc_larger" && multiDate && multiDate.largerHc) ? multiDate.largerHc.id : ((multiDate && multiDate.largerCrl && (method === "crl" || method === "prior_crl" || method === "art" || method === "prior_art")) ? multiDate.largerCrl.id : ""),
+      largerMean: (multiDate && multiDate.largerHc && multiDate.largerHc.meanWeeks != null) ? multiDate.largerHc.meanWeeks : null,
       ci: ci, hc: hc, bpd: bpd, ofd: ofd, ac: ac, fl: fl, cbpd: cbpd
     };
   }
@@ -2901,21 +3671,32 @@
     Object.keys(Gbio.individual || {}).forEach(function (k) {
       perParam.push({ p: k + (k === "BPD" && Gbio.ci != null && (Gbio.ci < 74 || Gbio.ci > 83) ? " (corrected)" : ""), w: Gbio.individual[k] });
     });
-    var headlineDays = Gbio.bioDays;
+    var usePregnancy = Gbio.multiMode && Gbio.preferredDays != null && Gbio.method !== "lmp" && Gbio.method !== "msd";
+    var headlineDays = usePregnancy ? Gbio.preferredDays : (Gbio.multiMode ? null : Gbio.bioDays);
+    var headlineLabel = Gbio.bioLabel || "Biometric age";
+    if (usePregnancy) {
+      headlineLabel = Gbio.method === "crl" ? "Pregnancy age, larger CRL (ISUOG)"
+        : Gbio.method === "hc_larger" ? "Pregnancy age, larger HC (ISUOG)"
+        : (Gbio.method === "art" || Gbio.method === "prior_art") ? "Pregnancy age, ART"
+        : "Pregnancy age, earlier EDD";
+      if (Gbio.multiWho) headlineLabel += " · " + Gbio.multiWho;
+    }
     if (headlineDays != null) {
       var wd = weeksDaysFromDays(headlineDays);
       datingHtml += '<span class="result-num">' + wd.w + '</span><span class="result-unit">w</span><span class="result-num">' + wd.d + '</span><span class="result-unit">d</span>';
-      datingHtml += '<div class="chip">' + fEsc(Gbio.bioLabel || "Biometric age") + '</div>';
+      datingHtml += '<div class="chip">' + fEsc(headlineLabel) + (Gbio.multiMode && !usePregnancy ? " · size, not the pregnancy EDD" : "") + '</div>';
       datingHtml += '<div class="note">' + trimesterLabel(headlineDays) + '</div>';
-      var meanEdd = Gbio.scan ? addDays(Gbio.scan, 280 - headlineDays) : null;
-      if (Gbio.preferredEDD && Gbio.method !== "composite") {
-        datingHtml += '<div class="compare-row"><span class="compare-label">Established EDD</span><span class="compare-value">' + formatDate(Gbio.preferredEDD) + '</span></div>';
+      var meanEdd = (!usePregnancy && Gbio.scan && headlineDays != null) ? addDays(Gbio.scan, 280 - headlineDays) : null;
+      if (Gbio.preferredEDD && (usePregnancy || Gbio.method !== "composite" || Gbio.multiMode)) {
+        datingHtml += '<div class="compare-row"><span class="compare-label">' + (Gbio.multiMode ? "Pregnancy EDD" : "Established EDD") + '</span><span class="compare-value">' + formatDate(Gbio.preferredEDD) + '</span></div>';
       }
-      if (meanEdd) {
+      if (meanEdd && !(Gbio.multiMode && Gbio.method !== "composite")) {
         var eddName = (Gbio.method === "composite" || !Gbio.preferredEDD) ? "EDD" : "EDD from this age";
         datingHtml += '<div class="compare-row"><span class="compare-label">' + eddName + '</span><span class="compare-value">' + formatDate(meanEdd) + '</span></div>';
+      } else if (Gbio.multiMode && !usePregnancy) {
+        datingHtml += '<p class="note">These boxes are not assigned to a fetus. Enter each fetus, or copy the single boxes into Fetus A. The pregnancy EDD is not taken from an unassigned measurement.</p>';
       }
-      if (perParam.length) {
+      if (!usePregnancy && perParam.length) {
         datingHtml += '<table class="ref"><tr><th>Parameter</th><th>GA</th></tr>';
         perParam.forEach(function (p) {
           var pwd = weeksDaysFromDays(p.w * 7);
@@ -2923,14 +3704,25 @@
         });
         datingHtml += '</table>';
       }
-      if (comp && Gbio.bioLabel && Gbio.bioLabel.indexOf("Mean") === 0) {
+      if (!usePregnancy && comp && Gbio.bioLabel && Gbio.bioLabel.indexOf("Mean") === 0) {
         var regWd = weeksDaysFromDays(comp.weeks * 7);
         var gap = Math.round(comp.weeks * 7) - Math.round(headlineDays);
         datingHtml += '<div class="compare-row"><span class="compare-label">Hadlock regression (comparison)</span><span class="compare-value">' + regWd.w + 'w ' + regWd.d + 'd (' + (gap > 0 ? "+" : "") + gap + ' d)</span></div>';
       }
-      if (headlineDays >= 28 * 7) {
+      if (usePregnancy && Gbio.method === "hc_larger" && Gbio.largerMean != null) {
+        var lm = weeksDaysFromDays(Gbio.largerMean * 7);
+        var lg = Math.round(Gbio.largerMean * 7) - Math.round(headlineDays);
+        datingHtml += '<div class="compare-row"><span class="compare-label">Hadlock mean of the larger fetus (comparison)</span><span class="compare-value">' + lm.w + 'w ' + lm.d + 'd (' + (lg > 0 ? "+" : "") + lg + ' d)</span></div>';
+      }
+      if (usePregnancy) datingHtml += '<p class="note">One EDD. ISUOG 2025: larger living CRL before 14 weeks, then the larger head circumference. NICE NG137: the largest baby. ART outranks both (ACOG Committee Opinion 700). Not the smaller fetus.</p>';
+      (Gbio.warnings || []).forEach(function (w) {
+        if (w.indexOf("at least 10 days later") !== -1) datingHtml += '<div class="badge warn">' + fEsc(w) + "</div>";
+      });
+      if (headlineDays >= 28 * 7 && !Gbio.locked) {
         datingHtml += '<p class="note">Do not redate from a third-trimester measurement alone.</p>';
       }
+    } else if (Gbio.multiMode) {
+      datingHtml += '<p class="empty">Enter each fetus. One EDD comes from the larger living CRL, or from the larger head circumference once CRL dating is no longer available. ART outranks both.</p>';
     } else {
       datingHtml += '<p class="empty">Enter BPD, HC, AC, and FL.</p>';
     }
@@ -2942,6 +3734,7 @@
     var growthHtml = '<div class="card-title">Growth Centile</div>';
     var estWk = num(val("b-estwk")), estD = num(val("b-estd"));
     var gaForPct = estWk != null ? (estWk + (estD || 0) / 7) : (Gbio.bioDays != null ? Gbio.bioDays / 7 : (comp ? comp.weeks : null));
+    if (Gbio.multiMode && Gbio.preferredDays != null) gaForPct = Gbio.preferredDays / 7;
     if (efw && gaForPct != null) {
       var pctRes = lookupPercentile(gaForPct, efw.grams);
       if (pctRes && !pctRes.outOfRange) {
@@ -2962,9 +3755,11 @@
 
     // --- Body proportion ratios (reuses BPD/HC/AC/FL already entered above, plus GA if known) ---
     set("ratio-card", renderRatios(bpd, hc, ac, fl, gaForPct));
+    try { paintMultiFetusCards(Gbio); } catch (eCards) {}
+    if (typeof paintMulti === "function") paintMulti();
   }
 
-  function buildGrowthChart(gaWeeks, efwGrams) {
+  function buildGrowthChart(gaWeeks, efwGrams, extras, primary, twinOverlay) {
     var width = 620, height = 240, mL = 42, mR = 12, mT = 12, mB = 24;
     var plotW = width - mL - mR, plotH = height - mT - mB;
     var minWk = 24, maxWk = 41, maxG = 4400;
@@ -2985,11 +3780,42 @@
       var pts = weeks.map(function (w) { return x(w) + "," + y(EFW_TABLE[w][c.idx]); }).join(" ");
       svg += '<polyline points="' + pts + '" fill="none" stroke="' + (c.dim ? "#B8A894" : "#C45C4A") + '" stroke-width="' + (c.dim ? 1 : 1.6) + '"/>';
     });
-    var cw = clamp(gaWeeks, minWk, maxWk), px = x(cw), py = y(efwGrams);
-    svg += '<line x1="' + px + '" x2="' + px + '" y1="' + mT + '" y2="' + (mT + plotH) + '" stroke="#F5A623" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>';
-    svg += '<circle cx="' + px + '" cy="' + py + '" r="5" fill="#F5A623" stroke="#0E1216" stroke-width="1.5"/>';
+    if (twinOverlay && typeof nichdDcTwinCols === "function") {
+      [0, 2, 4].forEach(function (idx) {
+        var pts = [];
+        var w;
+        for (w = 24; w <= 38; w++) {
+          var cols = nichdDcTwinCols(w);
+          if (cols) pts.push(x(w) + "," + y(cols[idx]));
+        }
+        svg += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="#355F6B" stroke-width="' + (idx === 2 ? 1.8 : 1) + '"' + (idx === 2 ? "" : ' stroke-dasharray="4 3"') + '/>';
+      });
+    }
+    var dots = [];
+    if (efwGrams != null && isFinite(efwGrams)) dots.push({ g: efwGrams, wk: gaWeeks, color: (primary && primary.color) || "#F5A623", label: (primary && primary.label) || "" });
+    (extras || []).forEach(function (e) {
+      if (!e || e.grams == null || !isFinite(e.grams)) return;
+      dots.push({ g: e.grams, wk: e.weeks || gaWeeks, color: e.color || "#355F6B", label: e.label || "" });
+    });
+    if (gaWeeks != null && isFinite(gaWeeks)) {
+      var px = x(clamp(gaWeeks, minWk, maxWk));
+      svg += '<line x1="' + px + '" x2="' + px + '" y1="' + mT + '" y2="' + (mT + plotH) + '" stroke="#F5A623" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>';
+    }
+    dots.forEach(function (d) {
+      var cx = x(clamp(d.wk, minWk, maxWk)), cy = y(d.g);
+      svg += '<circle cx="' + cx + '" cy="' + cy + '" r="5" fill="' + d.color + '" stroke="#0E1216" stroke-width="1.5"/>';
+      if (d.label) svg += '<text x="' + (cx + 8) + '" y="' + (cy - 6) + '" font-size="10" fill="' + d.color + '" font-family="sans-serif">' + fEsc(d.label) + "</text>";
+    });
     svg += '</svg>';
-    return '<div class="chart-wrap">' + svg + '<div class="chart-legend"><span><i class="sw" style="background:#B8A894"></i>3rd/10th/90th/97th</span><span><i class="sw" style="background:#C45C4A"></i>50th</span><span><i class="sw" style="background:#F5A623;width:7px;height:7px;border-radius:50%;display:inline-block"></i>this scan</span></div></div>';
+    var legend = '<div class="chart-legend"><span><i class="sw" style="background:#B8A894"></i>3rd/10th/90th/97th</span><span><i class="sw" style="background:#C45C4A"></i>50th</span>';
+    if (dots.length > 1) {
+      dots.forEach(function (d) {
+        legend += '<span><i class="sw" style="background:' + d.color + ';width:7px;height:7px;border-radius:50%;display:inline-block"></i>' + fEsc(d.label || "fetus") + "</span>";
+      });
+    } else legend += '<span><i class="sw" style="background:#F5A623;width:7px;height:7px;border-radius:50%;display:inline-block"></i>this scan</span>';
+    if (twinOverlay) legend += '<span><i class="sw" style="background:#355F6B"></i>DC twin 10th/50th/90th</span>';
+    legend += "</div>";
+    return '<div class="chart-wrap">' + svg + legend + "</div>";
   }
 
   /* Body proportion ratios — HC/AC (AAFP 1998, drops ~1.2→1.0 from 20-36wk, elevated = asymmetric FGR);
@@ -3063,7 +3889,8 @@
         }
       }
       if (usEDD) {
-        var usPretty = { crl: "CRL", msd: "MSD", art: "ART", prior_crl: "locked CRL EDD", prior_art: "locked ART EDD", composite: "biometry composite", lmp: "LMP" }[usLabel] || usLabel;
+        var usPretty = { crl: "CRL", msd: "MSD", art: "ART", prior_crl: "locked CRL EDD", prior_art: "locked ART EDD", composite: "biometry composite", lmp: "LMP", hc_larger: "larger HC" }[usLabel] || usLabel;
+        if (G.multiWho && (usLabel === "crl" || usLabel === "hc_larger")) usPretty = (usLabel === "crl" ? "larger CRL" : "larger HC") + " (" + G.multiWho + ")";
         eddHtml += '<div class="compare-row"><span class="compare-label">Preferred (' + usPretty + (G.locked ? ", locked" : "") + ')</span><span class="compare-value">' + formatDate(usEDD) + '</span></div>';
         if (G.crlEDD && G.method !== "crl") eddHtml += '<div class="compare-row"><span class="compare-label">This-visit CRL EDD (not preferred)</span><span class="compare-value">' + formatDate(G.crlEDD) + '</span></div>';
         if (G.bioDays != null && G.method !== "composite") eddHtml += '<div class="compare-row"><span class="compare-label">This-visit biometry EDD (not preferred)</span><span class="compare-value">' + formatDate(addDays(scan, 280 - G.bioDays)) + '</span></div>';
@@ -3106,7 +3933,9 @@
     } else {
       var awd = weeksDaysFromDays(G.preferredDays);
       audit += '<span class="result-num">' + awd.w + '</span><span class="result-unit">w</span><span class="result-num">' + awd.d + '</span><span class="result-unit">d</span>';
-      var methodLab = G.method === "composite" && G.bioLabel ? G.bioLabel : ({ crl: "CRL (Robinson-Fleming)", msd: "MSD (Hellman) \u2014 provisional", art: "ART / embryo transfer", prior_crl: "Locked prior CRL EDD", prior_art: "Locked prior ART EDD", composite: "Hadlock mean", lmp: "LMP (cycle-adjusted Naegele)" }[G.method] || G.method);
+      var methodLab = G.method === "composite" && G.bioLabel ? G.bioLabel : ({ crl: "CRL (Robinson-Fleming)", msd: "MSD (Hellman) \u2014 provisional", art: "ART / embryo transfer", prior_crl: "Locked prior CRL EDD", prior_art: "Locked prior ART EDD", composite: "Hadlock mean", lmp: "LMP (cycle-adjusted Naegele)", hc_larger: "Larger-fetus HC (Hadlock 1984, ISUOG)" }[G.method] || G.method);
+      if (G.multiWho && G.method === "crl") methodLab = "Larger CRL \u2014 " + G.multiWho + " (Robinson-Fleming, ISUOG)";
+      if (G.multiWho && G.method === "hc_larger") methodLab = "Larger HC \u2014 " + G.multiWho + " (Hadlock 1984, ISUOG)";
       audit += '<div class="chip">' + methodLab + (G.locked ? " \u00b7 locked" : "") + "</div>";
       if (G.preferredEDD) audit += '<div class="compare-row"><span class="compare-label">Preferred EDD</span><span class="compare-value">' + formatDate(G.preferredEDD) + "</span></div>";
       if (G.accuracy) audit += '<div class="note">' + G.accuracy.label + "</div>";
@@ -3163,6 +3992,7 @@
       if (refGAweeks >= 28) {
         redateHtml += '<div class="note flag">Third-trimester ultrasound dating is the least reliable (\u00b121\u201330 days). Avoid redating a fetus that may be growth-restricted \u2014 correlate with the whole clinical picture rather than the scan alone.</div>';
       }
+      if (G.multiMode) redateHtml += '<p class="note">Multiple pregnancy: this ultrasound date is the one pregnancy EDD. It is not a due date for the smaller fetus.</p>';
     } else {
       redateHtml += '<p class="empty">Needs both an LMP date and an ultrasound-based GA (CRL, MSD, or Biometry-tab measurements) to compare.</p>';
     }
@@ -6809,7 +7639,7 @@
     return out;
   }
 
-  function renderClinical() { renderBiometry(); renderDating(); renderDoppler(); if (window.__impReady) { renderImpression(); renderBppLive(); } if (window.__anomReady) renderAnomalyResult(); refreshRedFlags(); if (window.__examReady) renderExamWrap(); }
+  function renderClinical() { renderBiometry(); renderDating(); renderDoppler(); if (window.__impReady) { renderImpression(); renderBppLive(); } if (window.__anomReady) renderAnomalyResult(); refreshRedFlags(); if (window.__examReady) renderExamWrap(); try { paintMulti(); } catch (ePaint) {} }
   function renderAll() {
     renderClinical();
     if (window.__follReady) renderFolliculometry();
@@ -7891,7 +8721,7 @@
       steps: [{id:"bpp",label:"BPP",tab:"impress"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "cervix", group: "Obstetrics", name: "Cervical assessment", hint: "TV length before 24 weeks", kind: "workflow",
       steps: [{id:"cx",label:"Length",tab:"exam"},{id:"wrap",label:"Check & report",tab:"exam"}] },
-    { id: "twins", group: "Obstetrics", name: "Multiple pregnancy", hint: "Chorionicity not scored here — document locally", kind: "workflow",
+    { id: "twins", group: "Obstetrics", name: "Multiple pregnancy", hint: "Twins, triplets, or quadruplets — set the number on Measure", kind: "workflow",
       steps: [{id:"clin",label:"Clinical",tab:"exam"},{id:"dates",label:"Dating",tab:"dating"},{id:"bio",label:"Biometry",tab:"biometry"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "first", group: "Obstetrics", name: "First trimester", hint: "Sac, yolk sac, CRL, cardiac activity", kind: "workflow", steps: [{id:"dates",label:"Dating",tab:"dating"},{id:"sru",label:"Viability",tab:"impress"},{id:"wrap",label:"Check & report",tab:"exam"}] },
     { id: "pelvic", group: "Gynaecology", name: "Pelvic ultrasound", hint: "Uterus, endometrium, ovaries", kind: "workflow", steps: [{id:"ut",label:"Uterus",tab:"organ",organ:"uterus"},{id:"ov",label:"Ovary / IOTA",tab:"organ",organ:"ovary"},{id:"wrap",label:"Check & report",tab:"exam"}] },
@@ -8051,9 +8881,11 @@
     "kd-len","kd-len-l","kd-cortex","lv-liver","lv-gbwall","lv-cbd","lv-gbfast","lv-postchole","o-spleen","pr-l","pr-w","pr-h","pr-psa","pr-ipp",
     "sc-rl","sc-rw","sc-rh","sc-ll","sc-lw","sc-lh","sc-flow","sc-pain",
     "ca-psv","ca-edv","ca-ratio","ca-plaque","ca-near","ca-occl",
-    "twA-efw","twA-dvp","twA-mca","twA-blad","twA-ua","twA-bpd","twA-hc","twA-ac","twA-fl",
-    "twB-efw","twB-dvp","twB-mca","twB-blad","twB-ua","twB-bpd","twB-hc","twB-ac","twB-fl",
-    "twC-efw","twC-dvp","twC-mca","twC-blad","twC-ua","twC-bpd","twC-hc","twC-ac","twC-fl",
+    "twA-efw","twA-dvp","twA-mca","twA-blad","twA-ua","twA-bpd","twA-ofd","twA-hc","twA-ac","twA-fl","twA-crl","twA-nt","twA-fhr","twA-card","twA-pres","twA-label","twA-anat","twA-cord","twA-uapi","twA-mcapi","twA-dvpi","twA-dva","twA-atr","twA-cm","twA-nf","twA-foot","twA-pelvis","twA-nasal","twA-heart","twA-wall","twA-stomach","twA-kidneys","twA-pelside","twA-limbs","twA-cmob","twA-lemon","twA-banana","twA-spine","twA-cleft","twA-bow","twA-fx","twA-mineral",
+    "twB-efw","twB-dvp","twB-mca","twB-blad","twB-ua","twB-bpd","twB-ofd","twB-hc","twB-ac","twB-fl","twB-crl","twB-nt","twB-fhr","twB-card","twB-pres","twB-label","twB-anat","twB-cord","twB-uapi","twB-mcapi","twB-dvpi","twB-dva","twB-atr","twB-cm","twB-nf","twB-foot","twB-pelvis","twB-nasal","twB-heart","twB-wall","twB-stomach","twB-kidneys","twB-pelside","twB-limbs","twB-cmob","twB-lemon","twB-banana","twB-spine","twB-cleft","twB-bow","twB-fx","twB-mineral",
+    "twC-efw","twC-dvp","twC-mca","twC-blad","twC-ua","twC-bpd","twC-ofd","twC-hc","twC-ac","twC-fl","twC-crl","twC-nt","twC-fhr","twC-card","twC-pres","twC-label","twC-anat","twC-cord","twC-uapi","twC-mcapi","twC-dvpi","twC-dva","twC-atr","twC-cm","twC-nf","twC-foot","twC-pelvis","twC-nasal","twC-heart","twC-wall","twC-stomach","twC-kidneys","twC-pelside","twC-limbs","twC-cmob","twC-lemon","twC-banana","twC-spine","twC-cleft","twC-bow","twC-fx","twC-mineral",
+    "twD-efw","twD-dvp","twD-mca","twD-blad","twD-ua","twD-bpd","twD-ofd","twD-hc","twD-ac","twD-fl","twD-crl","twD-nt","twD-fhr","twD-card","twD-pres","twD-label","twD-anat","twD-cord","twD-uapi","twD-mcapi","twD-dvpi","twD-dva","twD-atr","twD-cm","twD-nf","twD-foot","twD-pelvis","twD-nasal","twD-heart","twD-wall","twD-stomach","twD-kidneys","twD-pelside","twD-limbs","twD-cmob","twD-lemon","twD-banana","twD-spine","twD-cleft","twD-bow","twD-fx","twD-mineral",
+    "ex-order-n","bio-order","d-x-twins","multi-chorion","multi-pair",
     "bk-class","bk-size","vs-portal","vs-aorta","an-afval","an-afmethod","an-atrium","an-cistmag","an-nt","imp-fca","imp-location",
     "rmi-multi","rmi-solid","rmi-bilat","rmi-ascites","rmi-mets"
   ];
@@ -8273,6 +9105,164 @@
     var sign = n > 0 ? "+" : "";
     return sign + n.toFixed(digits) + (unit ? " " + unit : "");
   }
+  function roundMeasure(v, places) {
+    if (v == null || !isFinite(Number(v))) return null;
+    var p = Math.pow(10, places);
+    return Math.round(Number(v) * p) / p;
+  }
+  function compactLitter(list, gaDays) {
+    var gaW = gaDays != null && isFinite(gaDays) ? gaDays / 7 : null;
+    return (list || []).filter(Boolean).map(function (f) {
+      var pct = null;
+      if (f.grams != null && gaW != null) {
+        var found = null;
+        try { found = lookupPercentile(gaW, f.grams); } catch (ePct) { found = null; }
+        if (found && !found.outOfRange && found.percentile != null) pct = Math.round(found.percentile);
+      }
+      var key = f.pairKey || f.key || "";
+      if (!key) {
+        var matched = String(f.id || f.label || "").match(/([A-D])$/);
+        if (matched) key = matched[1];
+      }
+      return {
+        key: key,
+        label: f.label || f.id || (key ? ("Fetus " + key) : "Fetus"),
+        grams: f.grams != null && isFinite(f.grams) ? Math.round(f.grams) : null,
+        pct: f.pct != null && isFinite(f.pct) ? Math.round(f.pct) : pct,
+        bpd: roundMeasure(f.bpd, 1), hc: roundMeasure(f.hc, 1), ac: roundMeasure(f.ac, 1), fl: roundMeasure(f.fl, 1),
+        crl: roundMeasure(f.crl, 1), uapi: roundMeasure(f.uapi, 2), cpr: roundMeasure(f.cpr, 2),
+        mca: roundMeasure(f.mca, 2), dvp: roundMeasure(f.dvp, 1), atrium: roundMeasure(f.atrium, 1),
+        ua: f.ua && f.ua !== "not assessed" ? f.ua : "",
+        living: f.living !== false && f.cardiac !== "absent"
+      };
+    }).filter(function (f) {
+      return f.grams != null || f.ac != null || f.hc != null || f.bpd != null || f.fl != null || f.crl != null || f.uapi != null || f.dvp != null || f.mca != null;
+    });
+  }
+  function litterOf(row) {
+    if (!row) return [];
+    if (Array.isArray(row.litter) && row.litter.length) return row.litter;
+    var src = row.multi && Array.isArray(row.multi.fetuses) ? row.multi.fetuses : null;
+    if (!src) return [];
+    return compactLitter(src, row.gaDays);
+  }
+  function litterSig(row) {
+    return litterOf(row).map(function (f) { return (f.key || f.label) + "=" + f.grams + "/" + f.ac + "/" + f.hc; }).join(";");
+  }
+  function examsForFolder(pid) {
+    pid = (pid || "").trim();
+    if (!pid) return [];
+    return loadExamStore().filter(function (r) {
+      return (r.pid || "").trim() === pid || (r.name || "").trim() === pid;
+    }).sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
+  }
+  function weightDiscordance(list) {
+    var grams = (list || []).filter(function (f) { return f && f.living !== false && f.grams != null; }).map(function (f) { return f.grams; });
+    if (grams.length < 2) return null;
+    var largest = Math.max.apply(null, grams);
+    var smallest = Math.min.apply(null, grams);
+    if (!largest) return null;
+    return (largest - smallest) / largest * 100;
+  }
+  function fetusIntervalSection(rows) {
+    rows = rows || [];
+    var packs = rows.map(function (r) { return { row: r, litter: litterOf(r) }; }).filter(function (p) { return p.litter.length; });
+    var multiple = packs.some(function (p) { return p.litter.length >= 2 || (p.row.fetusCount != null && p.row.fetusCount >= 2); });
+    if (!multiple) return "";
+    var html = '<div class="card-title">Each fetus since last time</div>';
+    html += '<p class="subhead">Matched by letter, not by the name typed on the card. Keep Fetus A as the same fetus at the next visit. Centiles use the pregnancy age and the singleton chart. This is not a growth-velocity cutoff and not an FGR diagnosis.</p>';
+    if (packs.length < 2) {
+      html += '<p class="note">Save this examination under the same name or folder. The next visit then shows how each letter changed.</p>';
+      return html;
+    }
+    var cols = [{ h: "Date", key: "date" }, { h: "Fetus", key: "who" }];
+    function any(pred) {
+      for (var i = 0; i < packs.length; i++) if (packs[i].litter.some(pred)) return true;
+      return false;
+    }
+    if (any(function (f) { return f.grams != null; })) cols.push({ h: "EFW", key: "grams" });
+    if (any(function (f) { return f.pct != null; })) cols.push({ h: "Centile", key: "pct" });
+    if (any(function (f) { return f.ac != null; })) cols.push({ h: "AC", key: "ac" });
+    if (any(function (f) { return f.hc != null; })) cols.push({ h: "HC", key: "hc" });
+    if (any(function (f) { return f.fl != null; })) cols.push({ h: "FL", key: "fl" });
+    if (any(function (f) { return f.uapi != null; })) cols.push({ h: "UA-PI", key: "uapi" });
+    if (any(function (f) { return f.cpr != null; })) cols.push({ h: "CPR", key: "cpr" });
+    if (any(function (f) { return f.dvp != null; })) cols.push({ h: "DVP", key: "dvp" });
+    if (any(function (f) { return f.mca != null; })) cols.push({ h: "MCA", key: "mca" });
+    html += '<div class="compare-wrap"><table class="compare-table"><thead><tr>';
+    cols.forEach(function (c) { html += "<th>" + c.h + "</th>"; });
+    html += "</tr></thead><tbody>";
+    packs.forEach(function (p) {
+      p.litter.forEach(function (f, idx) {
+        html += "<tr" + (p.row.live ? ' class="live"' : "") + ">";
+        cols.forEach(function (c) {
+          var cell = "—";
+          if (c.key === "date") cell = idx === 0 ? fEsc((p.row.date || "").slice(0, 10) + (p.row.live ? " (now)" : "")) : "";
+          else if (c.key === "who") cell = fEsc((f.key ? f.key + " · " : "") + (f.label || "Fetus"));
+          else if (c.key === "grams") cell = f.grams != null ? (Number(f.grams).toLocaleString() + " g") : "—";
+          else if (c.key === "pct") cell = f.pct != null ? ordinal(f.pct) : "—";
+          else if (c.key === "uapi" || c.key === "cpr" || c.key === "mca") cell = f[c.key] != null ? Number(f[c.key]).toFixed(2) : "—";
+          else cell = f[c.key] != null ? Number(f[c.key]).toFixed(1) : "—";
+          html += "<td>" + cell + "</td>";
+        });
+        html += "</tr>";
+      });
+    });
+    html += "</tbody></table></div>";
+    var prior = packs[packs.length - 2];
+    var curr = packs[packs.length - 1];
+    var days = null;
+    try {
+      var a = Date.parse(prior.row.date), b = Date.parse(curr.row.date);
+      if (isFinite(a) && isFinite(b)) days = Math.round((b - a) / 86400000);
+    } catch (eDays) {}
+    var byKey = {};
+    prior.litter.forEach(function (f) { if (f.key) byKey[f.key] = { prior: f }; });
+    curr.litter.forEach(function (f) {
+      if (!f.key) return;
+      if (!byKey[f.key]) byKey[f.key] = {};
+      byKey[f.key].curr = f;
+    });
+    var order = ["A", "B", "C", "D"].filter(function (k) { return byKey[k]; });
+    Object.keys(byKey).forEach(function (k) { if (order.indexOf(k) === -1) order.push(k); });
+    var lines = [];
+    order.forEach(function (k) {
+      var pair = byKey[k];
+      var name = (pair.curr && pair.curr.label) || (pair.prior && pair.prior.label) || ("Fetus " + k);
+      if (!pair.prior) { lines.push(name + " is entered now and was not on the earlier scan."); return; }
+      if (!pair.curr) { lines.push(name + " was measured on the earlier scan and is not entered now."); return; }
+      if (pair.prior.living && pair.curr.living === false) {
+        lines.push(name + " is recorded without cardiac activity. The weight change is not read as a growth trend.");
+        return;
+      }
+      var bits = [];
+      if (pair.prior.grams != null && pair.curr.grams != null) bits.push("Δ EFW " + fmtDelta(pair.curr.grams - pair.prior.grams, 0, "g"));
+      if (pair.prior.pct != null && pair.curr.pct != null) bits.push("Δ centile " + fmtDelta(pair.curr.pct - pair.prior.pct, 0, ""));
+      if (pair.prior.ac != null && pair.curr.ac != null) bits.push("Δ AC " + fmtDelta(pair.curr.ac - pair.prior.ac, 1, "cm"));
+      if (pair.prior.hc != null && pair.curr.hc != null) bits.push("Δ HC " + fmtDelta(pair.curr.hc - pair.prior.hc, 1, "cm"));
+      if (pair.prior.fl != null && pair.curr.fl != null) bits.push("Δ FL " + fmtDelta(pair.curr.fl - pair.prior.fl, 1, "cm"));
+      if (pair.prior.uapi != null && pair.curr.uapi != null) bits.push("Δ UA-PI " + fmtDelta(pair.curr.uapi - pair.prior.uapi, 2, ""));
+      if (pair.prior.cpr != null && pair.curr.cpr != null) bits.push("Δ CPR " + fmtDelta(pair.curr.cpr - pair.prior.cpr, 2, ""));
+      if (pair.prior.dvp != null && pair.curr.dvp != null) bits.push("Δ DVP " + fmtDelta(pair.curr.dvp - pair.prior.dvp, 1, "cm"));
+      if (pair.prior.mca != null && pair.curr.mca != null) bits.push("Δ MCA " + fmtDelta(pair.curr.mca - pair.prior.mca, 2, ""));
+      if (pair.prior.ua && pair.curr.ua && pair.prior.ua !== pair.curr.ua) bits.push("umbilical artery " + pair.prior.ua + " then " + pair.curr.ua);
+      if (bits.length) lines.push(name + ": " + bits.join(" · ") + ".");
+    });
+    if (days != null && days < 14) lines.push("These scans are " + days + " days apart. A gap under 14 days is a weak growth comparison.");
+    var was = weightDiscordance(prior.litter);
+    var now = weightDiscordance(curr.litter);
+    if (was != null && now != null) lines.push("Weight discordance was " + was.toFixed(1) + "% then " + now.toFixed(1) + "%. The 25% referral line is unchanged. This is not a second due date.");
+    if (lines.length) html += '<p class="note">Interval ' + (days != null ? days + " days. " : "") + lines.join(" ") + "</p>";
+    order.forEach(function (k) {
+      var pair = byKey[k];
+      if (!pair || !pair.prior || !pair.curr) return;
+      if (pair.prior.living === false || pair.curr.living === false) return;
+      if (pair.prior.pct == null || pair.curr.pct == null) return;
+      var drop = pair.curr.pct - pair.prior.pct;
+      if (drop <= -20) html += '<div class="badge warn">' + fEsc(pair.curr.label || ("Fetus " + k)) + " centile fell by " + Math.abs(drop) + " points. Look at that fetus’s AC, Doppler, and fluid. This is not an FGR diagnosis.</div>";
+    });
+    return html;
+  }
   function serialCompareHtml(pid) {
     pid = (pid || "").trim();
     var html = '<div class="card-title">Interval comparison</div>';
@@ -8281,14 +9271,12 @@
       html += '<p class="empty">Enter a folder ID to compare with a prior examination.</p>';
       return html;
     }
-    var saved = loadExamStore().filter(function (r) {
-      return (r.pid || "").trim() === pid || (r.name || "").trim() === pid;
-    }).sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
+    var saved = examsForFolder(pid);
     var live = currentSnapshot();
     live.live = true;
     var rows = saved.slice(-4);
     var last = rows.length ? rows[rows.length - 1] : null;
-    var same = last && last.efw === live.efw && last.ac === live.ac && last.gaLabel === live.gaLabel && last.efwPct === live.efwPct;
+    var same = last && last.efw === live.efw && last.ac === live.ac && last.gaLabel === live.gaLabel && last.efwPct === live.efwPct && litterSig(last) === litterSig(live);
     if (!same && (live.efw != null || live.ac != null || live.gaLabel)) rows = rows.concat([live]);
     if (rows.length < 1) {
       html += '<p class="empty">No saved examination for this folder yet. Save (with consent) after this visit to start a serial record.</p>';
@@ -8384,6 +9372,7 @@
       html += '<p class="note">A second scan on this folder is needed before an interval can be shown.</p>';
     }
     html += '<p class="note">Expected millimetre-per-week AC increment is not used as a cutoff here. Local protocol outranks this card.</p>';
+    html += fetusIntervalSection(rows);
     return html;
   }
   function seekCareLines() {
@@ -8459,6 +9448,19 @@
       worksheet: val("ex-worksheet") || "",
       indication: val("ex-indication"),
       fetuses: val("ex-fetuses"),
+      fetusCount: (function () { try { return fetusNumber(); } catch (eN) { return 1; } })(),
+      litter: (function () {
+        try {
+          var n = fetusNumber();
+          if (n < 2) return [];
+          var list = [];
+          for (var i = 0; i < n; i++) {
+            var one = readOneFetus(i);
+            if (one) list.push(one);
+          }
+          return compactLitter(list, gaDays);
+        } catch (eLit) { return []; }
+      })(),
       cardiac: val("ex-cardiac"),
       presentation: val("ex-presentation"),
       lie: val("ex-lie"),
@@ -8533,7 +9535,12 @@
           return multipleSurveillance({
             chorion: val("ex-chorion") || "",
             gaDays: gaDays,
-            fetuses: [readFetusSlot("twA", "Fetus A"), readFetusSlot("twB", "Fetus B"), readFetusSlot("twC", "Fetus C")]
+            method: G.method,
+            multiWho: G.multiWho,
+            edd: G.preferredEDD ? formatDate(G.preferredEDD) : "",
+            gaLabel: (function () { if (G.preferredDays == null) return ""; var wd = weeksDaysFromDays(G.preferredDays); return wd.w + "w" + wd.d + "d"; })(),
+            expected: (function () { try { return fetusNumber(); } catch (eN) { return 0; } })(),
+            fetuses: [readFetusSlot("twA", "Fetus A"), readFetusSlot("twB", "Fetus B"), readFetusSlot("twC", "Fetus C"), readFetusSlot("twD", "Fetus D")]
           });
         } catch (e) { return { lines: [], flags: { screened: false } }; }
       })(),
@@ -8732,8 +9739,19 @@
     } else if (id === "twins") {
       add("required", "Fetal number not left as singleton", val("ex-fetuses") !== "Singleton", J.examFet);
       add("required", "Chorionicity documented (lambda or T-sign \u2014 not a score)", !!val("ex-chorion"), { tab: "exam", field: "ex-chorion" });
-      add("required", "Cardiac activity for the fetus entered", !!(val("ex-cardiac") || num(val("fhr-bpm")) || num(val("ex-fhr"))), J.examCard);
-      add("recommended", "AC for the fetus entered (one set of measurements)", toCmB("b-ac") != null, J.bio);
+      add("required", "Cardiac activity entered for each measured fetus", (function () {
+        var n = fetusNumber();
+        var seen = 0, missing = 0;
+        for (var i = 0; i < n; i++) {
+          var f = readOneFetus(i);
+          if (!f) continue;
+          seen++;
+          if (f.cardiac !== "present" && f.cardiac !== "absent" && f.fhr == null) missing++;
+        }
+        return seen >= 1 && missing === 0;
+      })(), J.examFet);
+      add("recommended", "At least two fetuses measured", (function () { var n = 0; for (var i = 0; i < fetusNumber(); i++) if (readOneFetus(i)) n++; return n >= 2; })(), J.examFet);
+      add("recommended", "AC or CRL for the fetus on Measure", toCmB("b-ac") != null || num(val("d-crl")) != null || num(val("twA-crl")) != null, J.bio);
       add("recommended", "Presentation of the fetus entered", !!val("ex-presentation"), J.examPres);
       add("recommended", "Placenta vs internal os", !!val("ex-plac-os"), J.examOs);
     } else if (id === "thyroid") {
@@ -8854,14 +9872,16 @@
           placLines = placentaContext({ site: snap.placSite, os: snap.placOs, edgeMm: snap.placEdge, cord: snap.placCord, shape: snap.placShape, presentation: snap.presentation, gaDays: snap.gaDays, move: snap.move });
         } catch (ePl) {}
         placLines.forEach(function (l) { bits.push(l); });
-        if (snap.multi && snap.multi.lines) snap.multi.lines.forEach(function (l) { bits.push(l); });
+        if (snap.multi && snap.multi.impressionBits && snap.multi.impressionBits.length) snap.multi.impressionBits.forEach(function (l) { bits.push(l); });
+        else if (snap.multi && snap.multi.reportBits && snap.multi.reportBits.length) snap.multi.reportBits.forEach(function (l) { bits.push(l); });
+        else if (snap.multi && snap.multi.lines) snap.multi.lines.forEach(function (l) { bits.push(l); });
       }
       bits.push("Decision support only. Edit this wording. Local protocol outranks this text.");
       return bits.join(" ");
     }
     function chorionSentence() {
       var c = snap.chorion || "";
-      var map = { DCDA: "dichorionic diamniotic", MCDA: "monochorionic diamniotic", MCMA: "monochorionic monoamniotic", uncertain: "uncertain on this scan" };
+      var map = { DCDA: "dichorionic diamniotic", MCDA: "monochorionic diamniotic", MCMA: "monochorionic monoamniotic", TCTA: "trichorionic triamniotic", DCTA: "dichorionic triamniotic", MCTA: "monochorionic triamniotic", uncertain: "uncertain on this scan" };
       if (!c) return "Chorionicity is not documented. This app does not score it. Record lambda or T-sign from the earliest scan that shows the membrane.";
       return "Chorionicity recorded by the operator as " + (map[c] || c) + ". Documentation only, not a scoring engine.";
     }
@@ -9095,17 +10115,19 @@
     }
     if (id === "twins") {
       bits.push(obLead() + " " + chorionSentence());
-      if (!(snap.multi && snap.multi.flags && snap.multi.flags.screened)) bits.push("This form stores one set of measurements. It does not calculate intertwin discordance, TTTS, or selective growth restriction. Use the surveillance card when both fetuses are measured.");
-      if (snap.presentation) bits.push("Presentation of the fetus entered here: " + snap.presentation + ".");
-      if (snap.efw != null) {
-        var tw = "EFW for the fetus entered on this form is approximately " + snap.efw.toLocaleString() + " g";
-        if (snap.efwPct != null) tw += " (" + ordinal(snap.efwPct) + " centile on the singleton chart used here, not a twin-specific chart)";
-        bits.push(tw + ".");
+      if (!(snap.multi && snap.multi.flags && snap.multi.flags.screened)) {
+        bits.push("This form stores one set of measurements. It does not calculate intertwin discordance, TTTS, or selective growth restriction. Use the surveillance card when both fetuses are measured.");
+        if (snap.presentation) bits.push("Presentation of the fetus entered here: " + snap.presentation + ".");
+        if (snap.efw != null) {
+          var tw = "EFW for the fetus entered on this form is approximately " + snap.efw.toLocaleString() + " g";
+          if (snap.efwPct != null) tw += " (" + ordinal(snap.efwPct) + " centile on the singleton chart used here, not a twin-specific chart)";
+          bits.push(tw + ".");
+        }
+        if (snap.placOs) bits.push("Placenta relative to the os: " + snap.placOs + ".");
+        if (snap.redf) bits.push("Umbilical artery reversed end-diastolic flow is recorded for the fetus entered here. Correlate urgently. This app does not time delivery.");
+        else if (snap.aedf) bits.push("Umbilical artery absent end-diastolic flow is recorded for the fetus entered here. Correlate urgently.");
+        else if (snap.uapi != null) bits.push("UA-PI " + snap.uapi.toFixed(2) + " for the fetus entered here.");
       }
-      if (snap.placOs) bits.push("Placenta relative to the os: " + snap.placOs + ".");
-      if (snap.redf) bits.push("Umbilical artery reversed end-diastolic flow is recorded for the fetus entered here. Correlate urgently. This app does not time delivery.");
-      else if (snap.aedf) bits.push("Umbilical artery absent end-diastolic flow is recorded for the fetus entered here. Correlate urgently.");
-      else if (snap.uapi != null) bits.push("UA-PI " + snap.uapi.toFixed(2) + " for the fetus entered here.");
       return close();
     }
 
@@ -9232,7 +10254,8 @@
     }
 
     if (id === "twins") {
-      html += '<div class="badge warn">One fetus on this form. Chorionicity is what you documented. This app does not score TTTS or discordance. Centiles use the singleton chart.</div>';
+      if (snap.multi && snap.multi.flags && snap.multi.flags.screened) html += '<div class="badge ok">Each measured fetus is on the twins card. One pregnancy EDD. Centiles use the singleton chart.</div>';
+      else html += '<div class="badge warn">Enter each fetus on the twins card. Chorionicity is what you documented. This card does not score TTTS. Centiles use the singleton chart.</div>';
     }
     if (snap.efw == null) {
       html += '<p class="empty">Enter AC and FL on Biometry for EFW (Hadlock). Centiles need an established GA.</p>';
@@ -10001,6 +11024,9 @@
     renderExamBar();
     var first = (e.steps && e.steps[0]) ? e.steps[0] : { tab: "exam" };
     if (window.__showTab) window.__showTab(first.tab);
+    if (e.id === "twins") {
+      try { setPregnancyCount(Math.max(2, fetusNumber())); } catch (eTw) {}
+    }
     if (first.organ && first.tab === "organ" && typeof selectOrganSection === "function") {
       setTimeout(function () { selectOrganSection(first.organ); }, 40);
     }
@@ -10225,9 +11251,13 @@
     set("exam-meaning", meaningBlock(snap));
     var multiHost = document.getElementById("multi-out");
     if (multiHost) {
-      var ml = snap.multi && snap.multi.lines ? snap.multi.lines : [];
-      multiHost.innerHTML = ml.length ? ml.map(function (l) { return '<p class="note">' + fEsc(l) + "</p>"; }).join("") : '<p class="empty">Enter two weights, or two deepest pockets. Chorionicity and dating on this page are reused. CRL from the other app’s dating equation is not used.</p>';
+      if (snap.multi && snap.multi.html) multiHost.innerHTML = snap.multi.html;
+      else {
+        var ml = snap.multi && snap.multi.lines ? snap.multi.lines : [];
+        multiHost.innerHTML = ml.length ? ml.map(function (l) { return '<p class="note">' + fEsc(l) + "</p>"; }).join("") : '<p class="empty">On Measure, set the number of fetuses to twins, triplets, or quadruplets, then enter each one.</p>';
+      }
     }
+    if (typeof syncMultiSlots === "function") syncMultiSlots(snap);
     var placHost = document.getElementById("plac-out");
     if (placHost) {
       var pln = placentaContext({ site: snap.placSite, os: snap.placOs, edgeMm: snap.placEdge, cord: snap.placCord, shape: snap.placShape, presentation: snap.presentation, gaDays: snap.gaDays, move: snap.move });
@@ -10270,36 +11300,391 @@
     scheduleDraft();
   }
 
+  var currentTabName = "home";
+  var pregnancyLock = false;
+  function setPregnancyCount(n) {
+    n = parseInt(n, 10);
+    if (!isFinite(n) || n < 1) n = 1;
+    if (n > 4) n = 4;
+    if (pregnancyLock) return;
+    pregnancyLock = true;
+    var bio = document.getElementById("bio-order");
+    if (bio) bio.value = String(n);
+    var fet = document.getElementById("ex-fetuses");
+    if (fet) fet.value = n <= 1 ? "Singleton" : (n === 2 ? "Twins" : (n === 3 ? "Triplets" : "Quadruplets"));
+    var order = document.getElementById("ex-order-n");
+    if (order && n >= 3) order.value = String(n);
+    var tw = document.getElementById("d-x-twins");
+    if (tw) tw.checked = n >= 2;
+    pregnancyLock = false;
+    try { renderClinical(); } catch (eSet) {}
+  }
+  function placeMultiCard(name) {
+    var card = document.getElementById("multi-card");
+    if (!card) return;
+    var n = 1;
+    try { n = fetusNumber(); } catch (eN) { n = 1; }
+    var destId = "multi-mount-exam";
+    if (n >= 2 && name === "biometry") destId = "multi-mount-bio";
+    else if (n >= 2 && name === "dating") destId = "multi-mount-date";
+    var dest = document.getElementById(destId);
+    if (dest && card.parentElement !== dest) dest.appendChild(card);
+    card.hidden = n < 2;
+  }
+  function paintMultiFetusCards(Gbio) {
+    var n = 1;
+    try { n = fetusNumber(); } catch (eN) { n = 1; }
+    if (n < 2) return;
+    Gbio = Gbio || {};
+    var fetuses = [];
+    for (var i = 0; i < n; i++) {
+      var f = readOneFetus(i);
+      if (f) fetuses.push(f);
+    }
+    var gaW = Gbio.preferredDays != null ? Gbio.preferredDays / 7 : null;
+    var headHtml = '<div class="card-title">Each head</div>';
+    var efwHtml = '<div class="card-title">Each estimated weight</div>';
+    var growthHtml = '<div class="card-title">Each centile</div>';
+    var ratioHtml = '<div class="card-title">Each proportion</div>';
+    if (!fetuses.length) {
+      var empty = '<p class="empty">Enter each fetus. HC fills from BPD and OFD when HC is left blank.</p>';
+      set("head-card", headHtml + empty);
+      set("efw-card", efwHtml + empty);
+      set("growth-card", growthHtml + '<p class="empty">Centiles use the pregnancy age. The singleton Hadlock chart is always shown. A dichorionic label adds the NICHD twin chart.</p>');
+      set("ratio-card", ratioHtml + empty);
+      return;
+    }
+    var chorGrow = "";
+    try { chorGrow = val("ex-chorion") || val("multi-chorion") || ""; } catch (eChor) { chorGrow = ""; }
+    var dcChartOn = chorGrow === "DCDA";
+    fetuses.forEach(function (f) {
+      var ciF = (f.bpd != null && f.ofd != null && f.ofd > 0) ? (f.bpd / f.ofd) * 100 : null;
+      headHtml += '<p class="note"><strong>' + fEsc(f.id) + '</strong>';
+      if (f.hc != null) headHtml += " · HC " + f.hc.toFixed(1) + " cm";
+      if (f.gaHc != null) headHtml += " · " + fEsc(wdWords(f.gaHc));
+      if (ciF != null) headHtml += " · CI " + ciF.toFixed(1) + "%";
+      headHtml += "</p>";
+      if (ciF != null && (ciF < 74 || ciF > 83)) headHtml += '<div class="badge warn">' + fEsc(f.id) + " head shape is outside 74–83. That does not create a second due date.</div>";
+      if (f.grams != null) {
+        var lo = gramsToLbOz(f.grams);
+        efwHtml += '<p class="note"><strong>' + fEsc(f.id) + "</strong> · " + Math.round(f.grams).toLocaleString() + " g · " + lo.lb + " lb " + lo.oz + " oz" + (f.how ? " · " + fEsc(f.how) : "") + "</p>";
+      } else efwHtml += '<p class="note"><strong>' + fEsc(f.id) + "</strong> · weight needs AC and FL, or a typed EFW.</p>";
+      if (f.grams != null && gaW != null) {
+        var pctRes = null;
+        try { pctRes = lookupPercentile(gaW, f.grams); } catch (ePct) { pctRes = null; }
+        if (pctRes && !pctRes.outOfRange) {
+          var gclass = classifyGrowth(pctRes.percentile, f.grams);
+          growthHtml += '<div class="badge ' + gclass.sizeCls + '">' + fEsc(f.id) + " · " + ordinal(pctRes.percentile) + " · " + gclass.sizeClass + "</div>";
+        } else if (pctRes && pctRes.outOfRange) growthHtml += '<p class="note">' + fEsc(f.id) + " · singleton centile chart is 24–41 weeks.</p>";
+        if (dcChartOn) {
+          var twinBand = null;
+          try { twinBand = nichdDcTwinBand(gaW, f.grams); } catch (eBand) { twinBand = null; }
+          if (twinBand) growthHtml += '<p class="note">' + fEsc(f.id) + " · " + fEsc(twinBand.label) + " on the NICHD dichorionic twin chart. Referral still uses the singleton 10th.</p>";
+          else if (gaW < 15 || gaW > 38) growthHtml += '<p class="note">' + fEsc(f.id) + " · NICHD dichorionic chart is 15–38 weeks.</p>";
+        }
+      } else if (f.grams != null) growthHtml += '<p class="note">' + fEsc(f.id) + " · centile needs the pregnancy age, not this fetus’s own size.</p>";
+      ratioHtml += '<p class="subhead" style="margin:8px 0 4px">' + fEsc(f.id) + "</p>";
+      ratioHtml += renderRatios(f.bpd, f.hc, f.ac, f.fl, gaW).replace('<div class="card-title">Body Proportion</div>', "");
+    });
+    growthHtml += dcChartOn
+      ? '<p class="note">Badges are the singleton Hadlock 1991 chart. Teal lines are the NICHD dichorionic twin 10th, 50th, and 90th (Grantz et al., AJOG 2016), drawn from 24 weeks. A United States reference, not a Nigerian chart, and not the referral cutoff.</p>'
+      : '<p class="note">Centiles use the singleton Hadlock 1991 chart. Set chorionicity to dichorionic to add the NICHD twin chart. Monochorionic and triplet pregnancies stay on the singleton chart.</p>';
+    if (gaW != null && fetuses.some(function (f) { return f.grams != null; })) {
+      var plotable = fetuses.filter(function (f) { return f.grams != null && gaW >= 24 && gaW <= 41; });
+      if (plotable.length) {
+        var cols = ["#F5A623", "#355F6B", "#8C6239", "#1A2744"];
+        growthHtml += buildGrowthChart(gaW, plotable[0].grams, plotable.slice(1).map(function (f, i) {
+          return { grams: f.grams, weeks: gaW, color: cols[(i + 1) % cols.length], label: f.id };
+        }), { color: cols[0], label: plotable[0].id }, dcChartOn && gaW <= 38);
+      }
+    }
+    set("head-card", headHtml);
+    set("efw-card", efwHtml);
+    set("growth-card", growthHtml);
+    set("ratio-card", ratioHtml);
+  }
+  function paintMulti() {
+    var n = 1;
+    try { n = fetusNumber(); } catch (eN) { n = 1; }
+    var singleBox = document.getElementById("singleton-measures");
+    var note = document.getElementById("multi-measure-note");
+    var early = document.getElementById("singleton-crl-fields");
+    var earlyNote = document.getElementById("multi-crl-note");
+    if (singleBox) singleBox.hidden = n >= 2;
+    if (note) note.hidden = n < 2;
+    if (early) early.hidden = n >= 2;
+    if (earlyNote) earlyNote.hidden = n < 2;
+    try { syncMultiSlots(); } catch (eSync) {}
+    placeMultiCard(currentTabName);
+    var card = document.getElementById("multi-card");
+    if (card) card.hidden = n < 2;
+    var host = document.getElementById("multi-out");
+    var twinCard = document.getElementById("twin-card");
+    var twinDate = document.getElementById("twin-date-card");
+    if (n < 2) {
+      if (twinCard) { twinCard.hidden = true; twinCard.innerHTML = ""; }
+      if (twinDate) { twinDate.hidden = true; twinDate.innerHTML = ""; }
+      if (host && currentTabName !== "exam") host.innerHTML = "";
+      ["twA", "twB", "twC", "twD"].forEach(function (p) { var live = document.getElementById(p + "-live"); if (live) live.innerHTML = ""; });
+      return;
+    }
+    var G = {};
+    try { G = assignGestationalAge(); } catch (eG) { G = {}; }
+    var fetuses = [];
+    for (var i = 0; i < n; i++) {
+      var f = readOneFetus(i);
+      if (f) fetuses.push(f);
+    }
+    var chor = val("ex-chorion") || val("multi-chorion") || "";
+    var surv = multipleSurveillance({
+      chorion: chor,
+      gaDays: G.preferredDays,
+      method: G.method,
+      multiWho: G.multiWho,
+      mcPair: val("multi-pair") || "",
+      edd: G.preferredEDD ? formatDate(G.preferredEDD) : "",
+      gaLabel: (function () {
+        if (G.preferredDays == null) return "";
+        var wd = weeksDaysFromDays(G.preferredDays);
+        return wd.w + "w" + wd.d + "d";
+      })(),
+      expected: n,
+      fetuses: fetuses
+    });
+    var full = surv.html || '<p class="empty">Enter a CRL or biometry for each fetus. One EDD uses the larger living fetus.</p>';
+    var onExam = currentTabName === "exam" || currentTabName === "report";
+    if (host) host.innerHTML = onExam ? full : '<p class="note">Comparison, discordance, and which fetus sets the EDD are on the results side of this screen.</p>';
+    if (twinCard) {
+      var showBio = currentTabName === "biometry";
+      twinCard.hidden = !showBio;
+      if (showBio) {
+        twinCard.innerHTML = '<div class="card-title">Fetus comparison</div>' + full;
+        var pidNow = (val("ex-pid") || val("log-pid") || "").trim();
+        if (pidNow && fetuses.length) {
+          var savedRows = examsForFolder(pidNow).slice(-4);
+          var liveRow = {
+            date: new Date().toISOString(),
+            live: true,
+            gaDays: G.preferredDays,
+            fetusCount: n,
+            litter: compactLitter(fetuses, G.preferredDays)
+          };
+          var lastSaved = savedRows.length ? savedRows[savedRows.length - 1] : null;
+          if (!(lastSaved && litterSig(lastSaved) === litterSig(liveRow))) savedRows.push(liveRow);
+          twinCard.innerHTML += fetusIntervalSection(savedRows);
+        }
+      }
+    }
+    if (twinDate) {
+      var showDate = currentTabName === "dating";
+      twinDate.hidden = !showDate;
+      if (showDate) twinDate.innerHTML = '<div class="card-title">Fetus comparison</div>' + full;
+    }
+    try { paintFetusLive(fetuses, G); } catch (eLive) {}
+  }
+  function paintFetusLive(fetuses, G) {
+    var n = 1;
+    try { n = fetusNumber(); } catch (eN) { n = 1; }
+    var prefixes = ["twA", "twB", "twC", "twD"];
+    var picked = null;
+    try { picked = selectMultipleDating(fetuses || []); } catch (ePick) { picked = null; }
+    var gaW = G && G.preferredDays != null ? G.preferredDays / 7 : null;
+    var method = G && G.method;
+    for (var i = 0; i < 4; i++) {
+      var host = document.getElementById(prefixes[i] + "-live");
+      if (!host) continue;
+      if (i >= n) { host.innerHTML = ""; continue; }
+      var f = null;
+      (fetuses || []).forEach(function (one) { if (one && one.index === i) f = one; });
+      if (!f) { host.innerHTML = '<p class="note">Enter this fetus. CRL is in millimetres. Biometry is in centimetres.</p>'; continue; }
+      var setsCrl = !!(picked && picked.largerCrl && picked.largerCrl.id === f.id && method === "crl");
+      var setsHc = !!(picked && !picked.largerCrl && picked.largerHc && picked.largerHc.id === f.id && method === "hc_larger");
+      var html = "";
+      if (method === "art" || method === "prior_art") html += '<div class="badge ok">ART date is the pregnancy EDD. This fetus is not a second due date.</div>';
+      else if (method === "prior_crl") html += '<div class="badge ok">The earlier CRL EDD stands. This fetus is not a second due date.</div>';
+      else if (setsCrl) html += '<div class="badge ok">Larger living CRL — this fetus sets the pregnancy EDD</div>';
+      else if (setsHc) html += '<div class="badge ok">Larger head circumference — this fetus sets the pregnancy EDD</div>';
+      else if (f.cardiac === "absent") html += '<div class="badge warn">No cardiac activity. Excluded from the due date.</div>';
+      else html += '<div class="badge">Compared for growth. Not a second due date.</div>';
+      var ages = [];
+      if (f.crl != null && f.crlDays != null) ages.push("CRL " + wdWords(f.crlDays / 7));
+      if (f.gaBpd != null) ages.push("BPD " + wdWords(f.gaBpd));
+      if (f.gaHc != null) ages.push("HC " + wdWords(f.gaHc));
+      if (f.gaAc != null) ages.push("AC " + wdWords(f.gaAc));
+      if (f.gaFl != null) ages.push("FL " + wdWords(f.gaFl));
+      if (ages.length) html += '<p class="note">' + fEsc(ages.join(" · ")) + "</p>";
+      if (f.meanWeeks != null) html += '<p class="note">Hadlock mean ' + fEsc(wdWords(f.meanWeeks)) + " — size only, not the EDD</p>";
+      if (f.grams != null) {
+        var pctTxt = "";
+        if (gaW != null) {
+          var pct = null;
+          try { pct = lookupPercentile(gaW, f.grams); } catch (ePct) { pct = null; }
+          if (pct && !pct.outOfRange) {
+            pctTxt = " · " + ordinal(pct.percentile) + " centile";
+            if (pct.percentile < 10) pctTxt += " · under the 10th";
+          }
+        }
+        html += '<p class="note">EFW ' + Math.round(f.grams).toLocaleString() + " g" + pctTxt + "</p>";
+      } else if (f.ac != null || f.fl != null) html += '<p class="note">Weight needs both AC and FL, or a typed EFW.</p>';
+      if (gaW != null && f.meanWeeks != null && isFinite(f.meanWeeks)) {
+        var dlt = Math.round((f.meanWeeks - gaW) * 7);
+        if (Math.abs(dlt) >= 10) html += '<div class="badge warn">' + Math.abs(dlt) + " days " + (dlt < 0 ? "smaller" : "larger") + " than the pregnancy age. Growth difference, not a new EDD.</div>";
+      }
+      if (f.nt != null && f.nt >= 3.5) html += '<div class="badge warn">NT ' + f.nt.toFixed(1) + " mm is at or above 3.5 mm</div>";
+      if (f.anatomy === "anomaly suspected") html += '<div class="badge warn">Anomaly suspected on the views obtained</div>';
+      if (f.cord === "velamentous") html += '<div class="badge warn">Velamentous cord. Not a vasa previa diagnosis</div>';
+      if (f.cpr != null && isFinite(f.cpr)) html += '<p class="note">CPR ' + f.cpr.toFixed(2) + (f.cpr < 1 ? " · below 1.0" : "") + "</p>";
+      if (f.dva === "absent" || f.dva === "reversed") html += '<div class="badge danger">Ductus venosus a-wave ' + fEsc(f.dva) + ". Not a delivery time.</div>";
+      if (f.atrium != null && f.atrium >= 10) html += '<div class="badge warn">Atrium ' + f.atrium.toFixed(1) + " mm</div>";
+      host.innerHTML = html;
+    }
+  }
   function buildMultiSlots() {
     var host = document.getElementById("multi-slots");
     if (!host || host.dataset.ready) return;
     host.dataset.ready = "1";
-    function slot(prefix, title) {
-      return '<details class="card" style="margin:8px 0;padding:10px"><summary><strong>' + title + '</strong></summary>' +
-        '<div class="grid2">' +
-        '<div class="field"><label>EFW if already calculated</label><div class="row"><input id="' + prefix + '-efw" type="number" inputMode="decimal" step="1" min="0" placeholder="-"><span class="suffix">g</span></div></div>' +
-        '<div class="field"><label>Deepest pocket</label><div class="row"><input id="' + prefix + '-dvp" type="number" inputMode="decimal" step="0.1" min="0" placeholder="-"><span class="suffix">cm</span></div></div>' +
-        '</div><div class="grid2">' +
-        '<div class="field"><label>MCA-PSV</label><div class="row"><input id="' + prefix + '-mca" type="number" inputMode="decimal" step="0.01" min="0" placeholder="-"><span class="suffix">MoM</span></div></div>' +
-        '<div class="field"><label>Bladder</label><div class="row"><select id="' + prefix + '-blad"><option value="not assessed">Not assessed</option><option value="visible">Visible</option><option value="not visible">Not visible</option></select></div></div>' +
-        '</div>' +
-        '<div class="field"><label>Umbilical artery</label><div class="row"><select id="' + prefix + '-ua"><option value="not assessed">Not assessed</option><option value="EDF">End-diastolic flow present</option><option value="AEDF">Absent end-diastolic flow</option><option value="REDF">Reversed end-diastolic flow</option></select></div></div>' +
-        '<details><summary>Or biometry in centimetres (Hadlock, only if EFW is empty)</summary><div class="grid2">' +
-        '<div class="field"><label>BPD</label><div class="row"><input id="' + prefix + '-bpd" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">cm</span></div></div>' +
-        '<div class="field"><label>HC</label><div class="row"><input id="' + prefix + '-hc" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">cm</span></div></div>' +
-        '<div class="field"><label>AC</label><div class="row"><input id="' + prefix + '-ac" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">cm</span></div></div>' +
-        '<div class="field"><label>FL</label><div class="row"><input id="' + prefix + '-fl" type="number" inputMode="decimal" step="0.1" placeholder="-"><span class="suffix">cm</span></div></div>' +
-        '</div></details></details>';
+    function field(prefix, suffix, label, unit, step) {
+      return '<div class="field"><label>' + label + '</label><div class="row"><input id="' + prefix + '-' + suffix + '" type="number" inputMode="decimal" step="' + (step || "0.1") + '" min="0" placeholder="-">' + (unit ? '<span class="suffix">' + unit + '</span>' : '') + '</div></div>';
     }
-    host.innerHTML = slot("twA", "Fetus A") + slot("twB", "Fetus B") + slot("twC", "Fetus C (optional)");
+    function slot(prefix, title, index) {
+      return '<details class="fetus-slot" data-fetus-index="' + index + '" open style="margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:14px"><summary style="min-height:44px;cursor:pointer"><strong class="fetus-sum">' + title + '</strong></summary>' +
+        '<div class="field"><label>Which one</label><div class="row"><input id="' + prefix + '-label" maxlength="24" placeholder="presenting, left, upper"></div></div>' +
+        '<div class="grid2">' +
+        '<div class="field"><label>Cardiac activity</label><div class="row"><select id="' + prefix + '-card"><option value="">-</option><option value="present">Present</option><option value="absent">Absent</option></select></div></div>' +
+        '<div class="field"><label>Presentation</label><div class="row"><select id="' + prefix + '-pres"><option value="">-</option><option value="cephalic">Cephalic</option><option value="breech">Breech</option><option value="transverse">Transverse</option><option value="oblique">Oblique</option></select></div></div>' +
+        '</div><div class="grid2">' +
+        field(prefix, "crl", "CRL", "mm", "0.1") +
+        field(prefix, "nt", "NT", "mm", "0.1") +
+        '</div><div class="grid2">' +
+        field(prefix, "fhr", "Heart rate", "bpm", "1") +
+        field(prefix, "efw", "EFW, if already known", "g", "1") +
+        '</div><p class="subhead" style="margin:8px 0 4px">Biometry, centimetres</p><div class="grid2">' +
+        field(prefix, "bpd", "BPD", "cm", "0.1") +
+        field(prefix, "ofd", "OFD", "cm", "0.1") +
+        field(prefix, "hc", "HC", "cm", "0.1") +
+        field(prefix, "ac", "AC", "cm", "0.1") +
+        field(prefix, "fl", "FL", "cm", "0.1") +
+        '</div><div class="grid2">' +
+        field(prefix, "dvp", "Deepest pocket", "cm", "0.1") +
+        field(prefix, "mca", "MCA-PSV", "MoM", "0.01") +
+        '</div><div class="grid2">' +
+        '<div class="field"><label>Bladder</label><div class="row"><select id="' + prefix + '-blad"><option value="not assessed">Not assessed</option><option value="visible">Visible</option><option value="not visible">Not visible</option></select></div></div>' +
+        '<div class="field"><label>Umbilical artery</label><div class="row"><select id="' + prefix + '-ua"><option value="not assessed">Not assessed</option><option value="EDF">End-diastolic flow present</option><option value="AEDF">Absent end-diastolic flow</option><option value="iAEDF">Intermittent absent end-diastolic flow</option><option value="REDF">Reversed end-diastolic flow</option></select></div></div>' +
+        '</div><p class="subhead" style="margin:8px 0 4px">Doppler, this fetus</p><div class="grid2">' +
+        field(prefix, "uapi", "UA-PI", "", "0.01") +
+        field(prefix, "mcapi", "MCA-PI", "", "0.01") +
+        field(prefix, "dvpi", "DV-PI", "", "0.01") +
+        '<div class="field"><label>DV a-wave</label><div class="row"><select id="' + prefix + '-dva"><option value="">Not assessed</option><option value="present">Present</option><option value="absent">Absent</option><option value="reversed">Reversed</option></select></div></div>' +
+        '</div><div class="grid2">' +
+        '<div class="field"><label>Structure on this scan</label><div class="row"><select id="' + prefix + '-anat"><option value="">Not reviewed</option><option value="no obvious anomaly">No obvious anomaly on views obtained</option><option value="incomplete">Views incomplete</option><option value="anomaly suspected">Anomaly suspected</option></select></div></div>' +
+        '<div class="field"><label>Cord insertion</label><div class="row"><select id="' + prefix + '-cord"><option value="">Not assessed</option><option value="central">Central or eccentric</option><option value="marginal">Marginal</option><option value="velamentous">Velamentous</option></select></div></div>' +
+        '</div><details><summary class="subhead" style="margin:8px 0;min-height:44px;cursor:pointer">Structure checklist</summary><div class="grid2">' +
+        field(prefix, "atr", "Atrium", "mm", "0.1") +
+        field(prefix, "cm", "Cisterna magna", "mm", "0.1") +
+        field(prefix, "nf", "Nuchal fold", "mm", "0.1") +
+        field(prefix, "pelvis", "Renal pelvis", "mm", "0.1") +
+        field(prefix, "foot", "Foot length", "cm", "0.1") +
+        '</div><div class="grid2">' +
+        '<div class="field"><label>Nasal bone</label><div class="row"><select id="' + prefix + '-nasal"><option value="">Not assessed</option><option value="present">Present</option><option value="hypoplastic">Hypoplastic</option><option value="absent">Absent</option></select></div></div>' +
+        '<div class="field"><label>Four-chamber view</label><div class="row"><select id="' + prefix + '-heart"><option value="">Not assessed</option><option value="normal">Looks normal</option><option value="abnormal">Looks abnormal</option><option value="not seen">Not seen</option></select></div></div>' +
+        '<div class="field"><label>Abdominal wall</label><div class="row"><select id="' + prefix + '-wall"><option value="">Not assessed</option><option value="intact">Intact</option><option value="defect">Defect suspected</option></select></div></div>' +
+        '<div class="field"><label>Stomach bubble</label><div class="row"><select id="' + prefix + '-stomach"><option value="">Not assessed</option><option value="seen">Seen</option><option value="not seen">Not seen</option></select></div></div>' +
+        '<div class="field"><label>Kidneys</label><div class="row"><select id="' + prefix + '-kidneys"><option value="">Not assessed</option><option value="both seen">Both seen</option><option value="one absent">One not seen</option><option value="both absent">Neither seen</option></select></div></div>' +
+        '<div class="field"><label>Pelvis side</label><div class="row"><select id="' + prefix + '-pelside"><option value="unilateral">Unilateral</option><option value="bilateral">Bilateral</option></select></div></div>' +
+        '<div class="field"><label>Limbs</label><div class="row"><select id="' + prefix + '-limbs"><option value="">Not assessed</option><option value="all seen">All seen</option><option value="abnormal">Short or abnormal</option></select></div></div>' +
+        '</div>' +
+        '<label class="check-row"><input type="checkbox" id="' + prefix + '-cmob"> Cisterna magna obliterated</label>' +
+        '<label class="check-row"><input type="checkbox" id="' + prefix + '-lemon"> Lemon sign</label>' +
+        '<label class="check-row"><input type="checkbox" id="' + prefix + '-banana"> Banana sign</label>' +
+        '<label class="check-row"><input type="checkbox" id="' + prefix + '-spine"> Spinal defect</label>' +
+        '<label class="check-row"><input type="checkbox" id="' + prefix + '-cleft"> Cleft lip or palate suspected</label>' +
+        '<label class="check-row"><input type="checkbox" id="' + prefix + '-bow"> Long-bone bowing</label>' +
+        '<label class="check-row"><input type="checkbox" id="' + prefix + '-fx"> Fracture</label>' +
+        '<label class="check-row"><input type="checkbox" id="' + prefix + '-mineral"> Reduced bone mineralisation</label>' +
+        '</details><div class="fetus-live" id="' + prefix + '-live"></div></details>';
+    }
+    host.innerHTML = slot("twA", "Fetus A", 0) + slot("twB", "Fetus B", 1) + slot("twC", "Fetus C", 2) + slot("twD", "Fetus D", 3);
     host.querySelectorAll("input,select").forEach(function (el) {
-      el.addEventListener("input", renderExamWrap);
-      el.addEventListener("change", renderExamWrap);
+      el.addEventListener("input", function () {
+        if (/-hc$/.test(el.id)) {
+          if (!String(el.value || "").trim() || document.activeElement === el) el.removeAttribute("data-auto");
+        }
+        onMultiEdit();
+      });
+      el.addEventListener("change", onMultiEdit);
+    });
+    var copyA = document.getElementById("multi-copy-a");
+    if (copyA && !copyA.dataset.bound) {
+      copyA.dataset.bound = "1";
+      copyA.addEventListener("click", function () {
+        function put(id, value) {
+          var el = document.getElementById(id);
+          if (!el || value == null || value === "") return;
+          el.value = value;
+        }
+        put("twA-crl", val("d-crl"));
+        var bpd = toCmB("b-bpd"), ofd = toCmB("b-ofd"), hc = toCmB("b-hc"), ac = toCmB("b-ac"), fl = toCmB("b-fl");
+        if (bpd != null) put("twA-bpd", String(Math.round(bpd * 10) / 10));
+        if (ofd != null) put("twA-ofd", String(Math.round(ofd * 10) / 10));
+        if (hc != null) { put("twA-hc", String(Math.round(hc * 10) / 10)); var hcEl = document.getElementById("twA-hc"); if (hcEl) hcEl.removeAttribute("data-auto"); }
+        if (ac != null) put("twA-ac", String(Math.round(ac * 10) / 10));
+        if (fl != null) put("twA-fl", String(Math.round(fl * 10) / 10));
+        put("twA-fhr", val("fhr-bpm") || val("ex-fhr"));
+        put("twA-card", val("ex-cardiac"));
+        put("twA-pres", val("ex-presentation"));
+        put("twA-uapi", val("dp-uapi"));
+        put("twA-mcapi", val("dp-mcapi"));
+        put("twA-dvpi", val("dp-dvpi"));
+        put("twA-atr", val("an-atrium"));
+        put("twA-cm", val("an-cistmag"));
+        put("twA-nf", val("an-nf"));
+        onMultiEdit();
+      });
+    }
+  }
+  function onMultiEdit() {
+    ["twA", "twB", "twC", "twD"].forEach(syncFetusDerivedHC);
+    if (window.__examReady) {
+      try { renderExamWrap(); } catch (eEx) {}
+    }
+    try { renderDating(); } catch (eDt) {}
+    try { renderBiometry(); } catch (eBi) {}
+  }
+  function syncMultiSlots(snap) {
+    var n = 1;
+    try { n = fetusNumber(); } catch (eN) { n = 1; }
+    var order = document.getElementById("order-n-wrap");
+    if (order) order.hidden = val("ex-fetuses") !== "Higher-order";
+    var note = document.getElementById("multi-a-note");
+    if (note) note.hidden = n < 2;
+    var pairWrap = document.getElementById("mc-pair-wrap");
+    if (pairWrap) {
+      var chorNow = val("ex-chorion") || val("multi-chorion") || "";
+      pairWrap.hidden = !(chorNow === "DCTA" && n >= 3);
+    }
+    document.querySelectorAll(".fetus-slot").forEach(function (el) {
+      var idx = parseInt(el.getAttribute("data-fetus-index") || "0", 10);
+      el.hidden = idx >= n;
+    });
+    var card = document.getElementById("multi-card");
+    if (card && n >= 2 && card.dataset.kept !== "1") { card.open = true; card.dataset.kept = "1"; }
+    if (card && n < 2) card.dataset.kept = "";
+    var fetuses = snap && snap.multi && snap.multi.fetuses ? snap.multi.fetuses : [];
+    fetuses.forEach(function (f) {
+      if (f.index == null) return;
+      var slot = document.querySelector('.fetus-slot[data-fetus-index="' + f.index + '"] .fetus-sum');
+      if (!slot) return;
+      var bit = f.id;
+      if (f.crl != null) bit += " · CRL " + f.crl + " mm";
+      else if (f.grams != null) bit += " · " + Math.round(f.grams) + " g";
+      else if (f.hc != null) bit += " · HC " + f.hc + " cm";
+      if (f.cardiac === "absent") bit += " · no heart activity";
+      slot.textContent = bit;
     });
   }
   function wireExam() {
     buildMultiSlots();
-    ["ex-name","ex-indication","ex-approach","ex-pid","ex-initials","ex-fetuses","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-plac-site","ex-plac-edge","ex-cord","ex-plac-shape","ex-cx","ex-fhr"].forEach(function (id) {
+    ["ex-name","ex-indication","ex-approach","ex-pid","ex-initials","ex-fetuses","ex-order-n","ex-chorion","ex-cardiac","ex-presentation","ex-lie","ex-move","ex-plac-os","ex-plac-site","ex-plac-edge","ex-cord","ex-plac-shape","ex-cx","ex-fhr"].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
       el.addEventListener("change", renderExamWrap);
@@ -10461,9 +11846,29 @@
     if (snap.approach) lines.push("Approach: " + snap.approach);
     if (examIsOb(id) || snap.gaLabel || snap.efw) {
       lines.push("GA " + (snap.gaLabel || "\u2014"));
+      var multiOn = snap.multi && snap.multi.flags && snap.multi.flags.screened && snap.multi.fetuses && snap.multi.fetuses.length;
+      if (multiOn) {
+        lines.push("Fetuses: " + (snap.fetuses || "multiple") + ". One EDD for the pregnancy.");
+        snap.multi.fetuses.forEach(function (f) {
+          var bit = f.id || "Fetus";
+          if (f.cardiac === "absent") bit += ": no cardiac activity";
+          if (f.crl != null) bit += ", CRL " + f.crl + " mm";
+          if (f.nt != null) bit += ", NT " + f.nt + " mm";
+          if (f.bpd != null) bit += ", BPD " + f.bpd + " cm";
+          if (f.hc != null) bit += ", HC " + f.hc + " cm";
+          if (f.ac != null) bit += ", AC " + f.ac + " cm";
+          if (f.fl != null) bit += ", FL " + f.fl + " cm";
+          if (f.grams != null) bit += ", EFW " + Math.round(f.grams) + " g";
+          if (f.anatomy === "anomaly suspected") bit += ", anomaly suspected";
+          if (f.cord === "velamentous" || f.cord === "marginal") bit += ", " + f.cord + " cord";
+          if (f.meanWeeks != null) bit += ", Hadlock mean " + wdWords(f.meanWeeks) + " (not an EDD)";
+          lines.push(bit);
+        });
+      } else {
       if (snap.efw) lines.push("EFW " + snap.efw + " g" + (snap.efwPct != null ? " (" + ordinal(snap.efwPct) + ")" : ""));
       if (snap.ac != null) lines.push("AC " + Number(snap.ac).toFixed(1) + " cm");
       if (snap.hc != null) lines.push("HC " + Number(snap.hc).toFixed(1) + " cm");
+      }
       if (snap.afVal != null) lines.push("Fluid " + snap.afVal);
       if (snap.uapi != null) lines.push("UA-PI " + snap.uapi);
       if (snap.cpr != null) lines.push("CPR " + Number(snap.cpr).toFixed(2));
@@ -10545,6 +11950,15 @@
       else if (snap.chorion === "MCMA") add("Monoamniotic pregnancy is a high-risk documentation. Local multiple-pregnancy protocol applies. This app does not time delivery.");
       else if (snap.chorion === "MCDA") add(snap.multi && snap.multi.flags && snap.multi.flags.screened ? "Monochorionic surveillance card was used. Read the Quintero, ISUOG, and Delphi lines. This is not a treatment order." : "Monochorionic diamniotic pregnancy needs a local multiple-pregnancy pathway. Fill the surveillance card if both fetuses were measured. This is not a Quintero stage.");
       if (!(snap.multi && snap.multi.flags && snap.multi.flags.screened)) add("This form stores one fetus until the surveillance card is filled. Discordance needs both weights.");
+    }
+    if (snap.multi && snap.multi.flags && snap.multi.flags.screened) {
+      var mf = snap.multi.flags;
+      if (mf.crlDiscordance != null && mf.crlDiscordance >= 10) add("CRL discordance is at or above 10%. ISUOG 2025: discuss with a fetal-medicine expert. Not a second EDD.");
+      if (mf.discordance != null && mf.discordance >= 25) add("EFW discordance is at or above 25%. ISUOG 2025 referral threshold. Not a delivery order from this app.");
+      else if (mf.discordance != null && mf.discordance >= 20) add("EFW discordance is at or above 20%. Closer monitoring in the ISUOG and NICE bands. Below the 25% referral threshold.");
+      if (mf.sfgr) add("Selective-growth pattern is met on the singleton chart. Local multiple-pregnancy pathway. Not a Quintero stage.");
+      if (mf.taps) add("Delphi TAPS pattern is met. Not a haemoglobin and not a treatment order.");
+      if (mf.quintero) add("Quintero fluid pattern is met. This app does not assign a stage.");
     }
     if (id === "hb" || id === "abdomen") {
       if (snap.gbWall != null && snap.gbFast && snap.gbWall > 3) add("Fasting gallbladder wall is above 3 mm. Thickness is nonspecific. Not a cholecystitis diagnosis.");
@@ -10767,12 +12181,34 @@
     ok("Synonym IUGR", smartJumpHits("IUGR").some(function (h) { return /FGR/.test(h.name); }), (smartJumpHits("IUGR")[0] || {}).name);
     var twinImp = suggestedImpression({ exam: "twins", fetuses: "Twins", cardiac: "present", chorion: "MCDA", efw: 1800, efwPct: 12, gaLabel: "32w0d" });
     ok("Twin impression refuses TTTS scoring", /does not calculate intertwin discordance/.test(twinImp) && /monochorionic diamniotic/.test(twinImp), twinImp.slice(0, 160));
+    ok("Screened twin impression names each fetus", (function () {
+      var imp = suggestedImpression({ exam: "twins", fetuses: "Twins", chorion: "DCDA", cardiac: "present", gaLabel: "28w0d", multi: { flags: { screened: true }, reportBits: ["One EDD. Larger CRL.", "Fetus B · CRL 68 mm · sets the comparison.", "EFW discordance 21.1%."] } });
+      return imp.indexOf("does not calculate intertwin discordance") === -1 && imp.indexOf("21.1%") !== -1 && /dichorionic diamniotic/.test(imp);
+    })(), "");
     ok("Discordance 1900 vs 1500", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 224, fetuses: [{ id: "A", grams: 1900, how: "entered weight", dvp: null, mca: null, bladder: "", ua: "" }, { id: "B", grams: 1500, how: "entered weight", dvp: null, mca: null, bladder: "", ua: "" }] }); return r.flags.discordance != null && Math.abs(r.flags.discordance - (400 / 1900 * 100)) < 0.05 && r.lines.join(" ").indexOf("TTTS") !== -1; })(), "");
     ok("Quintero met, ISUOG after 20 weeks not met at 9 cm", (function () { var r = multipleSurveillance({ chorion: "MCDA", gaDays: 22 * 7, fetuses: [{ id: "A", grams: null, dvp: 1.5, mca: null, bladder: "visible", ua: "" }, { id: "B", grams: null, dvp: 9, mca: null, bladder: "visible", ua: "" }] }); return r.flags.quintero === true && r.flags.isuogFluid === false; })(), "");
     ok("ISUOG before 20 weeks uses 8 cm", (function () { var r = multipleSurveillance({ chorion: "MCDA", gaDays: 18 * 7, fetuses: [{ id: "A", grams: null, dvp: 1.5, mca: null, bladder: "", ua: "" }, { id: "B", grams: null, dvp: 8, mca: null, bladder: "", ua: "" }] }); return r.flags.quintero === true && r.flags.isuogFluid === true; })(), "");
     ok("DCDA fluid is not TTTS", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 140, fetuses: [{ id: "A", grams: null, dvp: 1, mca: 1.8, bladder: "", ua: "" }, { id: "B", grams: null, dvp: 10, mca: 0.7, bladder: "", ua: "" }] }); var t = r.lines.join(" "); return t.indexOf("Do not call a dichorionic fluid difference TTTS") !== -1 && t.indexOf("TAPS is not a dichorionic") !== -1 && r.flags.taps === false; })(), "");
     ok("Delphi TAPS 1.6 and 0.7", (function () { var r = multipleSurveillance({ chorion: "MCDA", fetuses: [{ id: "A", grams: null, dvp: null, mca: 1.6, bladder: "", ua: "" }, { id: "B", grams: null, dvp: null, mca: 0.7, bladder: "", ua: "" }] }); return r.flags.taps === true; })(), "");
     ok("Older 1.6 and 0.9 is not Delphi TAPS", (function () { var r = multipleSurveillance({ chorion: "MCDA", fetuses: [{ id: "A", grams: null, dvp: null, mca: 1.6, bladder: "", ua: "" }, { id: "B", grams: null, dvp: null, mca: 0.9, bladder: "", ua: "" }] }); return r.flags.taps === false && r.lines.join(" ").indexOf("not used as a diagnosis") !== -1; })(), "");
+    ok("Larger CRL is chosen, not the smaller", (function () { var s = selectMultipleDating([{ id: "Fetus A", crl: 55, living: true, hc: 8 }, { id: "Fetus B", crl: 70, living: true, hc: 7 }]); return s.largerCrl && s.largerCrl.id === "Fetus B" && s.largerCrl.crl === 70; })(), "");
+    ok("A later head circumference outranks a leftover CRL", (function () {
+      var s = selectMultipleDating([{ id: "Fetus A", crl: 60, crlDays: gaFromCRLmm(60), living: true, hc: 16, hcWeeks: gaHC(16) }, { id: "Fetus B", crl: 55, crlDays: gaFromCRLmm(55), living: true, hc: 14.8, hcWeeks: gaHC(14.8) }]);
+      return s.largerCrl == null && s.crlHeld === true && s.largerHc && s.largerHc.id === "Fetus A" && s.largerHc.hcWeeks >= 14;
+    })(), "");
+    ok("Same-scan CRL still outranks a similar head circumference", (function () {
+      var s = selectMultipleDating([{ id: "Fetus A", crl: 62, crlDays: gaFromCRLmm(62), living: true, hc: 8.2, hcWeeks: gaHC(8.2) }, { id: "Fetus B", crl: 70, crlDays: gaFromCRLmm(70), living: true, hc: 8.6, hcWeeks: gaHC(8.6) }]);
+      return s.crlHeld !== true && s.largerCrl && s.largerCrl.id === "Fetus B";
+    })(), "");
+    ok("CRL above 84 mm yields to the larger HC", (function () { var s = selectMultipleDating([{ id: "Fetus A", crl: 90, living: true, hc: 12 }, { id: "Fetus B", crl: 60, living: true, hc: 9 }]); return s.largerCrl == null && s.crlOverWindow === true && s.largerHc && s.largerHc.id === "Fetus A"; })(), "");
+    ok("A fetus without cardiac activity is not the dating CRL", (function () { var s = selectMultipleDating([{ id: "Fetus A", crl: 80, cardiac: "absent", living: false }, { id: "Fetus B", crl: 61, living: true }]); return s.largerCrl && s.largerCrl.id === "Fetus B"; })(), "");
+    ok("CRL discordance uses the larger as denominator", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 90, fetuses: [{ id: "Fetus A", crl: 50, crlDays: 80, grams: null, dvp: null, mca: null, bladder: "", ua: "", living: true }, { id: "Fetus B", crl: 60, crlDays: 86, grams: null, dvp: null, mca: null, bladder: "", ua: "", living: true }] }); var t = r.lines.join(" "); return r.flags.crlDiscordance != null && Math.abs(r.flags.crlDiscordance - (10 / 60 * 100)) < 0.05 && t.indexOf("16.7%") !== -1 && t.indexOf("Not a second EDD") !== -1; })(), "");
+    ok("DCTA without a named pair does not call TTTS", (function () { var r = multipleSurveillance({ chorion: "DCTA", gaDays: 22 * 7, fetuses: [{ id: "Fetus A", pairKey: "A", dvp: 1, mca: 1.7, living: true }, { id: "Fetus B", pairKey: "B", dvp: 11, mca: 0.7, living: true }, { id: "Fetus C", pairKey: "C", dvp: 4, mca: 1, living: true }] }); var t = r.lines.join(" "); return r.flags.quintero === false && r.flags.taps === false && t.indexOf("does not know which two") !== -1; })(), "");
+    ok("DCTA reads TTTS and TAPS on the named pair only", (function () { var r = multipleSurveillance({ chorion: "DCTA", mcPair: "AB", gaDays: 22 * 7, fetuses: [{ id: "Fetus A", pairKey: "A", dvp: 1.5, mca: 1.7, living: true }, { id: "Fetus B", pairKey: "B", dvp: 11, mca: 0.7, living: true }, { id: "Fetus C", pairKey: "C", dvp: 4, mca: 1.0, living: true }] }); var t = r.lines.join(" "); return r.flags.quintero === true && r.flags.taps === true && t.indexOf("Fetus A and Fetus B") !== -1 && t.indexOf("Fetus C") === -1 || (r.flags.quintero === true && r.flags.taps === true && t.indexOf("monochorionic pair") !== -1); })(), "");
+    ok("CPR below 1 is named on that fetus", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 224, fetuses: [{ id: "Fetus A", uapi: 1.4, mcapi: 1.0, living: true }, { id: "Fetus B", uapi: 0.9, mcapi: 1.6, living: true }] }); var t = r.lines.join(" "); return t.indexOf("Fetus A CPR") !== -1 && t.indexOf("below 1.0") !== -1; })(), "");
+    ok("Atrium 13 mm is moderate on that fetus only", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 140, fetuses: [{ id: "Fetus A", atrium: 13, living: true }, { id: "Fetus B", atrium: 6, living: true }] }); var t = r.lines.join(" "); return t.indexOf("Moderate ventriculomegaly") !== -1 && t.indexOf("Fetus B: atrium") === -1; })(), "");
+    ok("Dichorionic twin chart does not replace the singleton 10th", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 32 * 7, fetuses: [{ id: "Fetus A", grams: 2000, living: true }, { id: "Fetus B", grams: 1600, living: true }] }); var t = r.lines.join(" "); var b = null; r.fetuses.forEach(function (f) { if (f.grams === 1600) b = f; }); return b && b.twinBand && b.twinBand.indexOf("10th") !== -1 && t.indexOf("not below the 10th on the dichorionic twin chart") !== -1; })(), "");
+    ok("Triplets are not plotted on the twin chart", (function () { var r = multipleSurveillance({ chorion: "TCTA", gaDays: 32 * 7, fetuses: [{ id: "Fetus A", grams: 2000, living: true }, { id: "Fetus B", grams: 1600, living: true }, { id: "Fetus C", grams: 1800, living: true }] }); return r.lines.join(" ").indexOf("not applied to three fetuses") !== -1 && !r.fetuses.some(function (f) { return f.twinBand; }); })(), "");
     ok("PSA density has no invented band name", (function () { var d = psaDensity(4, 40); return d != null && Math.abs(d - 0.1) < 1e-9; })(), "");
     ok("Twin Hadlock is not divided twice", (function () { var direct = hadlockEFW(9.2, 33, 32, 7.2); var via = fetusWeightFrom(null, 9.2, 33, 32, 7.2); return direct && via && Math.abs(direct.grams - via.grams) < 0.01; })(), "");
     ok("Edge 15 mm is low-lying not a caesarean order", (function () { var t = placentaContext({ edgeMm: 15, os: "" }).join(" "); return t.indexOf("low-lying") !== -1 && t.indexOf("automatic") === -1; })(), "");
@@ -10781,6 +12217,40 @@
     ok("Doppler impression names DV a-wave", /a-wave/.test(dopImp) && /uterine-artery/.test(dopImp), dopImp.slice(0, 160));
     var cmpI = intervalCompare({ date: "2026-10-09T00:00:00.000Z", efw: 2000, uapi: 1.4, cpr: 0.9 }, { date: "2026-09-25T00:00:00.000Z", efw: 1600, uapi: 1.1, cpr: 1.2 });
     ok("Interval CPR and UA deltas", cmpI && Math.abs(cmpI.dCpr - (0.9 - 1.2)) < 0.001 && Math.abs(cmpI.dUapi - 0.3) < 0.001 && cmpI.days === 14, cmpI && ("days " + cmpI.days));
+    ok("Each fetus interval names the fall and the discordance", (function () {
+      var html = fetusIntervalSection([
+        { date: "2026-09-01T00:00:00.000Z", fetusCount: 2, litter: [
+          { key: "A", label: "Fetus A", grams: 900, pct: 40, ac: 22, living: true },
+          { key: "B", label: "Fetus B", grams: 880, pct: 35, ac: 21.5, living: true }
+        ] },
+        { date: "2026-09-22T00:00:00.000Z", fetusCount: 2, litter: [
+          { key: "A", label: "Fetus A", grams: 1400, pct: 45, ac: 26, living: true },
+          { key: "B", label: "presenting", grams: 1000, pct: 8, ac: 23, living: true }
+        ] }
+      ]);
+      return html.indexOf("presenting") !== -1 && html.indexOf("fell by 27") !== -1 && html.indexOf("FGR diagnosis") !== -1 && html.indexOf("2.2%") !== -1 && html.indexOf("28.6%") !== -1;
+    })(), "");
+    ok("A missing letter is named, and a demise is not a growth trend", (function () {
+      var html = fetusIntervalSection([
+        { date: "2026-09-01T00:00:00.000Z", fetusCount: 3, litter: [
+          { key: "A", label: "Fetus A", grams: 900, pct: 40, living: true },
+          { key: "B", label: "Fetus B", grams: 800, pct: 30, living: true },
+          { key: "C", label: "Fetus C", grams: 850, pct: 32, living: true }
+        ] },
+        { date: "2026-09-22T00:00:00.000Z", fetusCount: 3, litter: [
+          { key: "A", label: "Fetus A", grams: 1200, pct: 20, living: false },
+          { key: "B", label: "Fetus B", grams: 1400, pct: 40, living: true }
+        ] }
+      ]);
+      return html.indexOf("Fetus C was measured") !== -1 && html.indexOf("without cardiac activity") !== -1 && html.indexOf("Fetus A centile fell") === -1;
+    })(), "");
+    ok("An old twin save without a litter still compares", (function () {
+      var html = fetusIntervalSection([
+        { date: "2026-09-01T00:00:00.000Z", gaDays: 196, multi: { fetuses: [{ id: "Fetus A", pairKey: "A", grams: 1100, ac: 24, living: true }, { id: "Fetus B", pairKey: "B", grams: 1000, ac: 23, living: true }] } },
+        { date: "2026-09-22T00:00:00.000Z", gaDays: 217, multi: { fetuses: [{ id: "Fetus A", pairKey: "A", grams: 1500, ac: 27, living: true }, { id: "Fetus B", pairKey: "B", grams: 1200, ac: 25, living: true }] } }
+      ]);
+      return html.indexOf("Fetus A") !== -1 && html.indexOf("Δ EFW") !== -1 && html.indexOf("FGR diagnosis") !== -1;
+    })(), "");
     var nichdEx = nichd2017Weeks(8.2, 30.1, 30, 6.2);
     ok("NICHD Table 2 uses millimetres", nichdEx && Math.abs(nichdEx.weeks - 31.2426) < 0.01 && !nichdEx.implausible, nichdEx && nichdEx.weeks.toFixed(3));
     ok("NICHD refuses a missing femur", nichd2017Weeks(8.2, 30.1, 30, null) == null, "");
@@ -10847,6 +12317,7 @@
     var tabs = document.querySelectorAll(".tab");
     var views = { biometry: document.getElementById("view-biometry"), dating: document.getElementById("view-dating"), doppler: document.getElementById("view-doppler"), home: document.getElementById("view-home"), exam: document.getElementById("view-exam"), report: document.getElementById("view-report"), organ: document.getElementById("view-organ"), log: document.getElementById("view-log"), anomaly: document.getElementById("view-anomaly"), quiz: document.getElementById("view-quiz"), follicle: document.getElementById("view-follicle"), refs: document.getElementById("view-refs"), about: document.getElementById("view-about"), impress: document.getElementById("view-impress"), weeks: document.getElementById("view-weeks"), protocol: document.getElementById("view-protocol"), cases: document.getElementById("view-cases") };
     function showTab(name) {
+      currentTabName = name || "home";
       tabs.forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-tab") === name); });
       Object.keys(views).forEach(function (k) { views[k].classList.toggle("active", k === name); });
       var dockFor = { home: "home", exam: "exam", report: "report", dating: "measure", biometry: "measure", doppler: "measure", anomaly: "measure", follicle: "measure", organ: "measure", impress: "measure", log: "more", quiz: "more", cases: "more", refs: "more", about: "more", protocol: "more", weeks: "more" };
@@ -10884,6 +12355,10 @@
       } else if (name === "exam") {
         if (!window.__examReady) { window.__examReady = true; wireExam(); }
         renderExamWrap();
+        try { paintMulti(); } catch (ePm) {}
+      } else if (name === "biometry" || name === "dating") {
+        try { renderBiometry(); } catch (eBioTab) {}
+        try { renderDating(); } catch (eDateTab) {}
       }
       document.querySelectorAll(".bottom-nav [data-go]").forEach(function (b) {
         b.classList.toggle("on", b.getAttribute("data-go") === name);
@@ -10894,6 +12369,15 @@
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { showTab(t.getAttribute("data-tab")); }); });
     window.__showTab = showTab;
+    window.assignGestationalAge = assignGestationalAge;
+    window.gaFromCRLmm = gaFromCRLmm;
+    window.gaHC = gaHC;
+    window.multipleSurveillance = multipleSurveillance;
+    window.readFetusSlot = readFetusSlot;
+    window.readOneFetus = readOneFetus;
+    window.fetusNumber = fetusNumber;
+    window.selectMultipleDating = selectMultipleDating;
+    window.setPregnancyCount = setPregnancyCount;
     window.__startExam = startExam;
     window.__loadDraft = loadDraft;
     window.__saveDraftNow = saveDraftNow;
@@ -10914,6 +12398,34 @@
     window.__calendarHtml = calendarHtml;
     window.__thresholdsCsv = thresholdsCsvText;
     initChrome();
+    try { buildMultiSlots(); } catch (eSlots) {}
+    var bioOrder = document.getElementById("bio-order");
+    if (bioOrder) bioOrder.addEventListener("change", function () { setPregnancyCount(parseInt(bioOrder.value, 10) || 1); });
+    ["ex-fetuses", "ex-order-n"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("change", function () {
+        var mode = val("ex-fetuses");
+        var n = 1;
+        if (mode === "Twins") n = 2;
+        else if (mode === "Triplets") n = 3;
+        else if (mode === "Quadruplets") n = 4;
+        else if (mode === "Higher-order") n = parseInt(val("ex-order-n") || "3", 10) === 4 ? 4 : 3;
+        setPregnancyCount(n);
+      });
+    });
+    var chorA = document.getElementById("ex-chorion");
+    var chorB = document.getElementById("multi-chorion");
+    if (chorA && chorB) {
+      function pushChor(src, dst) {
+        if (dst.value !== src.value) dst.value = src.value;
+        try { onMultiEdit(); } catch (eCh) {}
+      }
+      chorA.addEventListener("change", function () { pushChor(chorA, chorB); });
+      chorB.addEventListener("change", function () { pushChor(chorB, chorA); });
+    }
+    var pairSel = document.getElementById("multi-pair");
+    if (pairSel) pairSel.addEventListener("change", function () { try { onMultiEdit(); } catch (ePair) {} });
     showTab("home");
     document.querySelectorAll(".bottom-nav [data-go]").forEach(function (b) {
       b.addEventListener("click", function () { showTab(b.getAttribute("data-go")); });
@@ -10993,7 +12505,15 @@
       var el = document.getElementById(id);
       if (!el) return;
       var evt = (el.type === "checkbox" || el.tagName === "SELECT" || el.type === "date") ? "change" : "input";
-      el.addEventListener(evt, function () { renderClinical(); try { scheduleDraft(); } catch (eS) {} });
+      el.addEventListener(evt, function () {
+        if (id === "d-x-twins") {
+          var keep = parseInt(val("bio-order") || "1", 10);
+          setPregnancyCount(el.checked ? (keep >= 3 ? keep : 2) : 1);
+          return;
+        }
+        renderClinical();
+        try { scheduleDraft(); } catch (eS) {}
+      });
     });
 
     renderClinical();
@@ -11006,7 +12526,7 @@
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     if (window.self !== window.top) return;
-    var reg = function () { navigator.serviceWorker.register("sw.js").catch(function () {}); };
+    var reg = function () { navigator.serviceWorker.register("sw.js?v=58").catch(function () {}); };
     if ("requestIdleCallback" in window) requestIdleCallback(reg, { timeout: 2500 });
     else setTimeout(reg, 800);
   });

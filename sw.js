@@ -1,5 +1,11 @@
-const CACHE_NAME = "babsinogen-v50";
+const CACHE_NAME = "babsinogen-v58";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./logo-mark.png", "./favicon.svg", "./apple-touch.png"];
+
+function wantsFresh(request) {
+  var url = new URL(request.url);
+  if (request.mode === "navigate") return true;
+  return url.pathname.endsWith("/") || url.pathname.endsWith(".html") || url.pathname.endsWith("/sw.js");
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -19,16 +25,24 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  if (wantsFresh(event.request)) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        var copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
-      return fetch(event.request)
-        .then((response) => {
-          var copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          return response;
-        })
-        .catch(() => cached);
+      return fetch(event.request).then((response) => {
+        var copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      }).catch(() => cached);
     })
   );
 });
