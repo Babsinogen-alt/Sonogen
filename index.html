@@ -1706,7 +1706,7 @@
           <li><strong>CRL and NT discordance.</strong> (larger − smaller) / larger. CRL discordance ≥10%, or NT discordance ≥20%, should be discussed with a fetal-medicine expert (ISUOG 2025). Not a second EDD.</li>
           <li><strong>Interval, each fetus.</strong> Follow-up examinations on the same folder are matched by letter (A, B, C, D), not by a typed name such as presenting. Centiles use the pregnancy age and the singleton Hadlock 1991 chart. A fall of 20 centile points is shown, as on a singleton. No gram-per-day rule is applied. It is not an FGR diagnosis and not a second EDD.</li>
           <li><strong>EFW discordance.</strong> (larger − smaller) / larger. ISUOG 2025: about 20% marks higher risk of adverse outcome, and ≥25% is the referral threshold. Conventional selective growth restriction is one fetus with EFW below the 10th centile and discordance ≥25%. NICE NG137 uses the same 25% plus <10th pattern for referral in dichorionic twins and trichorionic triplets, and increases monitoring at 20% or if any baby is under the 10th. ACOG Practice Bulletin 231, as cited by ISUOG 2025, describes discordant growth across about 15–25% rather than one cutoff. The referral centile in this app stays the singleton Hadlock 1991 table. A dichorionic pregnancy also shows the NICHD dichorionic twin chart (Grantz et al., <em>AJOG</em> 2016; 10th, 25th, 50th, 75th, 90th, 15–38 weeks). That chart is a United States reference, not a monochorionic chart and not a Nigerian standard, and it does not replace the singleton 10th in the referral sentence. No monochorionic twin chart is loaded. Discordance is not TTTS and not a delivery order.</li>
-          <li><strong>Delphi selective growth.</strong> Khalil et al., <em>UOG</em> 2019: one fetus under the 3rd centile is a solitary criterion. Otherwise monochorionic pregnancies need two of EFW <10th, abdominal circumference <10th, discordance ≥25%, and UA-PI >95th in the smaller fetus. Dichorionic pregnancies need two of EFW <10th, discordance ≥25%, and UA-PI >95th. This app does not have an abdominal-circumference centile, so that item is not counted. UA-PI uses INTERGROWTH-21st (Drukker et al., <em>AJOG</em> 2020). Not a delivery time.</li>
+          <li><strong>Delphi selective growth.</strong> Khalil et al., <em>UOG</em> 2019: one fetus under the 3rd centile is a solitary criterion. Otherwise monochorionic pregnancies need two of EFW <10th, abdominal circumference <10th, discordance ≥25%, and UA-PI >95th in the smaller fetus. Dichorionic pregnancies need two of EFW <10th, discordance ≥25%, and UA-PI >95th. The abdominal item uses Chitty et al., <em>Br J Obstet Gynaecol</em> 1994;101:125–131 (directly measured circumference; mean −85.84 + 11.92×weeks − 0.0007902×weeks³, SD −3.080 + 0.6018×weeks, millimetres, 12–42 weeks). It is a UK singleton chart, not a twin chart and not a Nigerian standard, and it is not counted in a dichorionic pregnancy. UA-PI uses INTERGROWTH-21st (Drukker et al., <em>AJOG</em> 2020). Not a delivery time.</li>
           <li><strong>Dichorionic triamniotic triplets.</strong> TTTS and TAPS can affect only the monochorionic pair. Until that pair is named, this app does not call either diagnosis for the whole pregnancy. After the pair is named, fluid and MCA-PSV are read on those two fetuses only.</li>
           <li><strong>TTTS fluid.</strong> Quintero et al., <em>J Perinatol</em> 1999: deepest pocket ≤2 cm and ≥8 cm at any gestation (North American / ACOG / SMFM pattern). ISUOG twin guideline (Khalil et al., <em>UOG</em> 2016) and Eurofetus: recipient ≥8 cm at or before 20 weeks and ≥10 cm after 20 weeks. This app states both. It does not assign a Quintero stage.</li>
           <li><strong>TAPS.</strong> Khalil et al., Delphi consensus, <em>UOG</em> 2020: MCA-PSV ≥1.5 MoM and ≤0.8 MoM, or an intertwin difference ≥1.0 MoM. An older >1.5 / <1.0 pair is not used as a diagnosis here. Not a haemoglobin.</li>
@@ -1763,6 +1763,7 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.24.0</strong> (1 Nov 2026) — Abdominal circumference now has a centile (Chitty 1994, 12–42 weeks). In a monochorionic pregnancy that centile counts toward the Delphi selective-growth items. It does not count in a dichorionic pregnancy, and it does not replace the Hadlock weight centile.</li>
         <li><strong>3.23.0</strong> (30 Oct 2026) — A saved follow-up compares each fetus by letter: weight, centile, AC, HC, FL, and Doppler. A 20-point centile fall is named on that fetus. It is not an FGR diagnosis. Twins, triplets, and quadruplets are chosen by those names on Measure and under Exam → Obstetric context.</li>
         <li><strong>3.22.1</strong> (27 Oct 2026) — On a dichorionic pregnancy the weight card shows each fetus on the NICHD 2016 twin chart as well as the singleton centile, and draws the twin 10th, 50th, and 90th on the growth curve. The referral sentence is unchanged.</li>
         <li><strong>3.22.0</strong> (27 Oct 2026) — Dichorionic triamniotic triplets: name the two fetuses that share a placenta, and TTTS or TAPS is read on that pair only. Each fetus has UA-PI, MCA-PI, CPR, ductus venosus, and a structure checklist. A dichorionic pregnancy also shows the NICHD 2016 twin chart beside the singleton centile. The referral rule still uses the singleton 10th.</li>
@@ -1809,7 +1810,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Sonogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Sonogen 3.23.0 · Clinical sonography companion. One menu. Singleton formulas unchanged.</p>
+    <p class="note">Sonogen 3.24.0 · Clinical sonography companion. One menu. Singleton formulas unchanged.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -2365,6 +2366,15 @@
         if (pct && !pct.outOfRange) pctById[f.id] = pct.percentile;
       });
     }
+    var acPctById = {};
+    if (gaW != null) {
+      fetuses.forEach(function (f) {
+        if (!f || f.ac == null) return;
+        var hit = null;
+        try { hit = chittyAcCentile(gaW, f.ac); } catch (eAc) { hit = null; }
+        if (hit && !hit.outOfRange) acPctById[f.id] = hit.percentile;
+      });
+    }
     if (weights.length >= 2) {
       var wr = maxMin(weights, function (f) { return f.grams; });
       var disc = discOf(wr.hi.grams, wr.lo.grams);
@@ -2404,20 +2414,27 @@
         var uaHigh = !!(smallF.uapi != null && p95ua != null && gaW <= 40 && smallF.uapi > p95ua && smallF.ua !== "AEDF" && smallF.ua !== "REDF");
         var eBelow10 = pctById[smallF.id] != null && pctById[smallF.id] < 10;
         var eBelow3 = pctById[smallF.id] != null && pctById[smallF.id] < 3;
+        var mcDelphi = chorion === "MCDA" || chorion === "MCMA" || chorion === "MCTA";
+        var acBelow10 = acPctById[smallF.id] != null && acPctById[smallF.id] < 10;
         var bitsD = [];
         if (eBelow10) bitsD.push("EFW of " + smallF.id + " under the 10th on the singleton chart");
+        if (mcDelphi && acBelow10) bitsD.push("AC of " + smallF.id + " under the 10th on the Chitty 1994 chart");
         if (disc >= 25) bitsD.push("discordance at or above 25%");
         if (uaHigh) bitsD.push("UA-PI of " + smallF.id + " above the 95th");
-        var mcDelphi = chorion === "MCDA" || chorion === "MCMA" || chorion === "MCTA";
         if (eBelow3) {
           flags.delphiSfgr = true;
-          lines.push("Delphi 2019 solitary selective-growth criterion: " + smallF.id + " is under the 3rd centile on the singleton chart. Abdominal-circumference centile was not counted. Not a delivery time.");
+          lines.push("Delphi 2019 solitary selective-growth criterion: " + smallF.id + " is under the 3rd centile on the singleton chart. Not a delivery time.");
           deviate("danger", "Delphi solitary criterion: " + smallF.id + " is under the 3rd centile on the singleton chart. Not a delivery time.");
         } else if (bitsD.length >= 2) {
           flags.delphiSfgr = true;
-          lines.push("Delphi 2019 selective-growth pattern (" + (mcDelphi ? "monochorionic" : "dichorionic") + "): " + bitsD.join("; ") + ". Abdominal-circumference centile was not available, so it was not counted. Not a delivery time.");
+          lines.push("Delphi 2019 selective-growth pattern (" + (mcDelphi ? "monochorionic" : "dichorionic") + "): " + bitsD.join("; ") + ". Not a delivery time.");
           deviate("warn", "Delphi 2019 selective-growth pattern: " + bitsD.join("; ") + ". Not a delivery time.");
-        } else if (mcDelphi && bitsD.length === 1) lines.push("Delphi selective growth is not met on the items available. Abdominal-circumference centile was not counted.");
+        } else if (mcDelphi) {
+          var only = bitsD.length ? ("Only one item is present: " + bitsD[0] + ".") : "EFW is not under the 10th, AC is not under the 10th, discordance is under 25%, and UA-PI is not above the 95th.";
+          if (smallF.ac == null) only += " AC of " + smallF.id + " was not entered, so that item was not counted.";
+          else if (gaW < 12 || gaW > 42) only += " The Chitty abdominal chart is 12–42 weeks, so the AC item was not counted.";
+          lines.push("Delphi selective growth is not met. " + only + " Not a delivery time.");
+        }
       }
     } else if (weights.length === 1) lines.push("Only one fetal weight is entered. Discordance needs at least two.");
 
@@ -2452,7 +2469,7 @@
       if (f.presentation) bits.push(f.presentation);
       if (f.bpd != null) bits.push("BPD " + fmtMeasure(f.bpd) + " cm");
       if (f.hc != null) bits.push("HC " + fmtMeasure(f.hc) + " cm");
-      if (f.ac != null) bits.push("AC " + fmtMeasure(f.ac) + " cm");
+      if (f.ac != null) bits.push("AC " + fmtMeasure(f.ac) + " cm" + (acPctById[f.id] != null ? " (" + ordinal(acPctById[f.id]) + ", Chitty)" : ""));
       if (f.fl != null) bits.push("FL " + fmtMeasure(f.fl) + " cm");
       if (f.grams != null) bits.push("EFW " + Math.round(f.grams) + " g" + (f.how ? " (" + f.how + ")" : ""));
       if (pctById[f.id] != null) bits.push(Math.round(pctById[f.id]) + "th centile");
@@ -2690,6 +2707,7 @@
       row("BPD", function (f) { return f.bpd != null ? fmtMeasure(f.bpd) : "—"; });
       row("HC", function (f) { return f.hc != null ? fmtMeasure(f.hc) : "—"; });
       row("AC", function (f) { return f.ac != null ? fmtMeasure(f.ac) : "—"; });
+      row("AC centile", function (f) { return acPctById[f.id] != null ? ordinal(acPctById[f.id]) : "—"; });
       row("FL", function (f) { return f.fl != null ? fmtMeasure(f.fl) : "—"; });
       row("EFW", function (f) { return f.grams != null ? Math.round(f.grams).toLocaleString() + " g" : "—"; });
       row("Centile", function (f) { return pctById[f.id] != null ? ordinal(pctById[f.id]) : "—"; });
@@ -2731,7 +2749,7 @@
       });
       deviations.forEach(function (d) { impressionBits.push(d.text); });
       html += screenLines.map(function (l) { return '<p class="note">' + fEsc(l) + "</p>"; }).join("");
-      html += '<p class="note">The centile row is the singleton Hadlock 1991 chart. On a dichorionic pregnancy the twin-chart row is the NICHD 2016 dichorionic reference (Grantz). Neither is a Nigerian twin chart. No monochorionic twin chart is loaded.</p>';
+      html += '<p class="note">The weight centile is the singleton Hadlock 1991 chart. The AC centile is Chitty 1994, a UK singleton chart, and it counts only in a monochorionic Delphi item. On a dichorionic pregnancy the twin-chart row is the NICHD 2016 dichorionic reference (Grantz). None of these is a Nigerian twin chart. No monochorionic twin chart is loaded.</p>';
     }
     return { lines: lines, flags: flags, html: html, fetuses: fetuses, reportBits: reportBits, impressionBits: impressionBits, deviations: deviations };
   }
@@ -3344,6 +3362,24 @@
     return null;
   }
 
+  function normalCdf(z) {
+    var az = Math.abs(z);
+    var t = 1 / (1 + 0.2316419 * az);
+    var d = 0.3989422804014327 * Math.exp(-z * z / 2);
+    var p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+    return z >= 0 ? 1 - p : p;
+  }
+  function chittyAcCentile(gaWeeks, acCm) {
+    if (gaWeeks == null || acCm == null || !isFinite(gaWeeks) || !isFinite(acCm) || acCm <= 0) return null;
+    if (gaWeeks < 12 || gaWeeks > 42) return { outOfRange: true };
+    var mean = -85.84 + 11.92 * gaWeeks - 0.0007902 * gaWeeks * gaWeeks * gaWeeks;
+    var sd = -3.08 + 0.6018 * gaWeeks;
+    if (!(sd > 0)) return null;
+    var z = (acCm * 10 - mean) / sd;
+    var pct = normalCdf(z) * 100;
+    return { percentile: pct, below10: pct < 10, meanMm: mean, sd: sd, z: z, outOfRange: false };
+  }
+
   function classifyGrowth(pct, grams) {
     var sizeClass, sizeCls;
     if (pct < 10) { sizeClass = pct < 3 ? "Severe SGA (<3rd centile)" : "SGA (<10th centile)"; sizeCls = pct < 3 ? "danger" : "warn"; }
@@ -3750,6 +3786,10 @@
       }
     } else {
       growthHtml += '<p class="empty">Needs EFW (AC+FL) and a GA to classify growth.</p>';
+    }
+    if (ac != null && gaForPct != null) {
+      var acHit = chittyAcCentile(gaForPct, ac);
+      if (acHit && !acHit.outOfRange) growthHtml += '<p class="note">AC ' + ac.toFixed(1) + ' cm is the ' + ordinal(acHit.percentile) + ' (Chitty 1994). This is not the weight centile.</p>';
     }
     set("growth-card", growthHtml);
 
@@ -11376,6 +11416,13 @@
           var gclass = classifyGrowth(pctRes.percentile, f.grams);
           growthHtml += '<div class="badge ' + gclass.sizeCls + '">' + fEsc(f.id) + " · " + ordinal(pctRes.percentile) + " · " + gclass.sizeClass + "</div>";
         } else if (pctRes && pctRes.outOfRange) growthHtml += '<p class="note">' + fEsc(f.id) + " · singleton centile chart is 24–41 weeks.</p>";
+        if (f.ac != null) {
+          var acHitF = null;
+          try { acHitF = chittyAcCentile(gaW, f.ac); } catch (eAcF) { acHitF = null; }
+          if (acHitF && !acHitF.outOfRange) {
+            growthHtml += '<p class="note">' + fEsc(f.id) + " · AC " + f.ac.toFixed(1) + " cm · " + ordinal(acHitF.percentile) + " (Chitty 1994). Not the weight centile.</p>";
+          }
+        }
         if (dcChartOn) {
           var twinBand = null;
           try { twinBand = nichdDcTwinBand(gaW, f.grams); } catch (eBand) { twinBand = null; }
@@ -12209,6 +12256,25 @@
     ok("Atrium 13 mm is moderate on that fetus only", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 140, fetuses: [{ id: "Fetus A", atrium: 13, living: true }, { id: "Fetus B", atrium: 6, living: true }] }); var t = r.lines.join(" "); return t.indexOf("Moderate ventriculomegaly") !== -1 && t.indexOf("Fetus B: atrium") === -1; })(), "");
     ok("Dichorionic twin chart does not replace the singleton 10th", (function () { var r = multipleSurveillance({ chorion: "DCDA", gaDays: 32 * 7, fetuses: [{ id: "Fetus A", grams: 2000, living: true }, { id: "Fetus B", grams: 1600, living: true }] }); var t = r.lines.join(" "); var b = null; r.fetuses.forEach(function (f) { if (f.grams === 1600) b = f; }); return b && b.twinBand && b.twinBand.indexOf("10th") !== -1 && t.indexOf("not below the 10th on the dichorionic twin chart") !== -1; })(), "");
     ok("Triplets are not plotted on the twin chart", (function () { var r = multipleSurveillance({ chorion: "TCTA", gaDays: 32 * 7, fetuses: [{ id: "Fetus A", grams: 2000, living: true }, { id: "Fetus B", grams: 1600, living: true }, { id: "Fetus C", grams: 1800, living: true }] }); return r.lines.join(" ").indexOf("not applied to three fetuses") !== -1 && !r.fetuses.some(function (f) { return f.twinBand; }); })(), "");
+    ok("Chitty AC mean at 24 weeks is 189.3 mm", (function () {
+      var mid = chittyAcCentile(24, 18.9316);
+      var low = chittyAcCentile(24, 17.0);
+      var at32 = chittyAcCentile(32, 26.97);
+      return mid && Math.abs(mid.meanMm - 189.316) < 0.05 && Math.abs(mid.percentile - 50) < 1.5 && low && low.below10 === true && at32 && Math.abs(at32.percentile - 50) < 1.5 && chittyAcCentile(10, 8).outOfRange === true;
+    })(), "");
+    ok("Monochorionic Delphi counts a small AC with discordance", (function () {
+      var r = multipleSurveillance({ chorion: "MCDA", gaDays: 24 * 7, fetuses: [{ id: "Fetus A", grams: 800, ac: 22, living: true }, { id: "Fetus B", grams: 590, ac: 16.5, living: true }] });
+      return r.flags.delphiSfgr === true && r.lines.join(" ").indexOf("Chitty 1994") !== -1;
+    })(), "");
+    ok("Dichorionic Delphi does not count a small AC", (function () {
+      var r = multipleSurveillance({ chorion: "DCDA", gaDays: 24 * 7, fetuses: [{ id: "Fetus A", grams: 800, ac: 22, living: true }, { id: "Fetus B", grams: 590, ac: 16.5, living: true }] });
+      return r.flags.delphiSfgr !== true && r.lines.join(" ").indexOf("Chitty 1994") === -1;
+    })(), "");
+    ok("One small AC does not meet Delphi alone", (function () {
+      var r = multipleSurveillance({ chorion: "MCDA", gaDays: 32 * 7, fetuses: [{ id: "Fetus A", grams: 2000, ac: 29, living: true }, { id: "Fetus B", grams: 1800, ac: 20, living: true }] });
+      var t = r.lines.join(" ");
+      return r.flags.delphiSfgr !== true && t.indexOf("not met") !== -1 && t.indexOf("Chitty 1994") !== -1;
+    })(), "");
     ok("PSA density has no invented band name", (function () { var d = psaDensity(4, 40); return d != null && Math.abs(d - 0.1) < 1e-9; })(), "");
     ok("Twin Hadlock is not divided twice", (function () { var direct = hadlockEFW(9.2, 33, 32, 7.2); var via = fetusWeightFrom(null, 9.2, 33, 32, 7.2); return direct && via && Math.abs(direct.grams - via.grams) < 0.01; })(), "");
     ok("Edge 15 mm is low-lying not a caesarean order", (function () { var t = placentaContext({ edgeMm: 15, os: "" }).join(" "); return t.indexOf("low-lying") !== -1 && t.indexOf("automatic") === -1; })(), "");
@@ -12526,7 +12592,7 @@
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     if (window.self !== window.top) return;
-    var reg = function () { navigator.serviceWorker.register("sw.js?v=58").catch(function () {}); };
+    var reg = function () { navigator.serviceWorker.register("sw.js?v=59").catch(function () {}); };
     if ("requestIdleCallback" in window) requestIdleCallback(reg, { timeout: 2500 });
     else setTimeout(reg, 800);
   });
