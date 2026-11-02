@@ -1753,7 +1753,7 @@
     <div class="card ref-block" id="privacy-card">
       <h3>Privacy (this device only)</h3>
       <ul>
-        <li>No accounts, no cookies for tracking, no analytics, no cloud sync.</li>
+        <li>No accounts, no cookies for tracking, no analytics, no cloud sync. The same statement is on the public page: <a href="privacy.html">Privacy</a>.</li>
         <li>Calculators run in the browser. Folliculometry folders, quiz/case progress, bookmarks, theme, and text size use localStorage. The optional patient log uses IndexedDB and stays off until per-episode consent is ticked.</li>
         <li>Report-an-error text is copied locally; nothing is uploaded from this app.</li>
         <li>Clearing site data for this origin deletes saved names, numbers, and examinations on this device. Export a backup first if you need to keep them.</li>
@@ -1763,6 +1763,7 @@
     <div class="card ref-block" id="changelog-card">
       <h3>Changelog</h3>
       <ul>
+        <li><strong>3.25.0</strong> (2 Nov 2026) — A public privacy page for the website and the Android download. Records stay on the device. Formulas unchanged.</li>
         <li><strong>3.24.0</strong> (1 Nov 2026) — Abdominal circumference now has a centile (Chitty 1994, 12–42 weeks). In a monochorionic pregnancy that centile counts toward the Delphi selective-growth items. It does not count in a dichorionic pregnancy, and it does not replace the Hadlock weight centile.</li>
         <li><strong>3.23.0</strong> (30 Oct 2026) — A saved follow-up compares each fetus by letter: weight, centile, AC, HC, FL, and Doppler. A 20-point centile fall is named on that fetus. It is not an FGR diagnosis. Twins, triplets, and quadruplets are chosen by those names on Measure and under Exam → Obstetric context.</li>
         <li><strong>3.22.1</strong> (27 Oct 2026) — On a dichorionic pregnancy the weight card shows each fetus on the NICHD 2016 twin chart as well as the singleton centile, and draws the twin 10th, 50th, and 90th on the growth curve. The referral sentence is unchanged.</li>
@@ -1810,7 +1811,7 @@
   <footer class="footer">
     <p class="disclaimer">MEDICAL DISCLAIMER: Sonogen is decision support for qualified healthcare professionals. It does not replace clinical judgement, institutional protocol, or direct patient evaluation. It is not FDA-cleared or CE-marked as a medical device. Reference ranges come from published literature and may not fit every population. Verify critical measurements before acting. Use at professional risk.</p>
     <p>Sources for every formula and threshold live in the References section. No accounts, no tracking, no cloud — data stay on this device (HIPAA/GDPR-minded: clearing site data deletes them).</p>
-    <p class="note">Sonogen 3.24.0 · Clinical sonography companion. One menu. Singleton formulas unchanged.</p>
+    <p class="note">Sonogen 3.25.0 · Clinical sonography companion. One menu. Singleton formulas unchanged.</p>
     <button type="button" class="btn-ghost" id="ref-csv" style="width:auto;margin-top:8px;">Download thresholds CSV</button>
     <p class="note" id="ref-csv-msg">The CSV is the same published bands this app already uses — not a new table.</p>
     <p><button type="button" class="btn-ghost" id="err-open" style="width:auto;">Report an error</button></p>
@@ -12592,7 +12593,7 @@
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     if (window.self !== window.top) return;
-    var reg = function () { navigator.serviceWorker.register("sw.js?v=59").catch(function () {}); };
+    var reg = function () { navigator.serviceWorker.register("sw.js?v=60").catch(function () {}); };
     if ("requestIdleCallback" in window) requestIdleCallback(reg, { timeout: 2500 });
     else setTimeout(reg, 800);
   });
