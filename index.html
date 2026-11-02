@@ -684,6 +684,7 @@
 
   <section class="panel-view active" id="view-home">
     <button type="button" class="btn-primary" id="new-exam">New examination</button>
+    <a class="btn-primary" id="install-android" href="sonogen.apk" download="Sonogen.apk" style="display:block;text-align:center;text-decoration:none;margin-top:8px">Install on this phone</a>
     <div id="home-body"></div>
   </section>
 
@@ -12593,11 +12594,15 @@
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
     if (window.self !== window.top) return;
-    var reg = function () { navigator.serviceWorker.register("sw.js?v=60").catch(function () {}); };
+    var reg = function () { navigator.serviceWorker.register("sw.js?v=61").catch(function () {}); };
     if ("requestIdleCallback" in window) requestIdleCallback(reg, { timeout: 2500 });
     else setTimeout(reg, 800);
   });
 }
+(function () {
+  var install = document.getElementById("install-android");
+  if (install && location.protocol === "file:") install.hidden = true;
+})();
 
 (function () {
   var el = document.getElementById("boot-splash");
